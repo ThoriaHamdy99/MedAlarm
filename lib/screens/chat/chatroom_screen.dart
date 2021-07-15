@@ -1,13 +1,11 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
-import 'package:med_alarm/models/user.dart';
-import 'package:med_alarm/providers/user_provider.dart';
-
-import '../../providers/firebase_provider.dart';
-import '../../custom_widgets/custom_widgets.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
+import '/models/user.dart';
+import '/providers/user_provider.dart';
+import '/providers/firebase_provider.dart';
+import '/custom_widgets/custom_widgets.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +25,7 @@ class ChatRoom extends StatefulWidget {
 }
 
 class _ChatRoomState extends State<ChatRoom> {
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseProvider fbPro = FirebaseProvider.instance;
   String messagesPath;
   File image;
 
@@ -53,21 +51,16 @@ class _ChatRoomState extends State<ChatRoom> {
       setState(() {
         msgBox.textFieldHeight = 50;
       });
-      type == 'text'?
-      await firestore.collection('Messages/$messagesPath/$messagesPath').add({
-        'from': widget.currentUser.uid,
-        'to': widget.otherUser.uid,
-        'type': type,
-        'text': msg,
-        'date': DateTime.now().toIso8601String().toString()
-      }):
-      await firestore.collection('Messages/$messagesPath/$messagesPath').add({
-        'from': widget.currentUser.uid,
-        'to': widget.otherUser.uid,
-        'type': type,
-        'url': url,
-        'date': DateTime.now().toIso8601String().toString()
-      });
+
+      await fbPro.sendMessage(
+        messagesPath,
+        widget.currentUser.uid,
+        widget.otherUser.uid,
+        type,
+        msg,
+        url
+      );
+
       scrollController.animateTo(scrollController.position.minScrollExtent,
           duration: Duration(milliseconds: 1), curve: Curves.easeOut);
     }
@@ -147,10 +140,7 @@ class _ChatRoomState extends State<ChatRoom> {
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: firestore
-                    .collection("Messages/$messagesPath/$messagesPath")
-                    .orderBy('date', descending: true)
-                    .snapshots(),
+                stream: fbPro.getChat(messagesPath),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(

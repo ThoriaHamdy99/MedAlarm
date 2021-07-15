@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_alarm/models/user.dart';
 import 'package:med_alarm/providers/user_provider.dart';
@@ -10,7 +11,6 @@ import '/config/language.dart';
 import '../../models/sign_up_model.dart';
 import 'package:validators/validators.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginFreshSignUp extends StatefulWidget {
   static const id = 'LOGIN_SCREEN';
@@ -42,6 +42,7 @@ class LoginFreshSignUp extends StatefulWidget {
 }
 
 class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
+  FirebaseProvider fbPro = FirebaseProvider.instance;
   final _formKey = new GlobalKey<FormState>();
 
   int _radioSelected;
@@ -70,36 +71,27 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
       String date = this.signUpModel.dob.trim().replaceAll('/', '') + 'T';
       date += '000000';
 
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(auth.user.uid)
-          .set({
-        'email': this.signUpModel.email.trim(),
-        'type': this.signUpModel.type.trim(),
-        'firstname': this.signUpModel.firstname.trim(),
-        'lastname': this.signUpModel.lastname.trim(),
-        'profPicURL': '',
-        'phoneNumber': this.signUpModel.phoneNumber.trim(),
-        'address': this.signUpModel.address.trim(),
-        'dob': Timestamp.fromDate(DateTime.parse(date)),
-      });
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(auth.user.uid)
-          .collection('Contacts')
-          .doc('_init')
-          .set({});
+      await fbPro.insertNewUser(
+        auth.user.uid,
+        this.signUpModel.email.trim(),
+        this.signUpModel.type.trim(),
+        this.signUpModel.firstname.trim(),
+        this.signUpModel.lastname.trim(),
+        this.signUpModel.phoneNumber.trim(),
+        this.signUpModel.address.trim(),
+        date,
+      );
 
-      print('+++++++++++++++++++++++ From Sign Up +++++++++++++++++++++++');
-      print(auth.user.uid);
-      print(this.signUpModel.email.trim());
-      print(this.signUpModel.type.trim());
-      print(this.signUpModel.firstname.trim());
-      print(this.signUpModel.lastname.trim());
-      print(this.signUpModel.phoneNumber.trim());
-      print(this.signUpModel.address.trim());
-      print(Timestamp.fromDate(DateTime.parse(date)));
-      print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+      // print('+++++++++++++++++++++++ From Sign Up +++++++++++++++++++++++');
+      // print(auth.user.uid);
+      // print(this.signUpModel.email.trim());
+      // print(this.signUpModel.type.trim());
+      // print(this.signUpModel.firstname.trim());
+      // print(this.signUpModel.lastname.trim());
+      // print(this.signUpModel.phoneNumber.trim());
+      // print(this.signUpModel.address.trim());
+      // print(Timestamp.fromDate(DateTime.parse(date)));
+      // print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
       UserProvider.instance.currentUser = User(
         uid: auth.user.uid,

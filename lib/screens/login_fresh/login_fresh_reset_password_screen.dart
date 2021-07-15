@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../config/ColorConstants.dart';
-
-import '../../custom_widgets/logging_widgets/login_fresh_loading.dart';
-import '../../config/language.dart';
+import '/config/ColorConstants.dart';
+import '/custom_widgets/logging_widgets/login_fresh_loading.dart';
+import '/config/language.dart';
 
 class LoginFreshResetPassword extends StatefulWidget {
   static const id = 'RESET_PASSWORD_SCREEN';

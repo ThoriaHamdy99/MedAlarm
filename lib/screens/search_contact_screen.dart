@@ -1,6 +1,6 @@
 import 'dart:ui';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
 
 import '../models/user.dart';
 import '../providers/user_provider.dart';
@@ -9,7 +9,6 @@ import 'chat/chatroom_screen.dart';
 class SearchContact extends StatefulWidget {
   static const String id = 'SEARCH_CONTACT_SCREEN';
   final User currentUser = UserProvider.instance.currentUser;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   SearchContact({Key key}) : super(key: key);
 
   @override
@@ -17,6 +16,7 @@ class SearchContact extends StatefulWidget {
 }
 
 class _SearchContactState extends State<SearchContact> {
+  FirebaseProvider fbPro = FirebaseProvider.instance;
   String email = '';
 
   @override
@@ -47,11 +47,7 @@ class _SearchContactState extends State<SearchContact> {
           child: email.isEmpty?
             Container():
             FutureBuilder(
-              future: widget.firestore
-                  .collection('Users')
-                  .where('email', isEqualTo: email)
-                  .where('email', isNotEqualTo: widget.currentUser.email)
-                  .get(),
+              future: fbPro.searchEmailExcept(email, widget.currentUser.email),
                 builder: (ctx, snapshot) {
               if(snapshot.hasData) {
                 if(snapshot.data.size==0) {
@@ -67,15 +63,12 @@ class _SearchContactState extends State<SearchContact> {
                 }
                 User user = User.fromDoc(snapshot.data.docs[0].id, snapshot.data.docs[0]);
                 return StreamBuilder(
-                stream: widget.firestore
-                    .collection('Users/${widget.currentUser.uid}/Contacts')
-                    .doc(user.uid)
-                    .snapshots(),
+                stream: fbPro.getContactFromUser(widget.currentUser.uid, user.uid),
                 builder: (ctx, snapshot) {
                   if(snapshot.hasData) {
-                    Widget add_rem_button;
+                    Widget addRemButton;
                     if(!snapshot.data.exists) {
-                      add_rem_button = IconButton(
+                      addRemButton = IconButton(
                         icon: Icon(
                           Icons.add,
                           // size: 50,
@@ -83,24 +76,12 @@ class _SearchContactState extends State<SearchContact> {
                         ),
                         tooltip: 'Add to contacts',
                         onPressed: () async {
-                          await widget.firestore
-                              .collection('Users/${widget.currentUser.uid}/Contacts')
-                              .doc(user.uid)
-                              .set({
-                            'uid': user.uid,
-                          });
-                          await widget.firestore
-                              .collection('Users/${user.uid}/Contacts')
-                              .doc(widget.currentUser.uid)
-                              .set({
-                            'uid': widget.currentUser.uid,
-                          });
-                          print('done');
+                          await fbPro.addContact(widget.currentUser.uid, user.uid);
                         },
                       );
                     }
                     else {
-                      add_rem_button = IconButton(
+                      addRemButton = IconButton(
                         icon: Icon(
                           Icons.remove,
                           // size: 50,
@@ -108,16 +89,10 @@ class _SearchContactState extends State<SearchContact> {
                         ),
                         tooltip: 'Remove from contacts',
                         onPressed: () async {
-                          await widget.firestore
-                              .collection(
-                              'Users/${widget.currentUser.uid}/Contacts')
-                              .doc(user.uid)
-                              .delete();
-                          await widget.firestore
-                              .collection('Users/${user.uid}/Contacts')
-                              .doc(widget.currentUser.uid)
-                              .delete();
-                          print('done');
+                          await FirebaseProvider.instance.deleteContact(
+                              widget.currentUser.uid,
+                              user.uid,
+                          );
                         },
                       );
                     }
@@ -149,7 +124,7 @@ class _SearchContactState extends State<SearchContact> {
                             ):
                             Image.network(user.profPicURL),
                           ),
-                          trailing: add_rem_button,
+                          trailing: addRemButton,
                           onTap: () async {
                             Navigator.push(
                                 context,

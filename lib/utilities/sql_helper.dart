@@ -115,18 +115,18 @@ class SQLHelper {
 
     List<Map<String, dynamic>> result = await db.rawQuery('''SELECT * FROM User;''');
     // print(Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']));
-    print('+++++++++++++++++++++++ From GetUser +++++++++++++++++++++++');
-    print(result[0]['uid']);
-    print(result[0]['email']);
-    print(result[0]['username']);
-    print(result[0]['type']);
-    print(result[0]['firstname']);
-    print(result[0]['lastname']);
-    print(result[0]['profPicURL']);
-    print(result[0]['phoneNumber']);
-    print(result[0]['address']);
-    print(Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']));
-    print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+    // print('+++++++++++++++++++++++ From GetUser +++++++++++++++++++++++');
+    // print(result[0]['uid']);
+    // print(result[0]['email']);
+    // print(result[0]['username']);
+    // print(result[0]['type']);
+    // print(result[0]['firstname']);
+    // print(result[0]['lastname']);
+    // print(result[0]['profPicURL']);
+    // print(result[0]['phoneNumber']);
+    // print(result[0]['address']);
+    // print(Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']));
+    // print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     return User(
       uid: result[0]['uid'],
       email: result[0]['email'],

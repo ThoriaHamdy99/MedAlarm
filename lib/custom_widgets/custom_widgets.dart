@@ -2,6 +2,8 @@ import 'package:auto_direction/auto_direction.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 
 import '../models/contact.dart';
 import '../models/message.dart';
@@ -116,7 +118,6 @@ class _MessageBoxState extends State<MessageBox> {
 class ContactTile extends StatefulWidget {
   final Auth.FirebaseAuth auth = FirebaseProvider.instance.auth;
   final User currentUser = UserProvider.instance.currentUser;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final Contact contact;
   final Function refresh;
 
@@ -126,6 +127,7 @@ class ContactTile extends StatefulWidget {
 }
 
 class _ContactTileState extends State<ContactTile> {
+  FirebaseProvider fbPro = FirebaseProvider.instance;
   String msgPath;
   Message msg;
 
@@ -142,89 +144,99 @@ class _ContactTileState extends State<ContactTile> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: widget.firestore
-          .collection('Messages/$msgPath/$msgPath')
-          .orderBy('date', descending: true)
-          .limit(1)
-          .snapshots(),
+      stream: fbPro.getLatestMsgStream(msgPath),
       builder: (ctx, snapshot) {
         if (snapshot.hasData) {
           if(snapshot.data.docs.isEmpty)
             return Container();
           msg = Message.fromDoc(snapshot.data);
-          // msg = widget.contact.latestMsg;
-          return Container(
-            margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-            child: ListTile(
-              shape: RoundedRectangleBorder(
+          return FocusedMenuHolder(
+            onPressed: (){},
+            blurSize: 0,
+            blurBackgroundColor: Colors.white,
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              child: ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 5,
+                ),
+                title: Text(
+                  widget.contact.user.firstname + ' ' + widget.contact.user.lastname,
+                ),
+                subtitle: RichText(
+                  maxLines: 1,
+                  softWrap: false,
+                  text: TextSpan(
+                    style: TextStyle(color: Colors.grey),
+                    children: [
+                      widget.currentUser.uid == msg.from ?
+                      TextSpan(text: 'You: ',
+                          style: TextStyle(color: Theme.of(context).accentColor)) :
+                      TextSpan(
+                          text: '', style: TextStyle(color: Theme.of(context).accentColor)),
+                      msg.type == 'image'?
+                      TextSpan(text: '<Image>')
+                          : TextSpan(text: msg.text),
+                    ],
+                  ),
+                ),
+                leading: Hero(
+                  tag: widget.contact.user.uid,
+                  child: widget.contact.user.profPicURL.isEmpty ? Icon(
+                    Icons.account_circle,
+                    size: 50,
+                    color: Theme.of(context).accentColor,
+                  ) :
+                  Image.network(widget.contact.user.profPicURL),
+                ),
+                trailing: Container(
+                  padding: EdgeInsets.only(right: 5),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        msg.date.substring(0, 10),
+                        style: TextStyle(color: Theme.of(context).accentColor),
+                      ),
+                      Text(
+                        msg.date.substring(11, 16),
+                        style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ChatRoom(
+                              otherUser: widget.contact.user,
+                            ),
+                      )).whenComplete(widget.refresh);
+                },
+              ),
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 5,
-              ),
-              title: Text(
-                widget.contact.user.firstname + ' ' + widget.contact.user.lastname,
-              ),
-              subtitle: RichText(
-                maxLines: 1,
-                softWrap: false,
-                text: TextSpan(
-                  style: TextStyle(color: Colors.grey),
-                  children: [
-                    widget.currentUser.uid == msg.from ?
-                    TextSpan(text: 'You: ',
-                        style: TextStyle(color: Theme.of(context).accentColor)) :
-                    TextSpan(
-                        text: '', style: TextStyle(color: Theme.of(context).accentColor)),
-                    msg.type == 'image'?
-                    TextSpan(text: '<Image>')
-                        : TextSpan(text: msg.text),
-                  ],
-                ),
-              ),
-              leading: Hero(
-                tag: widget.contact.user.uid,
-                child: widget.contact.user.profPicURL.isEmpty ? Icon(
-                  Icons.account_circle,
-                  size: 50,
-                  color: Theme.of(context).accentColor,
-                ) :
-                Image.network(widget.contact.user.profPicURL),
-              ),
-              trailing: Container(
-                padding: EdgeInsets.only(right: 5),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      msg.date.substring(0, 10),
-                      style: TextStyle(color: Theme.of(context).accentColor),
-                    ),
-                    Text(
-                      msg.date.substring(11, 16),
-                      style: TextStyle(
-                        color: Theme.of(context).accentColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              onTap: () async {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ChatRoom(
-                            otherUser: widget.contact.user,
-                          ),
-                    )).whenComplete(widget.refresh);
-              },
             ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
+            menuItems: <FocusedMenuItem>[
+              FocusedMenuItem(
+                onPressed: () async {
+                  setState(() {});
+                  await fbPro.deleteContact(widget.currentUser.uid, widget.contact.user.uid);
+                },
+                title: Text('Delete', style: TextStyle(color: Colors.red)),
+                trailingIcon: Icon(Icons.delete, color: Colors.red)
+              ),
+            ],
           );
         }
         return Container();

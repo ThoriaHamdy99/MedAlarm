@@ -14,19 +14,139 @@ class FirebaseProvider with ChangeNotifier {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
-  // Future<void> login() async {
-  //   final email = '1@1.1';
-  //   // final email = '2@2.2';
-  //   // final email = '3@3.3';
-  //   final pass = '000000';
-  //   try{
-  //     await auth.signInWithEmailAndPassword(email: email, password: pass)
-  //         .timeout(Duration(seconds: 5));
-  //     await registerDeviceToken();
-  //   } catch(e) {
-  //     print(e);
-  //   }
-  // }
+  Stream getLatestMsgStream(String msgPath) {
+    return firestore
+        .collection('Messages/$msgPath/$msgPath')
+        .orderBy('date', descending: true)
+        .limit(1)
+        .snapshots();
+  }
+
+  Future getLatestMsg(String msgPath) {
+    return firestore
+        .collection('Messages/$msgPath/$msgPath')
+        .orderBy('date', descending: true)
+        .limit(1)
+        .get();
+  }
+
+  Stream getChat(String msgPath) {
+    return firestore
+        .collection('Messages/$msgPath/$msgPath')
+        .orderBy('date', descending: true)
+        .snapshots();
+  }
+
+  deleteContact(String uid1, String uid2) async {
+    await firestore
+        .collection(
+        'Users/$uid1/Contacts')
+        .doc(uid2)
+        .delete();
+    await firestore
+        .collection('Users/$uid2/Contacts')
+        .doc(uid1)
+        .delete();
+  }
+
+  addContact(String uid1, String uid2) async {
+    await firestore
+        .collection('Users/$uid1/Contacts')
+        .doc(uid2)
+        .set({
+      'uid': uid2,
+    });
+    await firestore
+        .collection('Users/$uid2/Contacts')
+        .doc(uid1)
+        .set({
+      'uid': uid1,
+    });
+  }
+
+  Future searchEmailExcept(String email, String excEmail) {
+    return firestore
+        .collection('Users')
+        .where('email', isEqualTo: email)
+        .where('email', isNotEqualTo: excEmail)
+        .get();
+  }
+
+  Stream getContactFromUser(String userUid, String uid) {
+    return firestore
+        .collection('Users/$userUid/Contacts')
+        .doc(uid)
+        .snapshots();
+  }
+
+  Stream getContacts(String userUid) {
+    return firestore.collection("Users/$userUid/Contacts").snapshots();
+  }
+
+  sendMessage(
+      String msgPath,
+      String from,
+      String to,
+      String type,
+      String msg,
+      String url,
+  ) async {
+    type == 'text'?
+    await firestore.collection('Messages/$msgPath/$msgPath').add({
+      'from': from,
+      'to': to,
+      'type': type,
+      'text': msg,
+      'date': DateTime.now().toIso8601String().toString()
+    }):
+    await firestore.collection('Messages/$msgPath/$msgPath').add({
+      'from': from,
+      'to': to,
+      'type': type,
+      'url': url,
+      'date': DateTime.now().toIso8601String().toString()
+    });
+  }
+
+  insertNewUser(
+      String uid,
+      String email,
+      String type,
+      String firstname,
+      String lastname,
+      String phoneNumber,
+      String address,
+      String date,
+  ) async {
+    await firestore
+        .collection('Users')
+        .doc(uid)
+        .set({
+      'email': email,
+      'type': type,
+      'firstname': firstname,
+      'lastname': lastname,
+      'profPicURL': '',
+      'phoneNumber': phoneNumber,
+      'address': address,
+      'dob': Timestamp.fromDate(DateTime.parse(date)),
+    });
+    initNewUserContacts(uid);
+  }
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUser(String userUid) async {
+    return await firestore.collection('Users').doc(userUid).get();
+  }
+
+  initNewUserContacts(String uid) async {
+    await firestore
+        .collection('Users')
+        .doc(uid)
+        .collection('Contacts')
+        .doc('_init')
+        .set({});
+  }
+
 
   Future<void> logout() async {
     try{

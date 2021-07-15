@@ -2,14 +2,12 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
-import 'package:med_alarm/models/contact.dart';
-import 'package:med_alarm/models/message.dart';
-
-import '../../models/user.dart';
-// import '../../providers/user_provider.dart';
-import '../../screens/search_contact_screen.dart';
-import '../../providers/firebase_provider.dart';
-import '../../custom_widgets/custom_widgets.dart';
+import '/models/contact.dart';
+import '/models/message.dart';
+import '/models/user.dart';
+import '/screens/search_contact_screen.dart';
+import '/providers/firebase_provider.dart';
+import '/custom_widgets/custom_widgets.dart';
 
 class ChatsScreen extends StatefulWidget {
   static const String id = 'CHATS_SCREEN';
@@ -22,27 +20,13 @@ class ChatsScreen extends StatefulWidget {
 }
 
 class _ChatsScreenState extends State<ChatsScreen> {
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseProvider fbPro = FirebaseProvider.instance;
   List<Contact> contacts = [];
-  // bool isSearching = false;
-
-  tileEndedBuilding(uid) {
-    contacts.removeWhere((element) => element.user.uid == uid);
-    print('Received: ' + uid);
-    print(contacts.length);
-  }
 
   refresh() {
     setState(() {
+      contacts.clear();
     });
-    print('refreshed..........................');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // FirebaseProvider.instance.login();
-    // getLoggedUserInfo();
   }
 
   @override
@@ -61,12 +45,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
       ),
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
-          stream:
-              firestore.collection(
-                  "Users/"
-                  "${widget.auth.currentUser.uid}/"
-                  "Contacts"
-              ).snapshots(),
+          stream: fbPro.getContacts(widget.auth.currentUser.uid),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               // return Container();
@@ -76,6 +55,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                     if(ss.hasData && ss.data.isNotEmpty) {
                       contacts = ss.data;
                       contacts.sort((a, b) => b.latestMsg.date.compareTo(a.latestMsg.date));
+                      print('Sorted');
                       return ListView.builder(
                         itemCount: contacts.length,
                         itemBuilder: (ctx2, i) {
@@ -108,21 +88,8 @@ class _ChatsScreenState extends State<ChatsScreen> {
           },
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {Navigator.pushNamed(context, SearchContact.id);},
-      //   backgroundColor: Theme.of(context).accentColor,
-      //   child: Icon(Icons.add),
-      // ),
     );
   }
-
-  // getLoggedUserInfo() async {
-  //   var value = await firestore
-  //       .collection("Users")
-  //       .doc(custom_widgets.widget.auth.currentUser.uid)
-  //       .get();
-  //   UserProvider.instance.currentUser = User.fromDoc(custom_widgets.widget.auth.currentUser.uid, value);
-  // }
 
   String getMsgPath(uid) {
     if (widget.auth.currentUser.uid.compareTo(uid) < 0) {
@@ -137,16 +104,9 @@ class _ChatsScreenState extends State<ChatsScreen> {
     for(DocumentSnapshot dss in docs) {
       if(dss.id == '_init') continue;
       String msgPath = getMsgPath(dss.get('uid'));
-      var v1 = await firestore
-          .collection('Users')
-          .doc(dss.get('uid'))
-          .get();
+      var v1 = await fbPro.getUser(dss.get('uid'));
       if(!v1.exists) continue;
-      var v2 = await firestore
-          .collection('Messages/$msgPath/$msgPath')
-          .orderBy('date', descending: true)
-          .limit(1)
-          .get();
+      var v2 = await fbPro.getLatestMsg(msgPath);
       if(v2.docs.isEmpty) continue;
       contacts.add(
         Contact(
