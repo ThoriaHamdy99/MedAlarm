@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/service/sign_up_model.dart';
+import '../../models/sign_up_model.dart';
 import '/service/type_login.dart';
 import '/custom_widgets/logging_widgets/footer_login.dart';
 import 'login_fresh.dart';

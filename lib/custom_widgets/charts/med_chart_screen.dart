@@ -16,7 +16,6 @@ class MedChart extends StatelessWidget {
     );
   }
   double fun (){
-Medicine med;
     final num1= seriesList[0].data.fold(0, (t, e) =>( t as int) + e.numOfMed);
     final num2= seriesList[1].data.fold(0, (t, e) =>( t as int) + e.numOfMed);
     final num3= seriesList[2].data.fold(0, (t, e) =>( t as int) + e.numOfMed);

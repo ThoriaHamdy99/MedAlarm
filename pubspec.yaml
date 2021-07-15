@@ -53,6 +53,9 @@ dependencies:
   permission_handler:
   ext_storage:
   charts_flutter:
+#  flare_flutter:
+#  rxdart:
+#  flutter_local_notifications:
 
 dev_dependencies:
   flutter_test:

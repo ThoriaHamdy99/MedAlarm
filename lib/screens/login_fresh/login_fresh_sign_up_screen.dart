@@ -7,7 +7,7 @@ import '/utilities/sql_helper.dart';
 import '/config/ColorConstants.dart';
 import '/custom_widgets/logging_widgets/login_fresh_loading.dart';
 import '/config/language.dart';
-import '/service/sign_up_model.dart';
+import '../../models/sign_up_model.dart';
 import 'package:validators/validators.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:cloud_firestore/cloud_firestore.dart';

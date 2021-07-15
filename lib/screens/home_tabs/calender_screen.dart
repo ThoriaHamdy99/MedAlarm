@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:med_alarm/screens/medicine/med_details.dart';
 import '/main.dart';
 import '/providers/firebase_provider.dart';
 import '/providers/user_provider.dart';
@@ -23,7 +24,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
   final lastDay = DateTime(
       DateTime.now().year, DateTime.now().month + 3, DateTime.now().day);
-  bool _check = false;
+  // bool _check = false;
 
   @override
   void initState() {
@@ -187,13 +188,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
                         onPressed: () {
-                          setState(() {
-                            allEvents[_selectedDay] = [Event("Med2")];
-                            print(allEvents);
-                          });
+                          // setState(() {
+                          //   allEvents[_selectedDay] = [Event("Med2")];
+                          //   print(allEvents);
+                          // });
+                          Navigator.of(context).pushNamed(MedDetails.id);
                         },
                         child: Text(
-                          "Add a med",
+                          "Add Medicine",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -293,6 +295,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ))
             ],
           ),
+          /*
           if (_check == true)
             Container(
               color: Colors.black45,
@@ -310,10 +313,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ElevatedButton(
                             onPressed: () {
                               setState(() {
-                                print(allEvents);
+                                // print(allEvents);
                                 allEvents[_selectedDay] = [Event("med3")];
-                                print(allEvents);
-                                _check = false;
+                                // print(allEvents);
                               });
                             },
                             child: Text(
@@ -344,20 +346,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
             ),
+           */
         ],
       ),
       floatingActionButton: new Visibility(
         visible: allEvents.isEmpty ? false : true,
         child: FloatingActionButton(
-          backgroundColor: _check ? Colors.white70 : Theme.of(context).accentColor,
-          child: Icon(_check ? Icons.clear : Icons.add),
+          backgroundColor: Theme.of(context).accentColor,
+          child: Icon(Icons.add),
           onPressed: () {
-            setState(() {
-              if (_check)
-                _check = false;
-              else
-                _check = true;
-            });
+            Navigator.of(context).pushNamed(MedDetails.id);
           },
         ),
       ),
