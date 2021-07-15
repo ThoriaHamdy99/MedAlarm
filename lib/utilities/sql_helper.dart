@@ -72,17 +72,17 @@ class SQLHelper {
     Database db = await this.database;
 
     await db.execute('DELETE FROM User');
-    await db.execute('DROP TABLE User');
-    await db.execute('''CREATE TABLE User(
-              uid TEXT PRIMARY KEY,
-              email TEXT NOT NULL,
-              type TEXT NOT NULL,
-              firstname TEXT NOT NULL,
-              lastname TEXT NOT NULL,
-              profPicURL TEXT NOT NULL,
-              phoneNumber TEXT NOT NULL,
-              address TEXT NOT NULL,
-              dob INT NOT NULL)''');
+    // await db.execute('DROP TABLE User');
+    // await db.execute('''CREATE TABLE User(
+    //           uid TEXT PRIMARY KEY,
+    //           email TEXT NOT NULL,
+    //           type TEXT NOT NULL,
+    //           firstname TEXT NOT NULL,
+    //           lastname TEXT NOT NULL,
+    //           profPicURL TEXT NOT NULL,
+    //           phoneNumber TEXT NOT NULL,
+    //           address TEXT NOT NULL,
+    //           dob INT NOT NULL)''');
     User user = UserProvider.instance.currentUser;
     print('+++++++++++++++++++++++ From InsertUser +++++++++++++++++++++++');
     print(user.uid);
@@ -140,19 +140,6 @@ class SQLHelper {
     );
   }
 
-  // Future<int> updateStudent(Student student) async {
-  //   Database db = await this.database;
-  //
-  //   int result = await db.rawUpdate('''update $_tableName
-  //                                       set $_name = '${student.name}',
-  //                                           $_description = '${student.description}',
-  //                                           $_date = '${student.date}',
-  //                                           $_pass = ${student.pass}
-  //                                        where $_id = ${student.id}''');
-  //
-  //   return result;
-  // }
-
   Future<int> deleteUser() async {
     Database db = await database;
 
@@ -160,6 +147,19 @@ class SQLHelper {
 
     return result;
   }
+
+// Future<int> updateStudent(Student student) async {
+//   Database db = await this.database;
+//
+//   int result = await db.rawUpdate('''update $_tableName
+//                                       set $_name = '${student.name}',
+//                                           $_description = '${student.description}',
+//                                           $_date = '${student.date}',
+//                                           $_pass = ${student.pass}
+//                                        where $_id = ${student.id}''');
+//
+//   return result;
+// }
 
   // Future<int> getCount() async {
   //   Database db = await this.database;

@@ -1,21 +1,20 @@
-import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'providers/firebase_provider.dart';
 import 'screens/medicine/med_details.dart';
-import '/screens/home_tabs/calender_screen.dart';
-import '/screens/login_fresh/login_fresh_screen.dart';
-import '/screens/report/report_screen.dart';
-import '/utilities/push_notifications.dart';
-import '/utilities/scroll_behavior.dart';
-import '/providers/user_provider.dart';
-import '/screens/chat/chatroom_screen.dart';
-import '/screens/chat/chats_screen.dart';
-import '/screens/home_screen.dart';
-import '/screens/search_contact_screen.dart';
-import '/utilities/sql_helper.dart';
-import '/models/user.dart';
+import 'screens/home_tabs/calender_screen.dart';
+import 'screens/login_fresh/login_fresh_screen.dart';
+import 'screens/report/report_screen.dart';
+import 'utilities/push_notifications.dart';
+import 'utilities/scroll_behavior.dart';
+import 'providers/user_provider.dart';
+import 'screens/chat/chatroom_screen.dart';
+import 'screens/chat/chats_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/search_contact_screen.dart';
+import 'utilities/sql_helper.dart';
+import 'models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +34,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
+  
   @override
   void initState() {
     super.initState();

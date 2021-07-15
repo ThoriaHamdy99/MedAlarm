@@ -81,7 +81,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             onChanged: (itemIdentifier) {
               if (itemIdentifier == 'logout') {
                 FirebaseProvider.instance.logout();
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => MyApp(),
                 ));
               }

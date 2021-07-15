@@ -294,6 +294,7 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
                                         .trim());
 
                             await FirebaseProvider.instance.getLoggedUserInfo();
+                            await FirebaseProvider.instance.registerDeviceToken();
                             SQLHelper.getInstant().insertUser();
 
                             Navigator.of(context).pop();
