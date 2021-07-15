@@ -3,9 +3,10 @@ class SignUpModel {
   String password;
   String repeatPassword;
 
-  String username;
+  String firstname;
+  String lastname;
   String phoneNumber;
-  String dateOfBirth;
+  String dob;
   String address;
 
   String type ;
@@ -14,9 +15,10 @@ class SignUpModel {
     this.email,
     this.password,
     this.repeatPassword,
-    this.username,
+    this.firstname,
+    this.lastname,
     this.phoneNumber,
-    this.dateOfBirth,
+    this.dob,
     this.address,
     this.type
   });

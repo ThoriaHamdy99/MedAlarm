@@ -61,55 +61,110 @@ class _SearchContactState extends State<SearchContact> {
                       style: TextStyle(
                         fontSize: 30,
                         color: Colors.grey,
-                        shadows: [
-                          Shadow(color: Colors.black),
-                          Shadow(color: Colors.grey),
-                        ],
                       ),
                     ),
                   );
                 }
                 User user = User.fromDoc(snapshot.data.docs[0].id, snapshot.data.docs[0]);
-                return Container(
-                  margin: EdgeInsets.all(10.0),
-                  // height: 100,
-                  child: Card(
-                    elevation: 5.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                return StreamBuilder(
+                stream: widget.firestore
+                    .collection('Users/${widget.currentUser.uid}/Contacts')
+                    .doc(user.uid)
+                    .snapshots(),
+                builder: (ctx, snapshot) {
+                  if(snapshot.hasData) {
+                    Widget add_rem_button;
+                    if(!snapshot.data.exists) {
+                      add_rem_button = IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          // size: 50,
+                          color: Theme.of(context).accentColor,
+                        ),
+                        tooltip: 'Add to contacts',
+                        onPressed: () async {
+                          await widget.firestore
+                              .collection('Users/${widget.currentUser.uid}/Contacts')
+                              .doc(user.uid)
+                              .set({
+                            'uid': user.uid,
+                          });
+                          await widget.firestore
+                              .collection('Users/${user.uid}/Contacts')
+                              .doc(widget.currentUser.uid)
+                              .set({
+                            'uid': widget.currentUser.uid,
+                          });
+                          print('done');
+                        },
+                      );
+                    }
+                    else {
+                      add_rem_button = IconButton(
+                        icon: Icon(
+                          Icons.remove,
+                          // size: 50,
+                          color: Colors.red,
+                        ),
+                        tooltip: 'Remove from contacts',
+                        onPressed: () async {
+                          await widget.firestore
+                              .collection(
+                              'Users/${widget.currentUser.uid}/Contacts')
+                              .doc(user.uid)
+                              .delete();
+                          await widget.firestore
+                              .collection('Users/${user.uid}/Contacts')
+                              .doc(widget.currentUser.uid)
+                              .delete();
+                          print('done');
+                        },
+                      );
+                    }
+                    return Container(
+                      margin: EdgeInsets.all(10.0),
+                      // height: 100,
+                      child: Card(
+                        elevation: 5.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 5,
+                          ),
+                          title: Text(
+                            user.firstname + ' ' + user.lastname,
+                          ),
+                          // subtitle: ,
+                          leading: Hero(
+                            tag: user.uid,
+                            child: user.profPicURL.isEmpty ? Icon(
+                              Icons.account_circle,
+                              size: 50,
+                              color: Theme.of(context).accentColor,
+                            ):
+                            Image.network(user.profPicURL),
+                          ),
+                          trailing: add_rem_button,
+                          onTap: () async {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatRoom(
+                                    otherUser: user,
+                                  ),
+                                ));
+                          },
+                        ),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 5,
-                      ),
-                      title: Text(
-                        user.firstname + ' ' + user.lastname,
-                      ),
-                      // subtitle: ,
-                      leading: Hero(
-                        tag: user.uid,
-                        child: user.profPicURL.isEmpty ? Icon(
-                          Icons.account_circle,
-                          size: 50,
-                          color: Colors.grey,
-                        ):
-                        Image.network(user.profPicURL),
-                      ),
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatRoom(
-                                otherUser: user,
-                              ),
-                            ));
-                      },
-                    ),
-                  ),
-                );
+                    );
+                  }
+                  return Center(child: CircularProgressIndicator());
+                });
               }
               return Center(child: CircularProgressIndicator());
             }),

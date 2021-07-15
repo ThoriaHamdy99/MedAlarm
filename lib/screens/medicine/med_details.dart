@@ -81,7 +81,7 @@ class _BottomContainerState extends State<_BottomContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        // height: 800,
+        height: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(50),
@@ -287,80 +287,83 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                   ),
                   color: Colors.white,
                 ),
+                height: double.infinity,
                 width: double.infinity,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          child: PanelTitle(
-                            title: "Pick up Start date",
-                            isRequired: true,
-                          )),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            child: PanelTitle(
+                              title: "Pick up Start date",
+                              isRequired: true,
+                            )),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(50.0),
+                            ),
+                            primary: Theme.of(context).accentColor, // background
+                            onPrimary: Colors.amber, // foreground
                           ),
-                          primary: Theme.of(context).accentColor, // background
-                          onPrimary: Colors.amber, // foreground
-                        ),
-                        child: new Icon(Icons.date_range),
-                        onPressed: () => showRoundedDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(DateTime.now().year),
-                          lastDate: DateTime(DateTime.now().year + 2),
-                          borderRadius: 16,
-                        ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          child: PanelTitle(
-                            title: "Pick up end date",
-                            isRequired: true,
-                          )),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
+                          child: new Icon(Icons.date_range),
+                          onPressed: () => showRoundedDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(DateTime.now().year),
+                            lastDate: DateTime(DateTime.now().year + 2),
+                            borderRadius: 16,
                           ),
-                          primary: Theme.of(context).accentColor, // background
-                          onPrimary: Colors.amber, // foreground
                         ),
-                        child: new Icon(Icons.date_range),
-                        onPressed: () => showRoundedDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(DateTime.now().year),
-                          lastDate: DateTime(DateTime.now().year + 2),
-                          borderRadius: 16,
+                        Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            child: PanelTitle(
+                              title: "Pick up end date",
+                              isRequired: true,
+                            )),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(50.0),
+                            ),
+                            primary: Theme.of(context).accentColor, // background
+                            onPrimary: Colors.amber, // foreground
+                          ),
+                          child: new Icon(Icons.date_range),
+                          onPressed: () => showRoundedDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(DateTime.now().year),
+                            lastDate: DateTime(DateTime.now().year + 2),
+                            borderRadius: 16,
+                          ),
                         ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          child: PanelTitle(
-                            title: "Pick up time for first reminder",
-                            isRequired: true,
-                          )),
-                      TimePickerSpinner(
-                        is24HourMode: false,
-                        normalTextStyle: TextStyle(
-                            fontSize: 24, color: Theme.of(context).accentColor),
-                        highlightedTextStyle:
-                            TextStyle(fontSize: 24, color: Colors.amber),
-                        spacing: 50,
-                        itemHeight: 80,
-                        isForce2Digits: true,
-                        onTimeChange: (time) {
-                          setState(() {
-                            _dateTime = time;
-                          });
-                        },
-                      )
-                    ]))));
+                        Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            child: PanelTitle(
+                              title: "Pick up time for first reminder",
+                              isRequired: true,
+                            )),
+                        TimePickerSpinner(
+                          is24HourMode: false,
+                          normalTextStyle: TextStyle(
+                              fontSize: 24, color: Theme.of(context).accentColor),
+                          highlightedTextStyle:
+                              TextStyle(fontSize: 24, color: Colors.amber),
+                          spacing: 50,
+                          itemHeight: 80,
+                          isForce2Digits: true,
+                          onTimeChange: (time) {
+                            setState(() {
+                              _dateTime = time;
+                            });
+                          },
+                        )
+                      ]),
+                ))));
   }
 }

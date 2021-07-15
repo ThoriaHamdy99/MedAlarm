@@ -131,7 +131,7 @@ class _ChatRoomState extends State<ChatRoom> {
                   height: 5,
                 ),
                 Text(
-                  widget.otherUser.username,
+                  widget.otherUser.phoneNumber,
                   style: TextStyle(
                     fontSize: 14,
                   ),

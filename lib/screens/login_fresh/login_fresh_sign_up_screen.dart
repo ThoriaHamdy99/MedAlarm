@@ -56,17 +56,18 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
 
   void _submitAuthForm(BuildContext ctx) async {
     try {
-      print(this.signUpModel.username.trim());
+      print(this.signUpModel.firstname.trim());
+      print(this.signUpModel.lastname.trim());
       print(this.signUpModel.phoneNumber.trim());
       print(this.signUpModel.type.trim());
-      print(this.signUpModel.dateOfBirth.trim());
+      print(this.signUpModel.dob.trim());
 
       Auth.UserCredential auth = await FirebaseProvider.instance.auth
           .createUserWithEmailAndPassword(
               email: this.signUpModel.email.trim(),
               password: this.signUpModel.password.trim());
 
-      String date = this.signUpModel.dateOfBirth.trim().replaceAll('/', '') + 'T';
+      String date = this.signUpModel.dob.trim().replaceAll('/', '') + 'T';
       date += '000000';
 
       await FirebaseFirestore.instance
@@ -74,11 +75,10 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
           .doc(auth.user.uid)
           .set({
         'email': this.signUpModel.email.trim(),
-        'username': this.signUpModel.username.trim(),
         'type': this.signUpModel.type.trim(),
-        'firstname': 'fn',
-        'lastname': 'ln',
-        'profPicURL': 'pic',
+        'firstname': this.signUpModel.firstname.trim(),
+        'lastname': this.signUpModel.lastname.trim(),
+        'profPicURL': '',
         'phoneNumber': this.signUpModel.phoneNumber.trim(),
         'address': this.signUpModel.address.trim(),
         'dob': Timestamp.fromDate(DateTime.parse(date)),
@@ -93,11 +93,9 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
       print('+++++++++++++++++++++++ From Sign Up +++++++++++++++++++++++');
       print(auth.user.uid);
       print(this.signUpModel.email.trim());
-      print(this.signUpModel.username.trim());
       print(this.signUpModel.type.trim());
-      print('fn');
-      print('ln');
-      print('pic');
+      print(this.signUpModel.firstname.trim());
+      print(this.signUpModel.lastname.trim());
       print(this.signUpModel.phoneNumber.trim());
       print(this.signUpModel.address.trim());
       print(Timestamp.fromDate(DateTime.parse(date)));
@@ -106,17 +104,16 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
       UserProvider.instance.currentUser = User(
         uid: auth.user.uid,
         email: this.signUpModel.email.trim(),
-        username: this.signUpModel.username.trim(),
         type: this.signUpModel.type.trim(),
-        firstname: 'fn',
-        lastname: 'ln',
-        profPicURL: 'pic',
+        firstname: this.signUpModel.firstname.trim(),
+        lastname: this.signUpModel.lastname.trim(),
+        profPicURL: '',
         phoneNumber: this.signUpModel.phoneNumber.trim(),
         address: this.signUpModel.address.trim(),
         dob: Timestamp.fromDate(DateTime.parse(date)),
       );
 
-      // await FirebaseProvider.instance.getLoggedUserInfo();
+      await FirebaseProvider.instance.registerDeviceToken();
       SQLHelper.getInstant().insertUser();
 
       Navigator.of(context).pop();
@@ -308,12 +305,12 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                       child: TextFormField(
                           validator: (value) {
                             if (value.isEmpty) {
-                              return 'Username field can\'t be empty!';
+                              return 'First Name field can\'t be empty!';
                             }
                             return null;
                           },
                           onSaved: (String value) {
-                            this.signUpModel.username = value;
+                            this.signUpModel.firstname = value;
                           },
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -337,7 +334,44 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                                   borderSide: BorderSide(
                                       color: widget.backgroundColor ??
                                           ColorConstants.PrimaryColor)),
-                              hintText: this.loginFreshWords.hintName)),
+                              hintText: this.loginFreshWords.hintFirstname)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Last Name field can\'t be empty!';
+                            }
+                            return null;
+                          },
+                          onSaved: (String value) {
+                            this.signUpModel.lastname = value;
+                          },
+                          keyboardType: TextInputType.text,
+                          style: TextStyle(
+                              color: widget.textColor ?? Color(0xFF0F2E48),
+                              fontSize: 14),
+                          autofocus: false,
+                          decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide:
+                                      BorderSide(color: Color(0xFFAAB5C3))),
+                              filled: true,
+                              fillColor: Color(0xFFF3F3F5),
+                              focusColor: Color(0xFFF3F3F5),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide:
+                                      BorderSide(color: Color(0xFFAAB5C3))),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide(
+                                      color: widget.backgroundColor ??
+                                          ColorConstants.PrimaryColor)),
+                              hintText: this.loginFreshWords.hintLastname)),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -424,7 +458,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                             return null;
                           },
                           onSaved: (String value) {
-                            this.signUpModel.dateOfBirth = value;
+                            this.signUpModel.dob = value;
                           },
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -492,8 +526,8 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                           vertical: 5, horizontal: 20),
                       child: TextFormField(
                           validator: (value) {
-                            if (value.length < 7) {
-                              return 'Minimum length of password is 7 characters!';
+                            if (value.length < 6) {
+                              return 'Minimum length of password is 6 characters!';
                             } else if (value.isEmpty) {
                               return 'Password field can\'t be empty!';
                             }

@@ -4,7 +4,6 @@ class User {
   String firstname;
   String lastname;
   String email;
-  String username;
   String uid;
   String profPicURL;
   String address;
@@ -17,7 +16,6 @@ class User {
     this.firstname,
     this.lastname,
     this.email,
-    this.username,
     this.uid,
     this.profPicURL,
     this.address,
@@ -28,7 +26,6 @@ class User {
 
   User.fromDoc(uid, doc) {
     this.uid = uid;
-    username = doc.get('username');
     email = doc.get('email');
     type = doc.get('type');
     firstname = doc.get('firstname');
@@ -39,7 +36,6 @@ class User {
     dob = doc.get('dob');
     print('+++++++++++++++++++ From User Constructor +++++++++++++++++++');
     print(uid);
-    print(username);
     print(email);
     print(type);
     print(firstname);

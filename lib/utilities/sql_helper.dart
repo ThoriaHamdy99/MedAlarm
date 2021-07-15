@@ -37,7 +37,6 @@ class SQLHelper {
     await db.execute('''CREATE TABLE User(
               uid TEXT PRIMARY KEY,
               email TEXT NOT NULL,
-              username TEXT NOT NULL,
               type TEXT NOT NULL,
               firstname TEXT NOT NULL,
               lastname TEXT NOT NULL,
@@ -73,23 +72,21 @@ class SQLHelper {
     Database db = await this.database;
 
     await db.execute('DELETE FROM User');
-    // await db.execute('DROP TABLE User');
-    // await db.execute('''CREATE TABLE User(
-    //           uid TEXT PRIMARY KEY,
-    //           email TEXT NOT NULL,
-    //           username TEXT NOT NULL,
-    //           type TEXT NOT NULL,
-    //           firstname TEXT NOT NULL,
-    //           lastname TEXT NOT NULL,
-    //           profPicURL TEXT NOT NULL,
-    //           phoneNumber TEXT NOT NULL,
-    //           address TEXT NOT NULL,
-    //           dob INT NOT NULL)''');
+    await db.execute('DROP TABLE User');
+    await db.execute('''CREATE TABLE User(
+              uid TEXT PRIMARY KEY,
+              email TEXT NOT NULL,
+              type TEXT NOT NULL,
+              firstname TEXT NOT NULL,
+              lastname TEXT NOT NULL,
+              profPicURL TEXT NOT NULL,
+              phoneNumber TEXT NOT NULL,
+              address TEXT NOT NULL,
+              dob INT NOT NULL)''');
     User user = UserProvider.instance.currentUser;
     print('+++++++++++++++++++++++ From InsertUser +++++++++++++++++++++++');
     print(user.uid);
     print(user.email);
-    print(user.username);
     print(user.type);
     print(user.firstname);
     print(user.lastname);
@@ -102,7 +99,6 @@ class SQLHelper {
                                         values(
                                         '${user.uid.toString()}',
                                         '${user.email}',
-                                        '${user.username}',
                                         '${user.type}',
                                         '${user.firstname}',
                                         '${user.lastname}',
@@ -134,7 +130,6 @@ class SQLHelper {
     return User(
       uid: result[0]['uid'],
       email: result[0]['email'],
-      username: result[0]['username'],
       type: result[0]['type'],
       firstname: result[0]['firstname'],
       lastname: result[0]['lastname'],

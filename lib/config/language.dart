@@ -8,7 +8,8 @@ class LoginFreshWords {
   String hintLoginUser;
   String hintLoginPassword;
   String hintSignUpRepeatPassword;
-  String hintName;
+  String hintFirstname;
+  String hintLastname;
   String hintPhone;
   String hintDateOfBirth;
   String hintAddress;
@@ -19,7 +20,8 @@ class LoginFreshWords {
 
   LoginFreshWords(
       {this.loginWith = 'Login With',
-      this.hintName = 'Username',
+      this.hintFirstname = 'First Name',
+      this.hintLastname = 'Last Name',
       this.hintPhone = 'Phone',
       this.hintDateOfBirth = 'Date Of Birth yyyy/mm/dd',
       this.hintAddress = 'Address',
