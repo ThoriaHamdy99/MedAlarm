@@ -56,6 +56,10 @@ dependencies:
 #  flare_flutter:
 #  rxdart:
 #  flutter_local_notifications:
+  flutter_time_picker_spinner:
+  flutter_localizations:
+    sdk: flutter
+  flutter_rounded_date_picker:
 
 dev_dependencies:
   flutter_test:
