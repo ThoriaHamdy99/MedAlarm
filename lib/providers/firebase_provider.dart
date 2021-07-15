@@ -14,19 +14,19 @@ class FirebaseProvider with ChangeNotifier {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
-  Future<void> login() async {
-    final email = '1@1.1';
-    // final email = '2@2.2';
-    // final email = '3@3.3';
-    final pass = '000000';
-    try{
-      await auth.signInWithEmailAndPassword(email: email, password: pass)
-          .timeout(Duration(seconds: 5));
-      await registerDeviceToken();
-    } catch(e) {
-      print(e);
-    }
-  }
+  // Future<void> login() async {
+  //   final email = '1@1.1';
+  //   // final email = '2@2.2';
+  //   // final email = '3@3.3';
+  //   final pass = '000000';
+  //   try{
+  //     await auth.signInWithEmailAndPassword(email: email, password: pass)
+  //         .timeout(Duration(seconds: 5));
+  //     await registerDeviceToken();
+  //   } catch(e) {
+  //     print(e);
+  //   }
+  // }
 
   Future<void> logout() async {
     try{

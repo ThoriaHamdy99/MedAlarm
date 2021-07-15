@@ -53,9 +53,7 @@ dependencies:
   permission_handler:
   ext_storage:
   charts_flutter:
-#  flare_flutter:
-#  rxdart:
-#  flutter_local_notifications:
+
   flutter_time_picker_spinner:
   flutter_localizations:
     sdk: flutter

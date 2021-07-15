@@ -34,28 +34,7 @@ class _MedDetailsState extends State<MedDetails> {
       ),
       body: Container(
         color: Theme.of(context).accentColor,
-        child: Column(
-          children: [
-            Container(
-              color: Theme.of(context).accentColor,
-
-              // height: 200,
-              /*child:Padding(
-                  padding: EdgeInsets.only(
-                    bottom: 10,
-                    top: 10,
-                  ),
-                child:SizedBox(
-                  height: 50,
-                ) ,
-                ),*/
-            ),
-            Flexible(
-              flex: 3,
-              child: _BottomContainer(),
-            ),
-          ],
-        ),
+        child: _BottomContainer(),
       ),
       floatingActionButton: FloatingActionButton.extended(
         elevation: 10,
@@ -102,11 +81,11 @@ class _BottomContainerState extends State<_BottomContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 800,
+        // height: 800,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.elliptical(50, 27),
-            topRight: Radius.elliptical(50, 27),
+            topLeft: Radius.circular(50),
+            topRight: Radius.circular(50),
           ),
           color: Colors.white,
         ),
@@ -136,46 +115,6 @@ class _BottomContainerState extends State<_BottomContainer> {
                     title: "Medicine Type:",
                     isRequired: true,
                   ),
-                  /* Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: StreamBuilder<MedicineType>(
-              stream: _newEntryBloc.selectedMedicineType,
-              builder: (context, snapshot) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    MedicineTypeColumn(
-                        type: MedicineType.Bottle,
-                        name: "Bottle",
-                        iconValue: 0xe900,
-                        isSelected: snapshot.data == MedicineType.Bottle
-                            ? true
-                            : false),
-                    MedicineTypeColumn(
-                        type: MedicineType.Pill,
-                        name: "Pill",
-                        iconValue: 0xe901,
-                        isSelected: snapshot.data == MedicineType.Pill
-                            ? true
-                            : false),
-                    MedicineTypeColumn(
-                        type: MedicineType.Syringe,
-                        name: "Syringe",
-                        iconValue: 0xe902,
-                        isSelected: snapshot.data == MedicineType.Syringe
-                            ? true
-                            : false),
-                    MedicineTypeColumn(
-                        type: MedicineType.Tablet,
-                        name: "Tablet",
-                        iconValue: 0xe903,
-                        isSelected: snapshot.data == MedicineType.Tablet
-                            ? true
-                            : false),
-                  ],
-                );
-              },
-            )),*/
                   new DropdownButton(
                     value: dropDownValue,
                     icon: Icon(Icons.keyboard_arrow_down),
@@ -219,7 +158,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                     onChanged: (var newValue) {
                       if (newValue != null) {
                         setState(() {
-                          dropDownValue = newValue as String;
+                          dropDownValueDoses = newValue;
                         });
                       } else {}
                     },
@@ -290,10 +229,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
       ),
       body: Container(
         color: Theme.of(context).accentColor,
-        child: Flexible(
-          flex: 3,
-          child: _ReminderDetailsContainer(),
-        ),
+        child: _ReminderDetailsContainer(),
       ),
       floatingActionButton: FloatingActionButton.extended(
         elevation: 10,
@@ -339,13 +275,11 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
           GlobalWidgetsLocalizations.delegate,
         ],
         supportedLocales: [
-          const Locale('en', 'US'), // English
-          // const Locale('th', 'TH'), // Thai
+          const Locale('en', 'US'),
         ],
         home: Scaffold(
             backgroundColor: Theme.of(context).accentColor,
             body: Container(
-                // height: 800,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(50),
@@ -367,7 +301,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(60.0),
+                            borderRadius: new BorderRadius.circular(50.0),
                           ),
                           primary: Theme.of(context).accentColor, // background
                           onPrimary: Colors.amber, // foreground
@@ -391,7 +325,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(60.0),
+                            borderRadius: new BorderRadius.circular(50.0),
                           ),
                           primary: Theme.of(context).accentColor, // background
                           onPrimary: Colors.amber, // foreground

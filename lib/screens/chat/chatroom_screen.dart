@@ -36,12 +36,15 @@ class _ChatRoomState extends State<ChatRoom> {
 
   Future<void> sendMessage({String url}) async {
     String msg = '';
+    String type = '';
     if (msgBox.messagesController.text.length > 0) {
       msg = msgBox.messagesController.text.trim();
+      type = 'text';
     } else
       try {
         if (url != null && url.isNotEmpty) {
           msg = url;
+          type = 'image';
         }
       } catch (e) {}
     if (msg.isNotEmpty) {
@@ -50,12 +53,19 @@ class _ChatRoomState extends State<ChatRoom> {
       setState(() {
         msgBox.textFieldHeight = 50;
       });
+      type == 'text'?
       await firestore.collection('Messages/$messagesPath/$messagesPath').add({
-        'from': widget.currentUser.username,
-        'from_uid': widget.currentUser.uid,
-        'to': widget.otherUser.username,
-        'to_uid': widget.otherUser.uid,
+        'from': widget.currentUser.uid,
+        'to': widget.otherUser.uid,
+        'type': type,
         'text': msg,
+        'date': DateTime.now().toIso8601String().toString()
+      }):
+      await firestore.collection('Messages/$messagesPath/$messagesPath').add({
+        'from': widget.currentUser.uid,
+        'to': widget.otherUser.uid,
+        'type': type,
+        'url': url,
         'date': DateTime.now().toIso8601String().toString()
       });
       scrollController.animateTo(scrollController.position.minScrollExtent,
@@ -71,6 +81,7 @@ class _ChatRoomState extends State<ChatRoom> {
     } else {
       messagesPath = widget.otherUser.uid + widget.auth.currentUser.uid;
     }
+    print('path 2 : $messagesPath');
   }
 
   @override
@@ -146,6 +157,8 @@ class _ChatRoomState extends State<ChatRoom> {
                       child: CircularProgressIndicator(),
                     );
                   }
+                  if(snapshot.data.docs.isEmpty)
+                    return Center();
 
                   List<DocumentSnapshot> docs = snapshot.data.docs;
                   String prevDate;
@@ -155,11 +168,21 @@ class _ChatRoomState extends State<ChatRoom> {
                       if(prevDate != doc.get('date').toString().substring(0, 10))
                           messages.add(dateExtractor(prevDate));
 
+                    doc.get('type') == 'text'?
                     messages.add(MessageBubble(
-                            from: doc.get('from'),
+                            // from: doc.get('from'),
                             text: doc.get('text'),
                             date: doc.get('date'),
-                            me: widget.currentUser.username == doc.get('from')
+                            type: doc.get('type'),
+                            me: widget.currentUser.uid == doc.get('from')
+                                ? true
+                                : false)):
+                    messages.add(MessageBubble(
+                            // from: doc.get('from'),
+                            url: doc.get('url'),
+                            date: doc.get('date'),
+                            type: doc.get('type'),
+                            me: widget.currentUser.uid == doc.get('from')
                                 ? true
                                 : false));
                     prevDate = doc.get('date').toString().substring(0, 10);
@@ -236,35 +259,38 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   Widget dateExtractor(date) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-      // mainAxisSize: MainAxisSize.min,
-      children: [
-        Expanded(
-          child: Divider(
-            color: Colors.grey,
-            height: 1,
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.all(7),
-          child: Text(
-            date,
-            style: TextStyle(
-                color: Theme.of(context).accentColor,
-                fontSize: 16,
-                fontWeight: FontWeight.bold
+        // mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: Divider(
+              color: Colors.grey,
+              height: 1,
             ),
           ),
-        ),
-        Expanded(
-          child: Divider(
-            color: Colors.grey,
-            height: 1,
+          Container(
+            margin: EdgeInsets.all(10),
+            child: Text(
+              date,
+              style: TextStyle(
+                  color: Theme.of(context).accentColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold
+              ),
+            ),
           ),
-        ),
-      ],
+          Expanded(
+            child: Divider(
+              color: Colors.grey,
+              height: 1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -289,12 +315,21 @@ class _ChatRoomState extends State<ChatRoom> {
 }
 
 class MessageBubble extends StatelessWidget {
-  final String from;
+  // final String from;
   final String text;
+  final String url;
+  final String type;
   final String date;
   final bool me;
 
-  const MessageBubble({Key key, this.from, this.text, this.date, this.me}) : super(key: key);
+
+  MessageBubble({
+    this.text,
+    this.url,
+    this.type,
+    this.date,
+    this.me
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -308,8 +343,7 @@ class MessageBubble extends StatelessWidget {
             color: me ? Theme.of(context).accentColor : Colors.grey,
             borderRadius: BorderRadius.circular(20),
             // elevation: 6,
-            child: !text.contains(
-                    'https://firebasestorage.googleapis.com/v0/b/medalarm-fcai2021.appspot.com')
+            child: type == 'text'
                 ? Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -364,11 +398,11 @@ class MessageBubble extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ImageViewer(text),
+                                    builder: (context) => ImageViewer(url),
                                   ));
                             },
                             child: Image.network(
-                              text,
+                              url,
                               fit: BoxFit.fill,
                             ),
                           ),

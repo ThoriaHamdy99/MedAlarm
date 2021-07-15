@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
 import 'screens/medicine/med_details.dart';
 import '/screens/home_tabs/calender_screen.dart';
 import '/screens/login_fresh/login_fresh_screen.dart';
@@ -74,17 +75,21 @@ class _MyAppState extends State<MyApp> {
     return FutureBuilder<User> (
       future: SQLHelper.getInstant().getUser(),
       builder: (context, snapShot) {
-        if(Auth.FirebaseAuth.instance.currentUser == null)
-          return Scaffold(body: BuildLoginFresh());
-        else if(snapShot.hasError)
+        // if(Auth.FirebaseAuth.instance.currentUser == null)
+        //   return Scaffold(body: BuildLoginFresh());
+        if(snapShot.hasError)
           return Scaffold(body: BuildLoginFresh());
         // else if(snapShot.data == null)
         //   return Scaffold(body: BuildLoginFresh());
         else if (snapShot.hasData) {
           try {
-            if (Auth.FirebaseAuth.instance.currentUser.email ==
-                snapShot.data.email) {
+            if (snapShot.data.email.isNotEmpty) {
+            // if (Auth.FirebaseAuth.instance.currentUser.email ==
+            //     snapShot.data.email) {
               // if (Users.patientUser) {
+              var auth = FirebaseProvider.instance.auth;
+              print(auth.currentUser.uid);
+              print(auth.currentUser.email);
               UserProvider.instance.currentUser = snapShot.data;
               return HomeScreen();
             }

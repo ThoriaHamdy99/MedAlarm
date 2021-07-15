@@ -118,8 +118,9 @@ class ContactTile extends StatefulWidget {
   final User currentUser = UserProvider.instance.currentUser;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final Contact contact;
+  final Function refresh;
 
-  ContactTile(this.contact, {Key key}) : super(key: key);
+  ContactTile(this.contact, {Key key, this.refresh}) : super(key: key);
   @override
   _ContactTileState createState() => _ContactTileState();
 }
@@ -140,16 +141,18 @@ class _ContactTileState extends State<ContactTile> {
 
   @override
   Widget build(BuildContext context) {
-    // return StreamBuilder<QuerySnapshot>(
-    //   stream: custom_widgets.widget.firestore
-    //       .collection('Messages/$msgPath/$msgPath')
-    //       .orderBy('date', descending: true)
-    //       .limit(1)
-    //       .snapshots(),
-    //   builder: (ctx, snapshot) {
-    //     if (snapshot.hasData) {
-    //       // msg = Message.fromDoc(snapshot.data);
-          msg = widget.contact.latestMsg;
+    return StreamBuilder<QuerySnapshot>(
+      stream: widget.firestore
+          .collection('Messages/$msgPath/$msgPath')
+          .orderBy('date', descending: true)
+          .limit(1)
+          .snapshots(),
+      builder: (ctx, snapshot) {
+        if (snapshot.hasData) {
+          if(snapshot.data.docs.isEmpty)
+            return Container();
+          msg = Message.fromDoc(snapshot.data);
+          // msg = widget.contact.latestMsg;
           return Container(
             margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
             child: ListTile(
@@ -168,14 +171,12 @@ class _ContactTileState extends State<ContactTile> {
                 text: TextSpan(
                   style: TextStyle(color: Colors.grey),
                   children: [
-                    widget.currentUser.uid == msg.fromUid ?
+                    widget.currentUser.uid == msg.from ?
                     TextSpan(text: 'You: ',
                         style: TextStyle(color: Theme.of(context).accentColor)) :
                     TextSpan(
                         text: '', style: TextStyle(color: Theme.of(context).accentColor)),
-                    msg.text.contains(
-                        'https://firebasestorage.googleapis.com/v0/b/medalarm-fcai2021.appspot.com')
-                        ?
+                    msg.type == 'image'?
                     TextSpan(text: '<Image>')
                         : TextSpan(text: msg.text),
                   ],
@@ -218,16 +219,16 @@ class _ContactTileState extends State<ContactTile> {
                           ChatRoom(
                             otherUser: widget.contact.user,
                           ),
-                    ));
+                    )).whenComplete(widget.refresh);
               },
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
           );
-      //   }
-      //   return Container();
-      // });
+        }
+        return Container();
+      });
   }
 }
 

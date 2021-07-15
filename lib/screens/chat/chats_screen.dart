@@ -32,10 +32,16 @@ class _ChatsScreenState extends State<ChatsScreen> {
     print(contacts.length);
   }
 
+  refresh() {
+    setState(() {
+    });
+    print('refreshed..........................');
+  }
+
   @override
   void initState() {
     super.initState();
-    FirebaseProvider.instance.login();
+    // FirebaseProvider.instance.login();
     // getLoggedUserInfo();
   }
 
@@ -74,11 +80,11 @@ class _ChatsScreenState extends State<ChatsScreen> {
                         itemCount: contacts.length,
                         itemBuilder: (ctx2, i) {
                           if (i == contacts.length - 1)
-                            return ContactTile(contacts[i]);
+                            return ContactTile(contacts[i], refresh: refresh);
                           else
                             return Column(
                               children: [
-                                ContactTile(contacts[i]),
+                                ContactTile(contacts[i], refresh: refresh),
                                 Container(
                                   height: 1,
                                   width: MediaQuery
@@ -131,21 +137,23 @@ class _ChatsScreenState extends State<ChatsScreen> {
     for(DocumentSnapshot dss in docs) {
       if(dss.id == '_init') continue;
       String msgPath = getMsgPath(dss.get('uid'));
+      var v1 = await firestore
+          .collection('Users')
+          .doc(dss.get('uid'))
+          .get();
+      if(!v1.exists) continue;
+      var v2 = await firestore
+          .collection('Messages/$msgPath/$msgPath')
+          .orderBy('date', descending: true)
+          .limit(1)
+          .get();
+      if(v2.docs.isEmpty) continue;
       contacts.add(
         Contact(
-          User.fromDoc(dss.get('uid'),
-              await firestore
-                .collection("Users")
-                .doc(dss.get('uid'))
-                .get()),
-          Message.fromDoc(
-              await firestore
-                  .collection('Messages/$msgPath/$msgPath')
-                  .orderBy('date', descending: true)
-                  .limit(1)
-                  .get()
-          )),
+          User.fromDoc(dss.get('uid'),v1),
+          Message.fromDoc(v2)),
       );
+
     }
     return contacts;
   }

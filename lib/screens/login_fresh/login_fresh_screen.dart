@@ -66,7 +66,7 @@ class BuildLoginFresh extends StatelessWidget {
           String password) {
         isRequest(true);
 
-        Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(Duration(seconds: 5), () {
           print('-------------- function call----------------');
           print(user);
           print(password);
@@ -92,7 +92,7 @@ class BuildLoginFresh extends StatelessWidget {
           (BuildContext _context, Function isRequest, String email) {
         isRequest(true);
 
-        Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(Duration(seconds: 5), () {
           print('-------------- function call----------------');
           print(email);
           print('--------------   end call   ----------------');
