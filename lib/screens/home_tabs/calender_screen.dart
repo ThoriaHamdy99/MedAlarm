@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/screens/medicine/med_details.dart';
-import '/main.dart';
-import '/providers/firebase_provider.dart';
-import '/providers/user_provider.dart';
-import '/models/med_Info.dart';
+import 'package:med_alarm/main.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/models/med_day.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {

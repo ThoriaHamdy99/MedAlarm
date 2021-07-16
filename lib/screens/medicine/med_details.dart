@@ -36,7 +36,7 @@ class _MedDetailsState extends State<MedDetails> {
         color: Theme.of(context).accentColor,
         child: _BottomContainer(),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      /*floatingActionButton: FloatingActionButton.extended(
         elevation: 10,
         foregroundColor: Colors.white,
         backgroundColor: Theme.of(context).accentColor,
@@ -62,7 +62,7 @@ class _MedDetailsState extends State<MedDetails> {
           );
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,*/
     );
   }
 }
@@ -74,9 +74,12 @@ class _BottomContainer extends StatefulWidget {
 
 class _BottomContainerState extends State<_BottomContainer> {
   String dropDownValue = 'Pill';
+  String durationValue = 'daily';
   int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
   var items = ['Pill', 'Solution', 'Injection', 'Drops', 'Powder', 'other'];
+  var durationItems = ['daily', 'weakly', 'monthly'];
+  bool isDaily = false;
 
   @override
   Widget build(BuildContext context) {
@@ -118,8 +121,8 @@ class _BottomContainerState extends State<_BottomContainer> {
                   new DropdownButton(
                     value: dropDownValue,
                     icon: Icon(Icons.keyboard_arrow_down),
-                    items: items.map((String items) {
-                      return DropdownMenuItem(value: items, child: Text(items));
+                    items: items.map((String item) {
+                      return DropdownMenuItem(value: item, child: Text(item));
                     }).toList(),
                     onChanged: (var newValue) {
                       if (newValue != null) {
@@ -130,7 +133,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                     },
                   ),
                   PanelTitle(
-                    title: "amount of med in one dose",
+                    title: "amount of med",
                     isRequired: true,
                   ),
                   TextFormField(
@@ -144,6 +147,27 @@ class _BottomContainerState extends State<_BottomContainer> {
                       labelText: 'Enter number',
                     ),
                   ),
+
+                  PanelTitle(
+                    title: "Duration",
+                    isRequired: true,
+                  ),
+                  new DropdownButton(
+                    value: durationValue,
+                    icon: Icon(Icons.keyboard_arrow_down),
+                    items: durationItems.map((String item) {
+                      return DropdownMenuItem(value: item, child: Text(item));
+                    }).toList(),
+                    onChanged: (var newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          durationValue = newValue as String;
+                          if(durationValue == "daily") isDaily = true;
+                        });
+                      } else {}
+                    },
+                  ),
+
                   PanelTitle(
                     title: "hours between each dose",
                     isRequired: true,
@@ -151,9 +175,9 @@ class _BottomContainerState extends State<_BottomContainer> {
                   new DropdownButton(
                     value: dropDownValueDoses,
                     icon: Icon(Icons.keyboard_arrow_down),
-                    items: doses.map((int items) {
+                    items: doses.map((int item) {
                       return DropdownMenuItem(
-                          value: items, child: Text(items.toString()));
+                          value: item, child: Text(item.toString()));
                     }).toList(),
                     onChanged: (var newValue) {
                       if (newValue != null) {
@@ -163,6 +187,50 @@ class _BottomContainerState extends State<_BottomContainer> {
                       } else {}
                     },
                   ),
+                  RaisedButton(
+                    elevation: 10,
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 25,
+                    ),
+                    textColor: Colors.white,
+                    color: Theme.of(context).accentColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0)),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MedReminderDetails(),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          " Next ",
+                          style: TextStyle(
+                            fontFamily: "Angel",
+                            fontSize: 28,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward)
+                      ],
+                    ),
+                  ),
+                  /*TextFormField(
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    decoration: InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: 'Enter number',
+                    ),
+                  ),*/
                 ],
               ),
             )));
@@ -191,7 +259,7 @@ class PanelTitle extends StatelessWidget {
                 fontSize: 24, color: Colors.black, fontWeight: FontWeight.w500),
           ),
           TextSpan(
-            text: isRequired ? " *" : "",
+            text: isRequired ? "*" : "",
             style: TextStyle(fontSize: 16, color: Colors.red),
           ),
         ]),
@@ -229,9 +297,11 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
       ),
       body: Container(
         color: Theme.of(context).accentColor,
-        child: _ReminderDetailsContainer(),
+        child: Container(
+          child: _ReminderDetailsContainer(),
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      /*floatingActionButton: FloatingActionButton.extended(
         elevation: 10,
         foregroundColor: Colors.white,
         backgroundColor: Theme.of(context).accentColor,
@@ -252,7 +322,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
           );
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,*/
     );
   }
 }
@@ -305,7 +375,8 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(50.0),
                             ),
-                            primary: Theme.of(context).accentColor, // background
+                            primary:
+                                Theme.of(context).accentColor, // background
                             onPrimary: Colors.amber, // foreground
                           ),
                           child: new Icon(Icons.date_range),
@@ -329,7 +400,8 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(50.0),
                             ),
-                            primary: Theme.of(context).accentColor, // background
+                            primary:
+                                Theme.of(context).accentColor, // background
                             onPrimary: Colors.amber, // foreground
                           ),
                           child: new Icon(Icons.date_range),
@@ -351,18 +423,49 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         TimePickerSpinner(
                           is24HourMode: false,
                           normalTextStyle: TextStyle(
-                              fontSize: 24, color: Theme.of(context).accentColor),
+                              fontSize: 24,
+                              color: Theme.of(context).accentColor),
                           highlightedTextStyle:
                               TextStyle(fontSize: 24, color: Colors.amber),
-                          spacing: 50,
-                          itemHeight: 80,
+                          spacing: 45,
+                          itemHeight: 40,
                           isForce2Digits: true,
                           onTimeChange: (time) {
                             setState(() {
                               _dateTime = time;
                             });
                           },
-                        )
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        RaisedButton(
+                          elevation: 10,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 25,
+                          ),
+                          textColor: Colors.white,
+                          color: Theme.of(context).accentColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0)),
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MedReminderDetails(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            " Done ",
+                            style: TextStyle(
+                              fontFamily: "Angel",
+                              fontSize: 28,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ]),
                 ))));
   }

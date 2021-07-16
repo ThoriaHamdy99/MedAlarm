@@ -1,18 +1,30 @@
+import 'package:flutter/cupertino.dart';
+
+import 'dose.dart';
+
 class Medicine {
-  final List<dynamic> notificationIDs;
-  final String medicineName;
-  final int dosage;
-  final String medicineType;
-  final int interval;
-  final String startTime;
+  final String medName;
+  final String medType;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int amountOfMed;
+  final String interval;
+  final int intervalTime;
+  final DateTime startTime;
+  final int numOfDoses;
+  List<Dose> doses;
 
   Medicine({
-    this.notificationIDs,
-    this.medicineName,
-    this.dosage,
-    this.medicineType,
+    @required this.medName,
+    @required this.medType,
+    @required this.startDate,
+    @required this.endDate,
+    @required this.amountOfMed,
     this.startTime,
     this.interval,
+    this.numOfDoses,
+    this.doses,
+    this.intervalTime,
   });
 
   // String get getName => medicineName;
@@ -24,23 +36,31 @@ class Medicine {
 
   Map<String, dynamic> toJson() {
     return {
-      "ids": this.notificationIDs,
-      "name": this.medicineName,
-      "dosage": this.dosage,
-      "type": this.medicineType,
-      "interval": this.interval,
-      "start": this.startTime,
+      "name": this.medName,
+      "type": this.medType,
+      "start": this.startDate,
+      "end": this.endDate,
+      "amount": this.amountOfMed,
+      "numOfDoses": this.numOfDoses,
+      "doses": this.doses,
+      "startTime" : this.startTime,
+      "interval" : this.interval,
+      "intervalTime" : this.intervalTime,
     };
   }
 
   factory Medicine.fromJson(Map<String, dynamic> parsedJson) {
     return Medicine(
-      notificationIDs: parsedJson['ids'],
-      medicineName: parsedJson['name'],
-      dosage: parsedJson['dosage'],
-      medicineType: parsedJson['type'],
+      medName: parsedJson['name'],
+      medType: parsedJson['type'],
+      startDate: parsedJson['start'],
+      endDate: parsedJson['end'],
+      amountOfMed: parsedJson['amount'],
+      numOfDoses: parsedJson['numOfDoses'],
+      doses: parsedJson['doses'],
       interval: parsedJson['interval'],
-      startTime: parsedJson['start'],
+      startTime : parsedJson['startTime'],
+      intervalTime : parsedJson['intervalTime'],
     );
   }
 }

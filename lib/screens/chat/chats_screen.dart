@@ -4,12 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
-import '/models/contact.dart';
-import '/models/message.dart';
-import '/models/user.dart';
-import '/screens/search_contact_screen.dart';
-import '/providers/firebase_provider.dart';
-import '/custom_widgets/custom_widgets.dart';
+import 'package:med_alarm/models/contact.dart';
+import 'package:med_alarm/models/message.dart';
+import 'package:med_alarm/models/user.dart';
+import 'package:med_alarm/screens/search_contact_screen.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/custom_widgets/custom_widgets.dart';
 
 class ChatsScreen extends StatefulWidget {
   static const String id = 'CHATS_SCREEN';

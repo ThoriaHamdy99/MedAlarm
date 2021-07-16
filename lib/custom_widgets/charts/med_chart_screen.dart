@@ -1,4 +1,4 @@
-import '/models/medicine.dart';
+import 'package:med_alarm/models/medicine.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart'as charts;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/screens/home_tabs/calender_screen.dart';
 import 'package:med_alarm/screens/report/report_screen.dart';
-import '/main.dart';
-import '/providers/firebase_provider.dart';
-import '/providers/user_provider.dart';
-import '/models/med_Info.dart';
+import 'package:med_alarm/main.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/models/med_day.dart';
 
 import 'chat/chats_screen.dart';
 import 'empty.dart';

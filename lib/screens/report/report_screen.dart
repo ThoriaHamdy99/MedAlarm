@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:ext_storage/ext_storage.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart ' as pw;
-import '/custom_widgets/charts/med_chart_screen.dart';
+import 'package:med_alarm/custom_widgets/charts/med_chart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 

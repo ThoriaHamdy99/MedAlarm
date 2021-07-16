@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
-import '/models/user.dart';
-import '/providers/user_provider.dart';
-import '/providers/firebase_provider.dart';
-import '/custom_widgets/custom_widgets.dart';
+import 'package:med_alarm/models/user.dart';
+import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/custom_widgets/custom_widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:firebase_storage/firebase_storage.dart';
