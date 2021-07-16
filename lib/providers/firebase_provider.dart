@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/user.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
@@ -20,6 +22,7 @@ class FirebaseProvider with ChangeNotifier {
         .orderBy('date', descending: true)
         .limit(1)
         .snapshots();
+
   }
 
   Future getLatestMsg(String msgPath) {
@@ -163,7 +166,10 @@ class FirebaseProvider with ChangeNotifier {
         .collection("Users")
         .doc(auth.currentUser.uid)
         .get();
-    UserProvider.instance.currentUser = User.fromDoc(auth.currentUser.uid, value);
+    if(value.get('type') == 'Patient')
+      UserProvider.instance.currentUser = Patient.fromDoc(auth.currentUser.uid, value);
+    else if(value.get('type') == 'Doctor')
+      UserProvider.instance.currentUser = Doctor.fromDoc(auth.currentUser.uid, value);
   }
 
   Future<String> getDeviceToken() async {

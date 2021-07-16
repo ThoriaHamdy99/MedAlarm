@@ -9,7 +9,8 @@ class SignUpModel {
   String dob;
   String address;
 
-  String type ;
+  String type;
+  String speciality;
 
   SignUpModel({
     this.email,
@@ -20,6 +21,7 @@ class SignUpModel {
     this.phoneNumber,
     this.dob,
     this.address,
-    this.type
+    this.type,
+    this.speciality
   });
 }

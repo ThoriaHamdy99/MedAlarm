@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/user.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import '/providers/firebase_provider.dart';
@@ -92,18 +94,31 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
       // print(this.signUpModel.address.trim());
       // print(Timestamp.fromDate(DateTime.parse(date)));
       // print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-
-      UserProvider.instance.currentUser = User(
-        uid: auth.user.uid,
-        email: this.signUpModel.email.trim(),
-        type: this.signUpModel.type.trim(),
-        firstname: this.signUpModel.firstname.trim(),
-        lastname: this.signUpModel.lastname.trim(),
-        profPicURL: '',
-        phoneNumber: this.signUpModel.phoneNumber.trim(),
-        address: this.signUpModel.address.trim(),
-        dob: Timestamp.fromDate(DateTime.parse(date)),
-      );
+      if(this.signUpModel.type.trim() == 'Patient')
+        UserProvider.instance.currentUser = Patient(
+          uid: auth.user.uid,
+          email: this.signUpModel.email.trim(),
+          type: this.signUpModel.type.trim(),
+          firstname: this.signUpModel.firstname.trim(),
+          lastname: this.signUpModel.lastname.trim(),
+          profPicURL: '',
+          phoneNumber: this.signUpModel.phoneNumber.trim(),
+          address: this.signUpModel.address.trim(),
+          dob: Timestamp.fromDate(DateTime.parse(date)),
+        );
+      else if(this.signUpModel.type.trim() == 'Doctor')
+        UserProvider.instance.currentUser = Doctor(
+          uid: auth.user.uid,
+          email: this.signUpModel.email.trim(),
+          type: this.signUpModel.type.trim(),
+          speciality: this.signUpModel.speciality.trim(),
+          firstname: this.signUpModel.firstname.trim(),
+          lastname: this.signUpModel.lastname.trim(),
+          profPicURL: '',
+          phoneNumber: this.signUpModel.phoneNumber.trim(),
+          address: this.signUpModel.address.trim(),
+          dob: Timestamp.fromDate(DateTime.parse(date)),
+        );
 
       await FirebaseProvider.instance.registerDeviceToken();
       SQLHelper.getInstant().insertUser();

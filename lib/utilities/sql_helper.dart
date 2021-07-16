@@ -1,5 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/user.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -72,17 +74,18 @@ class SQLHelper {
     Database db = await this.database;
 
     await db.execute('DELETE FROM User');
-    // await db.execute('DROP TABLE User');
-    // await db.execute('''CREATE TABLE User(
-    //           uid TEXT PRIMARY KEY,
-    //           email TEXT NOT NULL,
-    //           type TEXT NOT NULL,
-    //           firstname TEXT NOT NULL,
-    //           lastname TEXT NOT NULL,
-    //           profPicURL TEXT NOT NULL,
-    //           phoneNumber TEXT NOT NULL,
-    //           address TEXT NOT NULL,
-    //           dob INT NOT NULL)''');
+    await db.execute('DROP TABLE User');
+    await db.execute('''CREATE TABLE User(
+              uid TEXT PRIMARY KEY,
+              email TEXT NOT NULL,
+              type TEXT NOT NULL,
+              speciality TEXT,
+              firstname TEXT NOT NULL,
+              lastname TEXT NOT NULL,
+              profPicURL TEXT NOT NULL,
+              phoneNumber TEXT NOT NULL,
+              address TEXT NOT NULL,
+              dob INT NOT NULL)''');
     User user = UserProvider.instance.currentUser;
     print('+++++++++++++++++++++++ From InsertUser +++++++++++++++++++++++');
     print(user.uid);
@@ -95,17 +98,36 @@ class SQLHelper {
     print(user.address);
     print(user.dob);
     print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    var result = await db.rawInsert('''insert into User
-                                        values(
-                                        '${user.uid.toString()}',
-                                        '${user.email}',
-                                        '${user.type}',
-                                        '${user.firstname}',
-                                        '${user.lastname}',
-                                        '${user.profPicURL}',
-                                        '${user.phoneNumber}',
-                                        '${user.address}',
-                                        '${user.dob.toDate().millisecondsSinceEpoch}')''');
+    var result;
+    if(UserProvider.instance.currentUser.type == 'Patient')
+      result = await db.rawInsert('''insert into User(
+        uid, email, type, speciality, firstname,
+        lastname, profPicURL, phoneNumber, address, dob)
+        values(
+        '${user.uid.toString()}',
+        '${user.email}',
+        '${user.type}',
+        '${user.firstname}',
+        '${user.lastname}',
+        '${user.profPicURL}',
+        '${user.phoneNumber}',
+        '${user.address}',
+        '${user.dob.toDate().millisecondsSinceEpoch}')''');
+    else if(UserProvider.instance.currentUser.type == 'Doctor')
+      result = await db.rawInsert('''insert into User(
+        uid, email, type, speciality, firstname,
+        lastname, profPicURL, phoneNumber, address, dob)
+        values(
+        '${user.uid.toString()}',
+        '${user.email}',
+        '${user.type}',
+        '${(user as Doctor).speciality}',
+        '${user.firstname}',
+        '${user.lastname}',
+        '${user.profPicURL}',
+        '${user.phoneNumber}',
+        '${user.address}',
+        '${user.dob.toDate().millisecondsSinceEpoch}')''');
 
     return result;
   }
@@ -115,29 +137,46 @@ class SQLHelper {
 
     List<Map<String, dynamic>> result = await db.rawQuery('''SELECT * FROM User;''');
     // print(Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']));
-    // print('+++++++++++++++++++++++ From GetUser +++++++++++++++++++++++');
-    // print(result[0]['uid']);
-    // print(result[0]['email']);
-    // print(result[0]['username']);
-    // print(result[0]['type']);
-    // print(result[0]['firstname']);
-    // print(result[0]['lastname']);
-    // print(result[0]['profPicURL']);
-    // print(result[0]['phoneNumber']);
-    // print(result[0]['address']);
-    // print(Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']));
-    // print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    return User(
-      uid: result[0]['uid'],
-      email: result[0]['email'],
-      type: result[0]['type'],
-      firstname: result[0]['firstname'],
-      lastname: result[0]['lastname'],
-      profPicURL: result[0]['profPicURL'],
-      phoneNumber: result[0]['phoneNumber'],
-      address: result[0]['address'],
-      dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
-    );
+    print('+++++++++++++++++++++++ From GetUser +++++++++++++++++++++++');
+    print(result[0]['uid']);
+    print(result[0]['email']);
+    print(result[0]['username']);
+    print(result[0]['type']);
+    print(result[0]['firstname']);
+    print(result[0]['lastname']);
+    print(result[0]['profPicURL']);
+    print(result[0]['phoneNumber']);
+    print(result[0]['address']);
+    print(Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']));
+    print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+
+    if(result[0]['type'] == 'Patient')
+      return Patient(
+        uid: result[0]['uid'],
+        email: result[0]['email'],
+        type: result[0]['type'],
+        firstname: result[0]['firstname'],
+        lastname: result[0]['lastname'],
+        profPicURL: result[0]['profPicURL'],
+        phoneNumber: result[0]['phoneNumber'],
+        address: result[0]['address'],
+        dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
+      );
+    else if(result[0]['type'] == 'Doctor')
+      return Doctor(
+        uid: result[0]['uid'],
+        email: result[0]['email'],
+        type: result[0]['type'],
+        speciality: result[0]['speciality'],
+        firstname: result[0]['firstname'],
+        lastname: result[0]['lastname'],
+        profPicURL: result[0]['profPicURL'],
+        phoneNumber: result[0]['phoneNumber'],
+        address: result[0]['address'],
+        dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
+      );
+    print('Function getUser is not fine');
+    return null;
   }
 
   Future<int> deleteUser() async {

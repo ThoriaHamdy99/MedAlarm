@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
+import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/patient.dart';
 import '/models/contact.dart';
 import '/models/message.dart';
 import '/models/user.dart';
@@ -108,12 +110,18 @@ class _ChatsScreenState extends State<ChatsScreen> {
       if(!v1.exists) continue;
       var v2 = await fbPro.getLatestMsg(msgPath);
       if(v2.docs.isEmpty) continue;
-      contacts.add(
-        Contact(
-          User.fromDoc(dss.get('uid'),v1),
-          Message.fromDoc(v2)),
-      );
-
+      if(v1.get('type') == 'Patient')
+        contacts.add(
+          Contact(
+            Patient.fromDoc(dss.get('uid'),v1),
+            Message.fromDoc(v2)),
+        );
+      else if(v1.get('type') == 'Doctor')
+        contacts.add(
+          Contact(
+            Doctor.fromDoc(dss.get('uid'),v1),
+            Message.fromDoc(v2)),
+        );
     }
     return contacts;
   }

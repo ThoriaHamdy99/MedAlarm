@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 
 import '../models/user.dart';
@@ -61,7 +63,11 @@ class _SearchContactState extends State<SearchContact> {
                     ),
                   );
                 }
-                User user = User.fromDoc(snapshot.data.docs[0].id, snapshot.data.docs[0]);
+                User user;
+                if(snapshot.data.docs[0].get('type') == 'Patient')
+                  user = Patient.fromDoc(snapshot.data.docs[0].id, snapshot.data.docs[0]);
+                else if(snapshot.data.docs[0].get('type') == 'Doctor')
+                  user = Doctor.fromDoc(snapshot.data.docs[0].id, snapshot.data.docs[0]);
                 return StreamBuilder(
                 stream: fbPro.getContactFromUser(widget.currentUser.uid, user.uid),
                 builder: (ctx, snapshot) {
