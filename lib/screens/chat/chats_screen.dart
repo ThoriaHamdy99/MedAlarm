@@ -2,14 +2,14 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
+import 'package:med_alarm/custom_widgets/custom_widgets.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/contact.dart';
 import 'package:med_alarm/models/message.dart';
-import 'package:med_alarm/models/user.dart';
+import 'package:med_alarm/screens/chat/chatbot_screen.dart';
 import 'package:med_alarm/screens/search_contact_screen.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
-import 'package:med_alarm/custom_widgets/custom_widgets.dart';
 
 class ChatsScreen extends StatefulWidget {
   static const String id = 'CHATS_SCREEN';
@@ -27,7 +27,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
   refresh() {
     setState(() {
-      contacts.clear();
+      // contacts.clear();
     });
   }
 
@@ -46,48 +46,71 @@ class _ChatsScreenState extends State<ChatsScreen> {
         ],
       ),
       body: SafeArea(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: fbPro.getContacts(widget.auth.currentUser.uid),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              // return Container();
-              return StreamBuilder(
-                  stream: Stream.fromFuture(getContacts(snapshot.data.docs)),
-                  builder: (ctx, ss) {
-                    if(ss.hasData && ss.data.isNotEmpty) {
-                      contacts = ss.data;
-                      contacts.sort((a, b) => b.latestMsg.date.compareTo(a.latestMsg.date));
-                      print('Sorted');
-                      return ListView.builder(
-                        itemCount: contacts.length,
-                        itemBuilder: (ctx2, i) {
-                          if (i == contacts.length - 1)
-                            return ContactTile(contacts[i], refresh: refresh);
-                          else
-                            return Column(
-                              children: [
-                                ContactTile(contacts[i], refresh: refresh),
-                                Container(
-                                  height: 1,
-                                  width: MediaQuery
-                                      .of(context)
-                                      .size
-                                      .width * 2 / 3,
-                                  color: Colors.grey,
-                                )
-                              ],
+        child: Column(
+          children: [
+            Container(
+              child: ListTile(
+                leading: Hero(
+                  tag: 'ChatBot',
+                  child: Icon(
+                    Icons.android,
+                    size: 40,
+                    color: Theme.of(context).accentColor,
+                  ),
+                ),
+                title: Text('Chat Bot', style: TextStyle(fontSize: 16)),
+                onTap: () {
+                  Navigator.pushNamed(context, ChatBotScreen.id);
+                },
+              ),
+            ),
+            Divider(height: 0, thickness: 1),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: fbPro.getContacts(widget.auth.currentUser.uid),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    // return Container();
+                    return StreamBuilder(
+                        stream: Stream.fromFuture(getContacts(snapshot.data.docs)),
+                        builder: (ctx, ss) {
+                          if(ss.hasData && ss.data.isNotEmpty) {
+                            contacts = ss.data;
+                            contacts.sort((a, b) => b.latestMsg.date.compareTo(a.latestMsg.date));
+                            print('Sorted');
+                            return ListView.builder(
+                              itemCount: contacts.length,
+                              itemBuilder: (ctx2, i) {
+                                if (i == contacts.length - 1)
+                                  return ContactTile(contacts[i], refresh: refresh);
+                                else
+                                  return Column(
+                                    children: [
+                                      ContactTile(contacts[i], refresh: refresh),
+                                      Container(
+                                        height: 1,
+                                        width: MediaQuery
+                                            .of(context)
+                                            .size
+                                            .width * 2 / 3,
+                                        color: Colors.grey,
+                                      )
+                                    ],
+                                  );
+                              },
                             );
+                          }
+                          else if(ss.hasData && ss.data.isEmpty)
+                            return Container();
+                          return Center(child: CircularProgressIndicator());
                         },
-                      );
-                    }
-                    else if(ss.hasData && ss.data.isEmpty)
-                      return Center(child: Text('No messages yet...'));
-                    return Center(child: CircularProgressIndicator());
-                  },
-              );
-            }
-            return Center(child: CircularProgressIndicator());
-          },
+                    );
+                  }
+                  return Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

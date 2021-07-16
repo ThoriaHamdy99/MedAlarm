@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
-import 'package:med_alarm/models/user.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/screens/home_screen.dart';

@@ -208,17 +208,17 @@ class _ChatRoomState extends State<ChatRoom> {
                       Container(
                         height: 50,
                         width: 30,
-                        child: FlatButton(
+                        child: IconButton(
                           padding: EdgeInsets.all(0),
                           onPressed: chooseImage,
-                          child: Icon(
+                          icon: Icon(
                             Icons.attach_file,
                             color: Colors.grey,
                             size: 30,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          // shape: RoundedRectangleBorder(
+                          //   borderRadius: BorderRadius.circular(10),
+                          // ),
                         ),
                       ),
                       Container(

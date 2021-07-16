@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:med_alarm/screens/chat/chatbot_screen.dart';
 import 'providers/firebase_provider.dart';
 import 'screens/medicine/med_details.dart';
 import 'screens/home_tabs/calender_screen.dart';
@@ -66,6 +67,7 @@ class _MyAppState extends State<MyApp> {
         ChatsScreen.id: (context) => ChatsScreen(),
         ReportScreen.id: (context) => ReportScreen(),
         MedDetails.id: (context) => MedDetails(),
+        ChatBotScreen.id: (context) => ChatBotScreen(),
       },
     );
   }
