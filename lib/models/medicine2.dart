@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 import 'dose.dart';
 
 class Medicine {
@@ -34,7 +32,7 @@ class Medicine {
   // String get getStartTime => startTime;
   // List<dynamic> get getIDs => notificationIDs;
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       "name": this.medName,
       "type": this.medType,
@@ -49,7 +47,7 @@ class Medicine {
     };
   }
 
-  factory Medicine.fromJson(Map<String, dynamic> parsedJson) {
+  factory Medicine.fromMap(Map<String, dynamic> parsedJson) {
     return Medicine(
       medName: parsedJson['name'],
       medType: parsedJson['type'],
