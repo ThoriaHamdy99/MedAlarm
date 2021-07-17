@@ -33,16 +33,5 @@ class Patient extends User {
     phoneNumber = doc.get('phoneNumber');
     address = doc.get('address');
     dob = doc.get('dob');
-    // print('+++++++++++++++++++ From User Constructor +++++++++++++++++++');
-    // print(uid);
-    // print(email);
-    // print(type);
-    // print(firstname);
-    // print(lastname);
-    // print(profPicURL);
-    // print(phoneNumber);
-    // print(address);
-    // print(dob);
-    // print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
   }
 }

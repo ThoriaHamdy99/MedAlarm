@@ -61,44 +61,23 @@ class SQLHelper {
               intervalTime INT)''');
   }
 
-  // Future<List<Map<String, dynamic>>> getStudentMapList() async {
-  //   Database db = await this.database;
-  //
-  //   // var result = await db.query(_tableName, orderBy: "$_id ASc");
-  //   var result = await db.rawQuery('''select * from $_tableName
-  //                                   order by $_id asc''');
-  //
-  //   return result;
-  // }
-
   Future<int> insertUser() async {
     Database db = await this.database;
 
     await db.execute('DELETE FROM User');
-    await db.execute('DROP TABLE User');
-    await db.execute('''CREATE TABLE User(
-              uid TEXT PRIMARY KEY,
-              email TEXT NOT NULL,
-              type TEXT NOT NULL,
-              speciality TEXT,
-              firstname TEXT NOT NULL,
-              lastname TEXT NOT NULL,
-              profPicURL TEXT NOT NULL,
-              phoneNumber TEXT NOT NULL,
-              address TEXT NOT NULL,
-              dob INT NOT NULL)''');
+    // await db.execute('DROP TABLE User');
+    // await db.execute('''CREATE TABLE User(
+    //           uid TEXT PRIMARY KEY,
+    //           email TEXT NOT NULL,
+    //           type TEXT NOT NULL,
+    //           speciality TEXT,
+    //           firstname TEXT NOT NULL,
+    //           lastname TEXT NOT NULL,
+    //           profPicURL TEXT NOT NULL,
+    //           phoneNumber TEXT NOT NULL,
+    //           address TEXT NOT NULL,
+    //           dob INT NOT NULL)''');
     User user = UserProvider.instance.currentUser;
-    print('+++++++++++++++++++++++ From InsertUser +++++++++++++++++++++++');
-    print(user.uid);
-    print(user.email);
-    print(user.type);
-    print(user.firstname);
-    print(user.lastname);
-    print(user.profPicURL);
-    print(user.phoneNumber);
-    print(user.address);
-    print(user.dob);
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     var result;
     if(UserProvider.instance.currentUser.type == 'Patient')
       result = await db.rawInsert('''insert into User(
@@ -137,18 +116,6 @@ class SQLHelper {
     Database db = await database;
 
     List<Map<String, dynamic>> result = await db.rawQuery('''SELECT * FROM User;''');
-    print('+++++++++++++++++++++++ From GetUser +++++++++++++++++++++++');
-    print(result[0]['uid']);
-    print(result[0]['email']);
-    print(result[0]['username']);
-    print(result[0]['type']);
-    print(result[0]['firstname']);
-    print(result[0]['lastname']);
-    print(result[0]['profPicURL']);
-    print(result[0]['phoneNumber']);
-    print(result[0]['address']);
-    print(Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']));
-    print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
     if(result[0]['type'] == 'Patient')
       return Patient(
@@ -240,17 +207,6 @@ class SQLHelper {
     print(result[0]['intervalTime']);
     print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     return Medicine.fromMap(result[0]);
-    // return Medicine(
-    //   medName: result[0]['name'],
-    //   medType: result[0]['type'],
-    //   startDate: result[0]['startDate'],
-    //   endDate: result[0]['endDate'],
-    //   amountOfMed: result[0]['amount'],
-    //   numOfDoses: result[0]['nDoses'],
-    //   startTime: result[0]['startTime'],
-    //   interval: result[0]['interval'],
-    //   intervalTime: result[0]['intervalTime'],
-    // );
   }
 
   Future<List<Medicine>> getAllMedicines() async {
@@ -268,38 +224,4 @@ class SQLHelper {
 
     return result;
   }
-
-// Future<int> updateStudent(Student student) async {
-//   Database db = await this.database;
-//
-//   int result = await db.rawUpdate('''update $_tableName
-//                                       set $_name = '${student.name}',
-//                                           $_description = '${student.description}',
-//                                           $_date = '${student.date}',
-//                                           $_pass = ${student.pass}
-//                                        where $_id = ${student.id}''');
-//
-//   return result;
-// }
-
-  // Future<int> getCount() async {
-  //   Database db = await this.database;
-  //
-  //   List<Map<String, dynamic>> all =
-  //       await db.rawQuery("SELECT COUNT (*) FROM $_tableName");
-  //
-  //   int result = Sqflite.firstIntValue(all);
-  //
-  //   return result;
-  // }
-
-  // Future<List<Student>> getStudentList() async {
-  //   var studentMapList = await getStudentMapList();
-  //   int count = studentMapList.length;
-  //   var students = List<Student>();
-  //   for (var i = 0; i < count; i++) {
-  //     students.add(Student.fromMap(studentMapList[i]));
-  //   }
-  //   return students;
-  // }
 }

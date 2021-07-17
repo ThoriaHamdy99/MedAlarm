@@ -37,17 +37,5 @@ class Doctor extends User {
     address = doc.get('address');
     dob = doc.get('dob');
     speciality = doc.get('speciality');
-    print('+++++++++++++++++++ From User Constructor +++++++++++++++++++');
-    print(uid);
-    print(email);
-    print(type);
-    print(speciality);
-    print(firstname);
-    print(lastname);
-    print(profPicURL);
-    print(phoneNumber);
-    print(address);
-    print(dob);
-    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
   }
 }

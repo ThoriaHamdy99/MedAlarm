@@ -82,8 +82,12 @@ class FirebaseProvider with ChangeNotifier {
         .snapshots();
   }
 
-  Stream getContacts(String userUid) {
+  Stream getContactsStream(String userUid) {
     return firestore.collection("Users/$userUid/Contacts").snapshots();
+  }
+
+  Future getContacts() {
+    return firestore.collection("Users/${auth.currentUser.uid}/Contacts").get();
   }
 
   sendMessage(
@@ -137,8 +141,13 @@ class FirebaseProvider with ChangeNotifier {
     initNewUserContacts(uid);
   }
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> getUser(String userUid) async {
+  Future getUser(String userUid) async {
     return await firestore.collection('Users').doc(userUid).get();
+  }
+
+  Future getDoctor(String userUid) async {
+    var doc = await firestore.collection('Users').doc(userUid).get();
+    return doc.get('type') == 'Doctor' ? doc : null;
   }
 
   initNewUserContacts(String uid) async {
@@ -150,8 +159,7 @@ class FirebaseProvider with ChangeNotifier {
         .set({});
   }
 
-
-  Future<void> logout() async {
+  logout() async {
     try{
       await SQLHelper.getInstant().deleteUser();
       await removeDeviceToken();

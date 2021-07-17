@@ -67,7 +67,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
             Divider(height: 0, thickness: 1),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: fbPro.getContacts(widget.auth.currentUser.uid),
+                stream: fbPro.getContactsStream(widget.auth.currentUser.uid),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     // return Container();

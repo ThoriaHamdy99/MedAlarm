@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/service/chatbot.dart';
+
+import 'chatroom_screen.dart';
 
 class ChatBotScreen extends StatefulWidget {
   static const id = 'CHAT_BOT_SCREEN';
@@ -20,10 +24,10 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   ChatBot cb;
   Answer answer;
 
-  callback(String query) {
-    answer = cb.query(query);
-    if(answer.list.isEmpty) answer = cb.start();
-    streamController.add(ChatBotMessage(answer, callback));
+  callback(String query) async {
+    Answer answer = await cb.query(query);
+    if(answer.type == AnswersType.error) answer = cb.start();
+    streamController.add(ChatBotMessage(cb, answer, callback));
   }
 
   @override
@@ -35,8 +39,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     msgBox = buildMessageBox();
     cb = ChatBot();
     answer = cb.start();
-    streamController.add(ChatBotMessage(answer, callback));
-    // load(streamController);
+    streamController.add(ChatBotMessage(cb, answer, callback));
   }
 
   @override
@@ -97,7 +100,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 color: Colors.white10,
                 child: Container(
                   height: 50,
-                  child: answer.needInput ? Row(
+                  child: answer.type == AnswersType.question ? Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
@@ -153,11 +156,11 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     );
   }
 
-  answerQuestion() {
+  answerQuestion() async {
     streamController.add(MessageBubble(messagesController.text));
-    answer = cb.query(answer.list[0], input: int.parse(messagesController.text));
-    if(answer.list.isEmpty) answer = cb.start();
-    streamController.add(ChatBotMessage(answer, callback));
+    answer = await cb.query(answer.list[0], input: int.parse(messagesController.text));
+    if(answer.type == AnswersType.error) answer = await cb.start();
+    streamController.add(ChatBotMessage(cb, answer, callback));
     messagesController.clear();
   }
 }
@@ -170,7 +173,7 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -209,69 +212,162 @@ class MessageBubble extends StatelessWidget {
 }
 
 class ChatBotMessage extends StatelessWidget {
+  final ChatBot cb;
   final Answer answer;
   final Function callback;
 
-  ChatBotMessage(this.answer, this.callback);
+  final bsMid = ButtonStyle(
+    overlayColor: MaterialStateColor.resolveWith((states) => Colors.white54),
+  );
+  final bsEnd = ButtonStyle(
+    overlayColor: MaterialStateColor.resolveWith((states) => Colors.white54),
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(25),
+            bottomRight: Radius.circular(25),
+          ),
+          // side: BorderSide(color: Colors.red),
+        )
+    ),
+  );
+  final bsBack = ButtonStyle(
+    overlayColor: MaterialStateColor.resolveWith((states) => Colors.red),
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(25),
+            bottomRight: Radius.circular(25),
+          ),
+          // side: BorderSide(color: Colors.red),
+        )
+    ),
+  );
+
+  ChatBotMessage(this.cb, this.answer, this.callback);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Material(
             color: Colors.grey,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(25),
             // elevation: 6,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  // padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 2 / 3,
                     ),
-                    child: answer.needInput ?
+                    child: answer.type == AnswersType.question ?
                       Text(answer.list[0]):
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            answer.title,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              // color: Colors.grey[600],
+                              color: Theme.of(context).accentColor,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(25),
+                                topRight: Radius.circular(25),
+                              ),
+                            ),
+                            child: Text(
+                              answer.title,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                // color: Colors.white,
+                              ),
                             ),
                           ),
-                          Divider(color: Colors.white, thickness: 1,),
+                          // Divider(color: Colors.white, thickness: 1, height: 0),
+                          SizedBox(height: 7),
                           ListView.builder(
                             shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
                             itemCount: answer.list.length,
                             itemBuilder: (ctx, i) {
+                              var bs = bsMid;
+                              if(i == answer.list.length - 1 &&
+                                  answer.type == AnswersType.start) bs = bsEnd;
                               return Container(
-                                margin: EdgeInsets.symmetric(vertical: 4),
-                                padding: EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: Theme.of(context).accentColor,
-                                ),
-                                child: TextButton(
-                                  onPressed: () => callback(answer.list[i]),
-                                  child: Text(answer.list[i], style: TextStyle(color: Colors.white)),
+                                // color: Theme.of(context).accentColor,
+                                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                child: Material(
+                                  color: Colors.white24,
+                                  // color: Theme.of(context).accentColor,
+                                  child: InkWell(
+                                    onTap: getButtonCallback(i, context),
+                                    child: getButtonChild(i),
+                                    splashColor: Theme.of(context).accentColor,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
                                 ),
                               );
                             },
                           ),
-                          Divider(color: Colors.white, thickness: 1,),
-                          answer.title != 'How can i help?' ?
-                          TextButton(
-                            onPressed: () => callback(''),
-                            child: Text('Back', style: TextStyle(color: Colors.white)),
-                          ):Container(),
+                          SizedBox(height: 7),
+                          // if(answer.type != AnswersType.start)
+                          //   Divider(color: Colors.white, thickness: 1,),
+                          answer.type == AnswersType.start ?
+                            Container():
+                            Material(
+                              color: Colors.grey[600],
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(25),
+                                bottomRight: Radius.circular(25),
+                              ),
+                              child: InkWell(
+                                onTap: () async {await callback('Back');},
+                                // child: Text('Back', style: TextStyle(color: Colors.white)),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                  child: Text(
+                                    'Back',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500
+                                    ),
+                                  ),
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(25),
+                                  bottomRight: Radius.circular(25),
+                                ),
+                                splashColor: Colors.red,
+                                // hoverColor: Colors.red,
+                                // highlightColor: Colors.red,
+                                // overlayColor: MaterialStateColor.resolveWith((states) => Colors.red),
+                                // style: ButtonStyle(
+                                //   overlayColor: MaterialStateColor.resolveWith((states) => Colors.red),
+                                //   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                //       RoundedRectangleBorder(
+                                //           borderRadius: BorderRadius.only(
+                                //             bottomLeft: Radius.circular(17),
+                                //             bottomRight: Radius.circular(17),
+                                //           ),
+                                //           // side: BorderSide(color: Colors.red),
+                                //       )
+                                //   ),
+                                ),
+                            ),
                         ],
                       ),
                   ),
@@ -283,24 +379,48 @@ class ChatBotMessage extends StatelessWidget {
       ),
     );
   }
-}
 
-class ImageViewer extends StatelessWidget {
-  final String url;
+  Function getButtonCallback(int i, BuildContext context) {
+    return answer.type == AnswersType.options ||
+        answer.type == AnswersType.start ?
+    () async {await callback(answer.list[i]);}
+    : answer.type == AnswersType.contacts ?
+    () async {await callback(answer.list[i].value);}
+    : answer.type == AnswersType.pages ?
+    () async {
+        Doctor doctor = await cb.getDoctor(answer.list[i].value);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  ChatRoom(
+                    otherUser: doctor,
+                  ),
+            ));
+      }:(){};
+  }
 
-  ImageViewer(this.url);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget getButtonChild(int i) {
+    String text = answer.type == AnswersType.options ||
+        answer.type == AnswersType.start ?
+    answer.list[i]
+        : answer.type == AnswersType.contacts ?
+    answer.list[i].text
+        : answer.type == AnswersType.pages ?
+    answer.list[i].text
+        :'';
     return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery
-            .of(context)
-            .padding
-            .top,
-      ),
-      child: Image.network(
-        url,
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      // color: Colors.cyan,
+      // color: Theme.of(context).accentColor,
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 15,
+          fontWeight: FontWeight.w500
+        ),
       ),
     );
   }
