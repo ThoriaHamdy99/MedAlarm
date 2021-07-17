@@ -3,23 +3,23 @@ import 'package:flutter/cupertino.dart';
 import 'dose.dart';
 
 class Medicine {
-  final String medName;
-  final String medType;
-  final DateTime startDate;
-  final DateTime endDate;
-  final int amountOfMed;
-  final String interval;
-  final int intervalTime;
-  final DateTime startTime;
-  final int numOfDoses;
+  String medName;
+  String medType;
+  DateTime startDate;
+  DateTime endDate;
+  int amountOfMed;
+  String interval;
+  int intervalTime;
+  DateTime startTime;
+  int numOfDoses;
   List<Dose> doses;
 
   Medicine({
-    @required this.medName,
-    @required this.medType,
-    @required this.startDate,
-    @required this.endDate,
-    @required this.amountOfMed,
+    this.medName,
+    this.medType,
+    this.startDate,
+    this.endDate,
+    this.amountOfMed,
     this.startTime,
     this.interval,
     this.numOfDoses,
