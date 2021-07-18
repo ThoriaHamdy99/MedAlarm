@@ -388,150 +388,150 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                 width: double.infinity,
                 child: SingleChildScrollView(
                   child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            child: PanelTitle(
-                              title: "Pick up Start date",
-                              isRequired: true,
-                            )),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(50.0),
-                            ),
-                            primary:
-                            Theme
-                                .of(context)
-                                .accentColor, // background
-                            onPrimary: Colors.white, // foreground
-                          ),
-                          child: new Icon(Icons.date_range),
-                          onPressed: () =>
-                              showRoundedDatePicker(
-                                context: context,
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(DateTime.now().year + 10),
-                                borderRadius: 16,
-                                onTapDay: (DateTime dateTime, bool available) {
-                                  if (!available) {
-                                    showDialog(
-                                        context: context,
-                                        builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
-                                          CupertinoDialogAction(child: Text("OK"),onPressed: (){
-                                            Navigator.pop(context);
-                                          },)
-                                        ],));
-                                  }
-                                  medInfo.startDate = dateTime;
-                                  return available;
-                                },
-                              ),
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: PanelTitle(
+                          title: "Pick up Start date",
+                          isRequired: true,
                         ),
-                        Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            child: PanelTitle(
-                              title: "Pick up end date",
-                              isRequired: true,
-                            )),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(50.0),
-                            ),
-                            primary: Theme.of(context).accentColor,
-                            onPrimary: Colors.white,
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(50.0),
                           ),
-                          child: new Icon(Icons.date_range),
-                          onPressed: () =>
-                              showRoundedDatePicker(
-                                context: context,
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(DateTime.now().year + 10),
-                                borderRadius: 16,
-                                onTapDay: (DateTime dateTime, bool available) {
-                                  if (!available) {
-                                    showDialog(
-                                        context: context,
-                                        builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
-                                          CupertinoDialogAction(child: Text("OK"),onPressed: (){
-                                            Navigator.pop(context);
-                                          },)
-                                        ],));
-                                  }
-                                   medInfo.endDate = dateTime;
-                                  return available;
-                                },
-                              ),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            child: PanelTitle(
-                              title: "Pick up time for first reminder",
-                              isRequired: true,
-                            )),
-                        TimePickerSpinner(
-                          is24HourMode: false,
-                          normalTextStyle: TextStyle(
-                              fontSize: 22,
-                              color: Colors.grey,
-                          ),
-                          highlightedTextStyle:
-                          TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).accentColor,
-                          ),
-                          spacing: 45,
-                          itemHeight: 40,
-                          isForce2Digits: true,
-                          onTimeChange: (time) {
-                            medInfo.startTime = time;
-                          },
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        RaisedButton(
-                          elevation: 10,
-                          padding: EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 130,
-                          ),
-                          textColor: Colors.white,
-                          color: Theme
+                          primary:
+                          Theme
                               .of(context)
-                              .accentColor,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50.0)),
-                          onPressed: () async {
-                            if(!await _sqlHelper.insertMedicine(medInfo)) {
-                              print('Med Not Inserted');
-                              return;
-                            }
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomeScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            " Done ",
-                            style: TextStyle(
-                              fontFamily: "Angel",
-                              fontSize: 28,
-                              color: Colors.white,
-                            ),
+                              .accentColor, // background
+                          onPrimary: Colors.white, // foreground
+                        ),
+                        child: new Icon(Icons.date_range),
+                        onPressed: () =>
+                          showRoundedDatePicker(
+                            context: context,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(DateTime.now().year + 10),
+                            borderRadius: 16,
+                            onTapDay: (DateTime dateTime, bool available) {
+                              if (!available) {
+                                showDialog(
+                                    context: context,
+                                    builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
+                                      CupertinoDialogAction(child: Text("OK"),onPressed: (){
+                                        Navigator.pop(context);
+                                      },)
+                                    ],));
+                              }
+                              medInfo.startDate = dateTime;
+                              return available;
+                            },
+                          ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: PanelTitle(
+                          title: "Pick up end date",
+                          isRequired: true,
+                        )),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(50.0),
+                          ),
+                          primary: Theme.of(context).accentColor,
+                          onPrimary: Colors.white,
+                        ),
+                        child: new Icon(Icons.date_range),
+                        onPressed: () =>
+                          showRoundedDatePicker(
+                            context: context,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(DateTime.now().year + 10),
+                            borderRadius: 16,
+                            onTapDay: (DateTime dateTime, bool available) {
+                              if (!available) {
+                                showDialog(
+                                    context: context,
+                                    builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
+                                      CupertinoDialogAction(child: Text("OK"),onPressed: (){
+                                        Navigator.pop(context);
+                                      },)
+                                    ],));
+                              }
+                               medInfo.endDate = dateTime;
+                              return available;
+                            },
+                          ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: PanelTitle(
+                          title: "Pick up time for first reminder",
+                          isRequired: true,
+                        )),
+                      TimePickerSpinner(
+                        is24HourMode: false,
+                        normalTextStyle: TextStyle(
+                            fontSize: 22,
+                            color: Colors.grey,
+                        ),
+                        highlightedTextStyle:
+                        TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).accentColor,
+                        ),
+                        spacing: 45,
+                        itemHeight: 40,
+                        isForce2Digits: true,
+                        onTimeChange: (time) {
+                          medInfo.startTime = time;
+                        },
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      RaisedButton(
+                        elevation: 10,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 130,
+                        ),
+                        textColor: Colors.white,
+                        color: Theme
+                            .of(context)
+                            .accentColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0)),
+                        onPressed: () async {
+                          if(!await _sqlHelper.insertMedicine(medInfo)) {
+                            print('Med Not Inserted');
+                            return;
+                          }
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          Navigator.pushReplacementNamed(context, HomeScreen.id);
+                        },
+                        child: Text(
+                          "Done",
+                          style: TextStyle(
+                            fontFamily: "Angel",
+                            fontSize: 28,
+                            color: Colors.white,
                           ),
                         ),
-                      ]),
-                ))));
+                      ),
+                    ],
+                  ),
+                ),
+            ),
+        ),
+    );
   }
 }
