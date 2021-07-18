@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '/config/ColorConstants.dart';
-import '/config/language.dart';
-import '/service/type_login.dart';
+import 'package:med_alarm/config/ColorConstants.dart';
+import 'package:med_alarm/config/language.dart';
+import 'package:med_alarm/service/type_login.dart';
 
 /// Widget main with social networks
 class LoginFresh extends StatefulWidget {

@@ -116,15 +116,34 @@ class SQLHelper {
     Database db = await database;
 
     List<Map<String, dynamic>> result = await db.rawQuery('''SELECT * FROM User;''');
-    try {
-      print(result[0]);
-      if (result[0]['type'] == 'Patient')
-        return Patient.fromMap(result[0]);
-      else if (result[0]['type'] == 'Doctor')
-        return Doctor.fromMap(result[0]);
-    } catch (e) {}
+
+    if(result[0]['type'] == 'Patient')
+      return Patient(
+        uid: result[0]['uid'],
+        email: result[0]['email'],
+        type: result[0]['type'],
+        firstname: result[0]['firstname'],
+        lastname: result[0]['lastname'],
+        profPicURL: result[0]['profPicURL'],
+        phoneNumber: result[0]['phoneNumber'],
+        address: result[0]['address'],
+        dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
+      );
+    else if(result[0]['type'] == 'Doctor')
+      return Doctor(
+        uid: result[0]['uid'],
+        email: result[0]['email'],
+        type: result[0]['type'],
+        speciality: result[0]['speciality'],
+        firstname: result[0]['firstname'],
+        lastname: result[0]['lastname'],
+        profPicURL: result[0]['profPicURL'],
+        phoneNumber: result[0]['phoneNumber'],
+        address: result[0]['address'],
+        dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
+      );
     print('Function getUser is not fine');
-    return Patient();
+    return null;
   }
 
   Future<int> deleteUser() async {
@@ -138,22 +157,34 @@ class SQLHelper {
   Future<bool> insertMedicine(Medicine med) async {
     Database db = await this.database;
     var result;
-    try {
-      if (UserProvider.instance.currentUser.type == 'Patient')
+    // await db.execute('DROP TABLE Medicine;');
+    // await db.execute('''CREATE TABLE Medicine(
+    //           name TEXT PRIMARY KEY,
+    //           type TEXT NOT NULL,
+    //           startDate INT NOT NULL,
+    //           endDate INT NOT NULL,
+    //           amount INT NOT NULL,
+    //           nDoses INT NOT NULL,
+    //           startTime INT NOT NULL,
+    //           interval TEXT NOT NULL,
+    //           intervalTime INT)''');
+    // try {
+      // if (UserProvider.instance.currentUser.type == 'Patient')
         result = await db.rawInsert('''insert into Medicine(
         name, type, startDate, endDate, amount,
         nDoses, startTime, interval, intervalTime)
         values(
         '${med.medName}',
         '${med.medType}',
-        '${med.startDate}',
-        '${med.endDate}',
+        '${med.startDate.millisecondsSinceEpoch}',
+        '${med.endDate.millisecondsSinceEpoch}',
         '${med.amountOfMed}',
         '${med.numOfDoses}',
-        '${med.startTime}',
+        '${med.startTime.millisecondsSinceEpoch}',
         '${med.interval}',
         '${med.intervalTime}')''');
-      if(result > 0) {
+        print('+++++++++++++++++++++ From InsertMedicine +++++++++++++++++++++');
+      if(result != null) {
         print('+++++++++++++++++++++ From InsertMedicine +++++++++++++++++++++');
         print(med.medName);
         print(med.medType);
@@ -168,7 +199,9 @@ class SQLHelper {
         return true;
       }
       return false;
-    } catch (e) {return false;}
+    // } catch (e) {
+    //   print(e);
+    //   return false;}
   }
 
   Future<Medicine> getMedicine(String medName) async {
@@ -179,11 +212,11 @@ class SQLHelper {
     print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
     print(result[0]['name']);
     print(result[0]['type']);
-    print(result[0]['startDate']);
-    print(result[0]['endDate']);
+    print(DateTime.fromMillisecondsSinceEpoch(result[0]['startDate']));
+    print(DateTime.fromMillisecondsSinceEpoch(result[0]['endDate']));
     print(result[0]['amount']);
     print(result[0]['nDoses']);
-    print(result[0]['startTime']);
+    print(DateTime.fromMillisecondsSinceEpoch(result[0]['startTime']));
     print(result[0]['interval']);
     print(result[0]['intervalTime']);
     print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
@@ -194,6 +227,7 @@ class SQLHelper {
     Database db = await database;
     List<Medicine> medicines = [];
     var result = await db.rawQuery('SELECT * FROM Medicine;');
+    print(result.length);
     result.forEach((medicine) => medicines.add(Medicine.fromMap(medicine)));
     return medicines;
   }

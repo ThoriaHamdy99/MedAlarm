@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/sign_up_model.dart';
-import '/service/type_login.dart';
-import '/custom_widgets/logging_widgets/footer_login.dart';
+import 'package:med_alarm/service/type_login.dart';
+import 'package:med_alarm/custom_widgets/logging_widgets/footer_login.dart';
 import 'login_fresh.dart';
 import 'login_fresh_reset_password_screen.dart';
 import 'login_fresh_sign_up_screen.dart';

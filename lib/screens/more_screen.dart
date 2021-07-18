@@ -76,7 +76,7 @@ class MoreScreen extends StatelessWidget {
   ListTile logoutTile(BuildContext context) {
     return ListTile(
       leading: Icon(
-        Icons.logout_outlined,
+        Icons.logout,
         size: 50,
         color: Colors.red,
       ),

@@ -14,8 +14,6 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-Map<DateTime, List<Event>> allEvents = {};
-
 class _HomeScreenState extends State<HomeScreen> {
   int _navBarIndex = 0;
 

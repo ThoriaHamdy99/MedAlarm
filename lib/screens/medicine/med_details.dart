@@ -1,22 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/home_screen.dart';
+import 'package:med_alarm/utilities/sql_helper.dart';
 import 'package:validators/validators.dart';
 import 'package:med_alarm/screens/home_tabs/calender_screen.dart';
 
-TextEditingController medNameController = new TextEditingController();
-Medicine medInfo = Medicine(
-    medName: null,
-    medType: null,
-    startDate: null,
-    endDate: null,
-    amountOfMed: null,
-);
+//TextEditingController medNameController = new TextEditingController();
+Medicine medInfo = new Medicine();
 final _formKey = new GlobalKey<FormState>();
-
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 class MedDetails extends StatefulWidget {
   static const id = 'MED_DETAILS_SCREEN';
 
@@ -29,6 +25,7 @@ class _MedDetailsState extends State<MedDetails> {
   Widget build(BuildContext context) {
 
     return new Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Theme
             .of(context)
@@ -110,13 +107,17 @@ class _BottomContainerState extends State<_BottomContainer> {
                       isRequired: true,
                     ),
                     TextFormField(
+
                       validator: (value) {
                         if (value.isEmpty)
                           return "please enter name of medicine!!";
                         return null;
                       },
-                      onSaved: (String value) {
+                      onChanged: (value) {
+                        setState(() {
                         medInfo.medName = value;
+
+                        });
                       },
                       maxLines: 1,
                       style: TextStyle(
@@ -158,8 +159,8 @@ class _BottomContainerState extends State<_BottomContainer> {
                           return "please enter amount of medicine!!";
                         return null;
                       },
-                      onSaved: (value) {
-                        medInfo.amountOfMed = value as int;
+                      onChanged: (value) {
+                        medInfo.amountOfMed = int.parse(value);
                       },
                       keyboardType: TextInputType.number,
                       style: TextStyle(
@@ -210,12 +211,13 @@ class _BottomContainerState extends State<_BottomContainer> {
                                   value: item, child: Text(item.toString()));
                             }).toList(),
                             onChanged: (var newValue) {
-                              if (newValue != null) {
+                              // if (newValue != null) {
                                 setState(() {
                                   dropDownValueDoses = newValue;
                                 });
-                              }
+                              // }
                               medInfo.intervalTime = dropDownValueDoses;
+                              medInfo.numOfDoses = (24 / dropDownValueDoses).round();
                             },
                           ),
                         ],
@@ -235,11 +237,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50.0)),
                       onPressed: () {
-                        print(medInfo.medName);
-                        print(medInfo.medType);
-                        print(medInfo.amountOfMed);
-                        print(medInfo.interval);
-                        print(medInfo.intervalTime);
+
                         _submit();
                       },
                       child: Row(
@@ -301,7 +299,7 @@ class MedReminderDetails extends StatefulWidget {
 }
 
 class _MedReminderDetailsState extends State<MedReminderDetails> {
-  String medname = medNameController.text;
+ // String medname = medNameController.text;
 
   @override
   Widget build(BuildContext context) {
@@ -315,7 +313,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
         ),
         centerTitle: true,
         title: Text(
-          "$medname Details",
+          "Medicine Details",
           style: TextStyle(
             fontFamily: "Angel",
             fontSize: 32,
@@ -332,28 +330,6 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
           child: _ReminderDetailsContainer(),
         ),
       ),
-      /*floatingActionButton: FloatingActionButton.extended(
-        elevation: 10,
-        foregroundColor: Colors.white,
-        backgroundColor: Theme.of(context).accentColor,
-        label: Text(
-          " Done ",
-          style: TextStyle(
-            fontFamily: "Angel",
-            fontSize: 28,
-            color: Colors.white,
-          ),
-        ),
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MedReminderDetails(),
-            ),
-          );
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,*/
     );
   }
 }
@@ -366,6 +342,7 @@ class _ReminderDetailsContainer extends StatefulWidget {
 
 class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
   var _dateTime;
+  SQLHelper _sqlHelper = SQLHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -426,6 +403,19 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                                     .now()
                                     .year + 2),
                                 borderRadius: 16,
+                                onTapDay: (DateTime dateTime, bool available) {
+                                  if (!available) {
+                                    showDialog(
+                                        context: context,
+                                        builder: (c) => CupertinoAlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
+                                          CupertinoDialogAction(child: Text("OK"),onPressed: (){
+                                            Navigator.pop(context);
+                                          },)
+                                        ],));
+                                  }
+                                  medInfo.startDate = dateTime;
+                                  return available;
+                                },
                               ),
                         ),
                         Padding(
@@ -458,6 +448,19 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                                     .now()
                                     .year + 2),
                                 borderRadius: 16,
+                                onTapDay: (DateTime dateTime, bool available) {
+                                  if (!available) {
+                                    showDialog(
+                                        context: context,
+                                        builder: (c) => CupertinoAlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
+                                          CupertinoDialogAction(child: Text("OK"),onPressed: (){
+                                            Navigator.pop(context);
+                                          },)
+                                        ],));
+                                  }
+                                   medInfo.endDate = dateTime;
+                                  return available;
+                                },
                               ),
                         ),
                         Padding(
@@ -483,6 +486,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             setState(() {
                               _dateTime = time;
                             });
+                            medInfo.startTime = time;
                           },
                         ),
                         SizedBox(
@@ -500,15 +504,19 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                               .accentColor,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(50.0)),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomeScreen(),
-                              ),
-                            );
+                          onPressed: () async {
+                            await _sqlHelper.insertMedicine(medInfo);
+                            var l = await _sqlHelper.getAllMedicines();
+                            print(l.length);
+
+                            // Navigator.pop(context);
+                            // Navigator.pop(context);
+                            // Navigator.pushReplacement(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => HomeScreen(),
+                            //   ),
+                            // );
                           },
                           child: Text(
                             " Done ",

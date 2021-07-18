@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:med_alarm/models/dose.dart';
+import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/med_details.dart';
+import 'package:med_alarm/main.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/providers/user_provider.dart';
-import 'package:med_alarm/models/med_day.dart';
+import 'package:med_alarm/screens/medicine/selected_med.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:med_alarm/utilities/sql_helper.dart';
 
 class CalendarScreen extends StatefulWidget {
   static const id = "CALENDAR_SCREEN";
@@ -11,10 +16,24 @@ class CalendarScreen extends StatefulWidget {
   _CalendarScreenState createState() => _CalendarScreenState();
 }
 
-Map<DateTime, List<Event>> allEvents = {};
+Medicine med1 = Medicine(
+  medName:     "medName",
+  medType:     "pill",
+  startDate:   DateTime.now(),
+  endDate:     DateTime.now(),
+  amountOfMed: 10,
+  startTime:  DateTime.now(),
+  interval:       "daily",
+  numOfDoses:    2,
+  intervalTime:   8,
+  dose: Dose(amountOfDose: 2, dateTime: DateTime.now(), taken: false),
+);
+
+List<Medicine> allMeds = [];
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  ValueNotifier<List<Event>> _selectedEvents;
+  SQLHelper _sqlHelper = SQLHelper();
+  ValueNotifier<List<Medicine>> _selectedMeds = ValueNotifier([]);
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay;
@@ -22,74 +41,63 @@ class _CalendarScreenState extends State<CalendarScreen> {
       DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
   final lastDay = DateTime(
       DateTime.now().year, DateTime.now().month + 3, DateTime.now().day);
+
   // bool _check = false;
 
   @override
   void initState() {
-    super.initState();
     _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay));
+    //_selectedMeds = ValueNotifier(_getEventsForDay(_selectedDay));
+    super.initState();
   }
 
   @override
   void dispose() {
-    _selectedEvents.dispose();
+    // _selectedMeds.dispose();
     super.dispose();
   }
 
-  List<Event> _getEventsForDay(DateTime day) {
-    return allEvents[day] == null ? [] : allEvents[day];
+  List<Medicine> _getEventsForDay(DateTime day) {
+    List<Medicine> allMedsForDay = [];
+    for (int i = 0; i < allMeds.length; ++i) {
+      if ((allMeds[i].startDate.isBefore(day) &&
+              allMeds[i].endDate.isAfter(day)) ||
+          allMeds[i].startDate.isAtSameMomentAs(day) ||
+          allMeds[i].endDate.isAtSameMomentAs(day))
+        allMedsForDay.add(allMeds[i]);
+    }
+    return allMedsForDay;
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    if(!isSameDay(selectedDay, _selectedDay)){
+    if (!isSameDay(selectedDay, _selectedDay)) {
       setState(() {
         _selectedDay = selectedDay;
         _focusedDay = focusedDay;
       });
-      _selectedEvents.value = _getEventsForDay(selectedDay);
+      _selectedMeds.value = _getEventsForDay(selectedDay);
     }
-
+  }
+  
+  String getTime(DateTime dateTime){
+    var hours = dateTime.hour >= 0 && dateTime.hour <= 9 ? "0" + "${dateTime.hour}" : "${dateTime.hour}";
+    var min = dateTime.minute >= 0 && dateTime.minute <= 9 ? "0" + "${dateTime.minute}" : "${dateTime.minute}";
+    return hours + ":" + min;
   }
 
   @override
   Widget build(BuildContext context) {
     String hello = "Hello ";
-    if(UserProvider.instance.currentUser.type == 'Doctor') hello += 'Dr/';
+    if (UserProvider.instance.currentUser.type == 'Doctor') hello += 'Dr/';
     hello += UserProvider.instance.currentUser.firstname;
     return Scaffold(
       appBar: AppBar(
         title: Text(hello),
-        // actions: [
-        //   DropdownButton(
-        //     icon: Icon(
-        //       Icons.more_vert,
-        //       color: Theme.of(context).primaryIconTheme.color,
-        //     ),
-        //     items: [
-        //       DropdownMenuItem(
-        //         child: Row(children: [
-        //           Icon(Icons.exit_to_app),
-        //           SizedBox(width: 8),
-        //           Text('Logout')
-        //         ]),
-        //         value: 'logout',
-        //       ),
-        //     ],
-        //     onChanged: (itemIdentifier) {
-        //       if (itemIdentifier == 'logout') {
-        //         FirebaseProvider.instance.logout();
-        //         Navigator.of(context).pushReplacement(MaterialPageRoute(
-        //           builder: (context) => MyApp(),
-        //         ));
-        //       }
-        //     },
-        //   ),
-        // ],
       ),
       body: Stack(
         children: [
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Card(
                 elevation: 4,
@@ -141,156 +149,281 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
               const SizedBox(height: 1),
-              allEvents.isEmpty
-                  ? Expanded(
-                child: Container(
-                  color: Color.fromRGBO(224, 240, 228, 0.5),
-                  width: double.infinity,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // ClipRRect(
-                      //     borderRadius: BorderRadius.circular(8.0),
-                      //     child: Image.asset(
-                      //       "assets/images/medImage2.gif",
-                      //       fit: BoxFit.fill,
-                      //       height: 100,
-                      //     )),
-                      // SizedBox(
-                      //   height: 20,
-                      // ),
-                      Text(
-                        "Monitor your med schedule",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "No Meds Today",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      RaisedButton(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 110),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        onPressed: () {
-                          // setState(() {
-                          //   allEvents[_selectedDay] = [Event("Med2")];
-                          //   print(allEvents);
-                          // });
-                          Navigator.of(context).pushNamed(MedDetails.id);
-                        },
-                        child: Text(
-                          "Add Medicine",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                          ),
-                        ),
-                        color: Theme.of(context).accentColor,
-                      )
-                    ],
-                  ),
+              /*SizedBox(
+                height: 20,
+              ),
+              Text(
+                getTime(med1.startTime),
+                style: TextStyle(
+                  fontSize: 25,
+                  color: Colors.black,
                 ),
-              )
-                  : ( allEvents[_selectedDay] != null
-                  ? Expanded(
-                child: ValueListenableBuilder<List<Event>>(
-                  valueListenable: _selectedEvents,
-                  builder: (context, value, _) {
-                    return Container(
-                      width: double.infinity,
-                      color: Color.fromRGBO(224, 240, 228, 0.5),
-                      child: ListView.builder(
-                        itemCount: value.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Text(
-                                "8.00 AM",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 6,
-                              ),
-                              Card(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 12.0),
-                                elevation: 5,
-                                shadowColor: Colors.green,
-                                clipBehavior: Clip.antiAlias,
-                                child: ListTile(
-                                  onTap: () =>
-                                      print('${value[index]}'),
-                                  title: InkWell(
-                                    onTap: (){
-                                      return Container(
-                                        color: Colors.blue,
-                                        alignment: Alignment.center,
-                                        child: Text("meddd"),
-                                      );
-                                    },
-                                    child: Column(
-                                      children: [
-                                        SizedBox(
-                                          height: 8,
-                                        ),
-                                        Text(
-                                          '${value[index]}',
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 12,
-                                        ),
-                                        Text('${value[index]}'),
-                                        SizedBox(
-                                          height: 8,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+              ),
+              SizedBox(
+                height: 6,
+              ),
+              Card(
+                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 12.0),
+                elevation: 5,
+                shadowColor: Colors.green,
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () {
+                    print("............");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SelectedMed(med1),
                       ),
                     );
                   },
-                ),
-              )
-                  : Expanded(
-                child: Container(
-                  color: Color.fromRGBO(224, 240, 228, 0.5),
-                  width: double.infinity,
-                  child: Center(
-                    child: Text(
-                      "No meds Today",
-                      style: TextStyle(
-                          fontSize: 25, fontWeight: FontWeight.bold),
+                  child: ListTile(
+                    title: Column(
+                      children: [
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          med1.medName,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        Text('take ' + "${2/*med1.dose.amountOfDose*/} " + "${med1.medType}"),
+                        SizedBox(
+                          height: 8,
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ))
+              ),*/
+              FutureBuilder<List<Medicine>>(
+                  future: SQLHelper.getInstant().getAllMedicines(),
+                  builder: (ctx, snapShot) {
+                    if (snapShot.hasData) {
+                      if (snapShot.data.isEmpty) {
+                        return Expanded(
+                          child: Container(
+                            color: Color.fromRGBO(224, 240, 228, 0.5),
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // ClipRRect(
+                                //     borderRadius: BorderRadius.circular(8.0),
+                                //     child: Image.asset(
+                                //       "assets/images/medImage2.gif",
+                                //       fit: BoxFit.fill,
+                                //       height: 100,
+                                //     )),
+                                // SizedBox(
+                                //   height: 20,
+                                // ),
+                                Text(
+                                  "Monitor your med schedule",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  "No Meds Today",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                RaisedButton(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 110),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pushNamed(MedDetails.id);
+                                  },
+                                  child: Text(
+                                    "Add Medicine",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  color: Theme.of(context).accentColor,
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                      print(allMeds);
+                      print(snapShot.data.length);
+                      allMeds = snapShot.data;
+                      _selectedMeds.value = _getEventsForDay(_selectedDay);
+                      return _selectedMeds.value.isEmpty
+                          ? Expanded(
+                              child: Container(
+                                color: Color.fromRGBO(224, 240, 228, 0.5),
+                                width: double.infinity,
+                                child: Center(
+                                  child: Text(
+                                    "No meds Today",
+                                    style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Expanded(
+                              child: ValueListenableBuilder<List<Medicine>>(
+                                valueListenable: _selectedMeds,
+                                builder: (context, value, _) {
+                                  return Container(
+                                    width: double.infinity,
+                                    color: Color.fromRGBO(224, 240, 228, 0.5),
+                                    child: ListView.builder(
+                                      itemCount: value.length,
+                                      itemBuilder: (context, index) {
+                                        return Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 20,
+                                            ),
+                                            Text(
+                                              "8.00 AM",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 6,
+                                            ),
+                                            Card(
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: 5,
+                                                  horizontal: 12.0),
+                                              elevation: 5,
+                                              shadowColor: Colors.green,
+                                              clipBehavior: Clip.antiAlias,
+                                              child: ListTile(
+                                                onTap: () =>
+                                                    print('${value[index]}'),
+                                                title: InkWell(
+                                                  onTap: () {
+                                                    return Container(
+                                                      color: Colors.blue,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text("meddd"),
+                                                    );
+                                                  },
+                                                  child: Column(
+                                                    children: [
+                                                      SizedBox(
+                                                        height: 8,
+                                                      ),
+                                                      Text(
+                                                        '${value[index]}',
+                                                        style: TextStyle(
+                                                          fontSize: 20,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 12,
+                                                      ),
+                                                      Text('${value[index]}'),
+                                                      SizedBox(
+                                                        height: 8,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                    } else if (snapShot.hasData && snapShot.data == []) {
+                      return Expanded(
+                        child: Container(
+                          color: Color.fromRGBO(224, 240, 228, 0.5),
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // ClipRRect(
+                              //     borderRadius: BorderRadius.circular(8.0),
+                              //     child: Image.asset(
+                              //       "assets/images/medImage2.gif",
+                              //       fit: BoxFit.fill,
+                              //       height: 100,
+                              //     )),
+                              // SizedBox(
+                              //   height: 20,
+                              // ),
+                              Text(
+                                "Monitor your med schedule",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "No Meds Today",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              RaisedButton(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 110),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushNamed(MedDetails.id);
+                                },
+                                child: Text(
+                                  "Add Medicine",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                color: Theme.of(context).accentColor,
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                    return Center(child: CircularProgressIndicator());
+                  }),
             ],
           ),
           /*
@@ -348,7 +481,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ],
       ),
       floatingActionButton: new Visibility(
-        visible: allEvents.isEmpty ? false : true,
+        visible: allMeds.isEmpty ? false : true,
         child: FloatingActionButton(
           backgroundColor: Theme.of(context).accentColor,
           child: Icon(Icons.add),
