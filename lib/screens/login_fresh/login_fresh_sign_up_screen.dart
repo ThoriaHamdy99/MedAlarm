@@ -479,7 +479,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                                 if (!available) {
                                   showDialog(
                                       context: context,
-                                      builder: (c) => CupertinoAlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
+                                      builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
                                         CupertinoDialogAction(child: Text("OK"),onPressed: (){
                                           Navigator.pop(context);
                                         },)

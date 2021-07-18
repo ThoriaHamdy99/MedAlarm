@@ -69,6 +69,15 @@ class _BottomContainerState extends State<_BottomContainer> {
   bool isDaily = true;
 
   @override
+  void initState() {
+    medInfo.medType = dropDownValue;
+    medInfo.interval = durationValue;
+    medInfo.intervalTime = dropDownValueDoses;
+    medInfo.numOfDoses = (24 / dropDownValueDoses).round();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     void _submit() {
       final isValid = _formKey.currentState.validate();
@@ -341,8 +350,16 @@ class _ReminderDetailsContainer extends StatefulWidget {
 }
 
 class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
-  var _dateTime;
   SQLHelper _sqlHelper = SQLHelper();
+
+  @override
+  void initState() {
+    medInfo.startDate = DateTime.now();
+    medInfo.endDate = DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
+    medInfo.startTime = DateTime.now();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -389,25 +406,20 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             Theme
                                 .of(context)
                                 .accentColor, // background
-                            onPrimary: Colors.amber, // foreground
+                            onPrimary: Colors.white, // foreground
                           ),
                           child: new Icon(Icons.date_range),
                           onPressed: () =>
                               showRoundedDatePicker(
                                 context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(DateTime
-                                    .now()
-                                    .year),
-                                lastDate: DateTime(DateTime
-                                    .now()
-                                    .year + 2),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(DateTime.now().year + 10),
                                 borderRadius: 16,
                                 onTapDay: (DateTime dateTime, bool available) {
                                   if (!available) {
                                     showDialog(
                                         context: context,
-                                        builder: (c) => CupertinoAlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
+                                        builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
                                           CupertinoDialogAction(child: Text("OK"),onPressed: (){
                                             Navigator.pop(context);
                                           },)
@@ -430,29 +442,21 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(50.0),
                             ),
-                            primary:
-                            Theme
-                                .of(context)
-                                .accentColor, // background
-                            onPrimary: Colors.amber, // foreground
+                            primary: Theme.of(context).accentColor,
+                            onPrimary: Colors.white,
                           ),
                           child: new Icon(Icons.date_range),
                           onPressed: () =>
                               showRoundedDatePicker(
                                 context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(DateTime
-                                    .now()
-                                    .year),
-                                lastDate: DateTime(DateTime
-                                    .now()
-                                    .year + 2),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(DateTime.now().year + 10),
                                 borderRadius: 16,
                                 onTapDay: (DateTime dateTime, bool available) {
                                   if (!available) {
                                     showDialog(
                                         context: context,
-                                        builder: (c) => CupertinoAlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
+                                        builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
                                           CupertinoDialogAction(child: Text("OK"),onPressed: (){
                                             Navigator.pop(context);
                                           },)
@@ -473,19 +477,19 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         TimePickerSpinner(
                           is24HourMode: false,
                           normalTextStyle: TextStyle(
-                              fontSize: 24,
-                              color: Theme
-                                  .of(context)
-                                  .accentColor),
+                              fontSize: 22,
+                              color: Colors.grey,
+                          ),
                           highlightedTextStyle:
-                          TextStyle(fontSize: 24, color: Colors.amber),
+                          TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).accentColor,
+                          ),
                           spacing: 45,
                           itemHeight: 40,
                           isForce2Digits: true,
                           onTimeChange: (time) {
-                            setState(() {
-                              _dateTime = time;
-                            });
                             medInfo.startTime = time;
                           },
                         ),

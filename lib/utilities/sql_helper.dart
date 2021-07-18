@@ -101,7 +101,6 @@ class SQLHelper {
 
   Future<User> getUser() async {
     Database db = await database;
-
     List<Map<String, dynamic>> result = await db.rawQuery('''SELECT * FROM User;''');
     if(result[0]['type'] == 'Patient')
       return Patient(
@@ -136,7 +135,7 @@ class SQLHelper {
     Database db = await database;
     try {
       // await db.rawDelete("DELETE FROM User");
-      await dropDB();
+      await deleteTables();
       await db.close();
       dbHelper = null;
       return true;
@@ -224,9 +223,9 @@ class SQLHelper {
     }
   }
 
-  dropDB() async {
+  deleteTables() async {
     Database db = await database;
-    await db.execute('DROP TABLE User');
-    await db.execute('DROP TABLE Medicine');
+    await db.execute('DELETE FROM User');
+    await db.execute('DELETE FROM Medicine');
   }
 }
