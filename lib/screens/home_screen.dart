@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/screens/home_tabs/calender_screen.dart';
+import 'package:med_alarm/screens/more_screen.dart';
 import 'package:med_alarm/screens/report/report_screen.dart';
-import 'package:med_alarm/main.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
-import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/models/med_day.dart';
 
 import 'chat/chats_screen.dart';
@@ -25,9 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     CalendarScreen(),
     EmptyScreen(),
     ChatsScreen(),
-    ReportScreen(),
-    EmptyScreen(),
-    EmptyScreen(),
+    MoreScreen(),
   ];
 
   @override
@@ -67,10 +63,10 @@ class _HomeScreenState extends State<HomeScreen> {
         iconSize: 30,
         items: [
           buildBottomNavigationBarItem(Icons.home, "Home"),
-          buildBottomNavigationBarItem(Icons.notifications, "Updates"),
-          buildBottomNavigationBarItem(Icons.message_rounded, "Messages"),
-          buildBottomNavigationBarItem(Icons.analytics, "Report"),
+          // buildBottomNavigationBarItem(Icons.notifications, "Updates"),
           buildBottomNavigationBarItem(Icons.medical_services, "Medicine"),
+          buildBottomNavigationBarItem(Icons.message_rounded, "Messages"),
+          // buildBottomNavigationBarItem(Icons.analytics, "Report"),
           buildBottomNavigationBarItem(Icons.more_horiz, "More"),
         ],
         currentIndex: _navBarIndex,

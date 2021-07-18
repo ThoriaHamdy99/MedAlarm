@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
-import 'package:med_alarm/screens/home_screen.dart';
-import 'package:med_alarm/utilities/sql_helper.dart';
-import 'package:med_alarm/config/ColorConstants.dart';
-import 'package:med_alarm/config/language.dart';
-import 'package:med_alarm/custom_widgets/logging_widgets/login_fresh_loading.dart';
+import '/providers/firebase_provider.dart';
+import '/screens/home_screen.dart';
+import '/utilities/sql_helper.dart';
+import '/config/ColorConstants.dart';
+import '/config/language.dart';
+import '/custom_widgets/logging_widgets/login_fresh_loading.dart';
 
 class LoginFreshUserAndPassword extends StatefulWidget {
   static const id = 'SIGN_UP_SCREEN';

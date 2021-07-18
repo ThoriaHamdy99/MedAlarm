@@ -81,7 +81,7 @@ class SQLHelper {
     var result;
     if(UserProvider.instance.currentUser.type == 'Patient')
       result = await db.rawInsert('''insert into User(
-        uid, email, type, speciality, firstname,
+        uid, email, type, firstname,
         lastname, profPicURL, phoneNumber, address, dob)
         values(
         '${user.uid.toString()}',

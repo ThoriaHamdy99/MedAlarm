@@ -123,7 +123,7 @@ class FirebaseProvider with ChangeNotifier {
       String lastname,
       String phoneNumber,
       String address,
-      String date,
+      DateTime date,
   ) async {
     await firestore
         .collection('Users')
@@ -136,7 +136,7 @@ class FirebaseProvider with ChangeNotifier {
       'profPicURL': '',
       'phoneNumber': phoneNumber,
       'address': address,
-      'dob': Timestamp.fromDate(DateTime.parse(date)),
+      'dob': Timestamp.fromDate(date),
     });
     initNewUserContacts(uid);
   }

@@ -7,6 +7,7 @@ import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/contact.dart';
 import 'package:med_alarm/models/message.dart';
+import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/screens/chat/chatbot_screen.dart';
 import 'package:med_alarm/screens/search_contact_screen.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
@@ -27,7 +28,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
   refresh() {
     setState(() {
-      // contacts.clear();
+      contacts.clear();
     });
   }
 
@@ -48,6 +49,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            if(UserProvider.instance.currentUser.type == 'Patient')
             Container(
               child: ListTile(
                 leading: Hero(
@@ -60,7 +62,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 ),
                 title: Text('Chat Bot', style: TextStyle(fontSize: 16)),
                 onTap: () {
-                  Navigator.pushNamed(context, ChatBotScreen.id);
+                  Navigator.pushNamed(context, ChatBotScreen.id).whenComplete(refresh);
                 },
               ),
             ),

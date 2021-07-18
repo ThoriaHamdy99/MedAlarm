@@ -55,6 +55,8 @@ dependencies:
   charts_flutter:
   focused_menu:
 
+  flutter_launcher_icons:
+
   flutter_time_picker_spinner:
   flutter_localizations:
     sdk: flutter
@@ -66,10 +68,9 @@ dev_dependencies:
   flutter_launcher_icons: ^0.7.4
 
 flutter_icons:
+  android: "launcher_icon"
+  ios: false
   image_path: "assets/logo.png"
-  android: true
-  ios: true
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

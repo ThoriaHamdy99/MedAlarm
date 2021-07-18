@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../models/sign_up_model.dart';
-import 'package:med_alarm/service/type_login.dart';
-import 'package:med_alarm/custom_widgets/logging_widgets/footer_login.dart';
+import '/service/type_login.dart';
+import '/custom_widgets/logging_widgets/footer_login.dart';
 import 'login_fresh.dart';
 import 'login_fresh_reset_password_screen.dart';
 import 'login_fresh_sign_up_screen.dart';
 import 'login_user_password_screen.dart';
 import '../home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BuildLoginFresh extends StatelessWidget {
   static const id = 'LANDING_SCREEN';
@@ -92,9 +93,29 @@ class BuildLoginFresh extends StatelessWidget {
           (BuildContext _context, Function isRequest, String email) {
         isRequest(true);
 
-        Future.delayed(Duration(seconds: 5), () {
+        Future.delayed(Duration(seconds: 3), () async {
           print('-------------- function call----------------');
           print(email);
+          final _auth = FirebaseAuth.instance;
+          _auth.sendPasswordResetEmail(email: email).then((onVal) {
+            Navigator.pop(_context, true);
+
+          }).catchError((onError) {
+            String message = 'error Occurred';
+
+            if (onError.toString().contains("ERROR_USER_NOT_FOUND")) {
+              message= "User Not Found" ;
+            }
+
+
+            ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
+              content: Text(message),
+              backgroundColor: Theme.of(_context).errorColor,
+            ));
+
+            }
+           );
+
           print('--------------   end call   ----------------');
           isRequest(false);
         });

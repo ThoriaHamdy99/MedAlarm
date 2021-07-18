@@ -6,7 +6,7 @@ class SignUpModel {
   String firstname;
   String lastname;
   String phoneNumber;
-  String dob;
+  DateTime dob;
   String address;
 
   String type;
