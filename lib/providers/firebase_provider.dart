@@ -222,8 +222,7 @@ class FirebaseProvider with ChangeNotifier {
 
   logout() async {
     try{
-      int res = await SQLHelper.getInstant().deleteUser();
-      if(res != 1) throw '';
+      if(!await SQLHelper.getInstant().deleteUser()) throw '';
       await removeDeviceToken();
       auth.signOut();
     } catch(e) {

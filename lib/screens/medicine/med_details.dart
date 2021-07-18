@@ -505,18 +505,18 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(50.0)),
                           onPressed: () async {
-                            await _sqlHelper.insertMedicine(medInfo);
-                            var l = await _sqlHelper.getAllMedicines();
-                            print(l.length);
-
-                            // Navigator.pop(context);
-                            // Navigator.pop(context);
-                            // Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => HomeScreen(),
-                            //   ),
-                            // );
+                            if(!await _sqlHelper.insertMedicine(medInfo)) {
+                              print('Med Not Inserted');
+                              return;
+                            }
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomeScreen(),
+                              ),
+                            );
                           },
                           child: Text(
                             " Done ",

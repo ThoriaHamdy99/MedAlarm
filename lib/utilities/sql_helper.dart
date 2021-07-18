@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 class SQLHelper {
   static SQLHelper dbHelper;
   static Database _database;
+  String path;
 
   SQLHelper.getInstant();
   factory SQLHelper() {
@@ -31,7 +32,7 @@ class SQLHelper {
 
   Future<Database> _initializedDatabase() async {
     Directory dir = await getApplicationDocumentsDirectory();
-    String path = dir.path + "med_alarm.db";
+    path = dir.path + "med_alarm.db";
     return await openDatabase(path, version: 1, onCreate: _createDatabase);
   }
 
@@ -63,20 +64,7 @@ class SQLHelper {
 
   Future<int> insertUser() async {
     Database db = await this.database;
-
     await db.execute('DELETE FROM User');
-    // await db.execute('DROP TABLE User');
-    // await db.execute('''CREATE TABLE User(
-    //           uid TEXT PRIMARY KEY,
-    //           email TEXT NOT NULL,
-    //           type TEXT NOT NULL,
-    //           speciality TEXT,
-    //           firstname TEXT NOT NULL,
-    //           lastname TEXT NOT NULL,
-    //           profPicURL TEXT NOT NULL,
-    //           phoneNumber TEXT NOT NULL,
-    //           address TEXT NOT NULL,
-    //           dob INT NOT NULL)''');
     User user = UserProvider.instance.currentUser;
     var result;
     if(UserProvider.instance.currentUser.type == 'Patient')
@@ -108,7 +96,6 @@ class SQLHelper {
         '${user.phoneNumber}',
         '${user.address}',
         '${user.dob.toDate().millisecondsSinceEpoch}')''');
-
     return result;
   }
 
@@ -116,7 +103,6 @@ class SQLHelper {
     Database db = await database;
 
     List<Map<String, dynamic>> result = await db.rawQuery('''SELECT * FROM User;''');
-
     if(result[0]['type'] == 'Patient')
       return Patient(
         uid: result[0]['uid'],
@@ -146,31 +132,26 @@ class SQLHelper {
     return null;
   }
 
-  Future<int> deleteUser() async {
+  Future<bool> deleteUser() async {
     Database db = await database;
-
-    int result = await db.rawDelete("DELETE FROM User");
-
-    return result;
+    try {
+      // await db.rawDelete("DELETE FROM User");
+      await dropDB();
+      await db.close();
+      dbHelper = null;
+      return true;
+    } catch (e) {
+      await db.close();
+      dbHelper = null;
+      return false;
+    }
   }
 
   Future<bool> insertMedicine(Medicine med) async {
     Database db = await this.database;
     var result;
-    // await db.execute('DROP TABLE Medicine;');
-    // await db.execute('''CREATE TABLE Medicine(
-    //           name TEXT PRIMARY KEY,
-    //           type TEXT NOT NULL,
-    //           startDate INT NOT NULL,
-    //           endDate INT NOT NULL,
-    //           amount INT NOT NULL,
-    //           nDoses INT NOT NULL,
-    //           startTime INT NOT NULL,
-    //           interval TEXT NOT NULL,
-    //           intervalTime INT)''');
-    // try {
-      // if (UserProvider.instance.currentUser.type == 'Patient')
-        result = await db.rawInsert('''insert into Medicine(
+    try {
+      result = await db.rawInsert('''insert into Medicine(
         name, type, startDate, endDate, amount,
         nDoses, startTime, interval, intervalTime)
         values(
@@ -183,60 +164,69 @@ class SQLHelper {
         '${med.startTime.millisecondsSinceEpoch}',
         '${med.interval}',
         '${med.intervalTime}')''');
-        print('+++++++++++++++++++++ From InsertMedicine +++++++++++++++++++++');
+      print('+++++++++++++++++++++ From InsertMedicine +++++++++++++++++++++');
       if(result != null) {
-        print('+++++++++++++++++++++ From InsertMedicine +++++++++++++++++++++');
-        print(med.medName);
-        print(med.medType);
-        print(med.startDate);
-        print(med.endDate);
-        print(med.amountOfMed);
-        print(med.numOfDoses);
-        print(med.startTime);
-        print(med.interval);
-        print(med.intervalTime);
-        print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+        print('Medicine Added');
         return true;
       }
+    } catch (e) {
+      print(e);
       return false;
-    // } catch (e) {
-    //   print(e);
-    //   return false;}
+    }
+    return false;
   }
 
   Future<Medicine> getMedicine(String medName) async {
     Database db = await database;
 
-    var result = await db.rawQuery('SELECT * FROM Medicine WHERE name = $medName;');
-    if(result.isEmpty) return null;
-    print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
-    print(result[0]['name']);
-    print(result[0]['type']);
-    print(DateTime.fromMillisecondsSinceEpoch(result[0]['startDate']));
-    print(DateTime.fromMillisecondsSinceEpoch(result[0]['endDate']));
-    print(result[0]['amount']);
-    print(result[0]['nDoses']);
-    print(DateTime.fromMillisecondsSinceEpoch(result[0]['startTime']));
-    print(result[0]['interval']);
-    print(result[0]['intervalTime']);
-    print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    return Medicine.fromMap(result[0]);
+    try {
+      var result = await db.rawQuery(
+          'SELECT * FROM Medicine WHERE name = $medName;');
+      if (result.isEmpty) return null;
+      print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
+      print(result[0]['name']);
+      print(result[0]['type']);
+      print(DateTime.fromMillisecondsSinceEpoch(result[0]['startDate']));
+      print(DateTime.fromMillisecondsSinceEpoch(result[0]['endDate']));
+      print(result[0]['amount']);
+      print(result[0]['nDoses']);
+      print(DateTime.fromMillisecondsSinceEpoch(result[0]['startTime']));
+      print(result[0]['interval']);
+      print(result[0]['intervalTime']);
+      print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+      return Medicine.fromMap(result[0]);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<List<Medicine>> getAllMedicines() async {
     Database db = await database;
     List<Medicine> medicines = [];
-    var result = await db.rawQuery('SELECT * FROM Medicine;');
-    print(result.length);
-    result.forEach((medicine) => medicines.add(Medicine.fromMap(medicine)));
-    return medicines;
+    try {
+      var result = await db.rawQuery('SELECT * FROM Medicine;');
+      print(result.length);
+      result.forEach((medicine) => medicines.add(Medicine.fromMap(medicine)));
+      return medicines;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<int> deleteMedicine(String medName) async {
     Database db = await database;
+    try {
+      int result = await db.rawDelete(
+          "DELETE FROM Medicine WHERE name = $medName");
+      return result;
+    } catch (e) {
+      return 0;
+    }
+  }
 
-    int result = await db.rawDelete("DELETE FROM Medicine WHERE name = $medName");
-
-    return result;
+  dropDB() async {
+    Database db = await database;
+    await db.execute('DROP TABLE User');
+    await db.execute('DROP TABLE Medicine');
   }
 }
