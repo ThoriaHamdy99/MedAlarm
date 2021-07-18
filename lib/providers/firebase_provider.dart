@@ -124,20 +124,37 @@ class FirebaseProvider with ChangeNotifier {
       String phoneNumber,
       String address,
       DateTime date,
+  {String speciality}
   ) async {
-    await firestore
-        .collection('Users')
-        .doc(uid)
-        .set({
-      'email': email,
-      'type': type,
-      'firstname': firstname,
-      'lastname': lastname,
-      'profPicURL': '',
-      'phoneNumber': phoneNumber,
-      'address': address,
-      'dob': Timestamp.fromDate(date),
-    });
+    if(type == 'Patient')
+      await firestore
+          .collection('Users')
+          .doc(uid)
+          .set({
+        'email': email,
+        'type': type,
+        'firstname': firstname,
+        'lastname': lastname,
+        'profPicURL': '',
+        'phoneNumber': phoneNumber,
+        'address': address,
+        'dob': Timestamp.fromDate(date),
+      });
+    else if(type == 'Doctor')
+      await firestore
+          .collection('Users')
+          .doc(uid)
+          .set({
+        'email': email,
+        'type': type,
+        'speciality': speciality,
+        'firstname': firstname,
+        'lastname': lastname,
+        'profPicURL': '',
+        'phoneNumber': phoneNumber,
+        'address': address,
+        'dob': Timestamp.fromDate(date),
+      });
     initNewUserContacts(uid);
   }
 

@@ -48,6 +48,7 @@ class LoginFreshSignUp extends StatefulWidget {
 
 class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
   FirebaseProvider fbPro = FirebaseProvider.instance;
+  String _ddlValue = 'Allergy and immunology';
   final _formKey = new GlobalKey<FormState>();
 
   int _radioSelected;
@@ -79,6 +80,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
         this.signUpModel.phoneNumber.trim(),
         this.signUpModel.address.trim(),
         this.signUpModel.dob,
+        speciality: this.signUpModel.speciality,
       );
 
       // print('+++++++++++++++++++++++ From Sign Up +++++++++++++++++++++++');
@@ -417,7 +419,8 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text('Speciality        '),
-                          DropdownButton<String>(
+                          DropdownButton(
+                            value: _ddlValue,
                             items: <String>[
                               'Allergy and immunology',
                               'Dermatology',
@@ -432,15 +435,15 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                               'Urology',
                               'Other'
                             ].map((String value) {
-                              return DropdownMenuItem<String>(
+                              return DropdownMenuItem(
                                 value: value,
-                                child: new Text(value)
+                                child: Text(value)
                               );
                             }).toList(),
-                            hint: this.signUpModel.speciality == null ? Text("Choose a speciality"): Text(this.signUpModel.speciality) ,
                             onChanged: (val) {
                               setState(() {
-                                this.signUpModel.speciality =val;
+                                _ddlValue = val;
+                                this.signUpModel.speciality = val;
                               });
                             },
                           )
