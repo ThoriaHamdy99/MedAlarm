@@ -94,6 +94,8 @@ class _MyAppState extends State<MyApp> {
               UserProvider.instance.currentUser = snapShot.data;
               return HomeScreen();
             }
+            else if(snapShot.data == null)
+              return HomeScreen();
             else
               return Scaffold(body: Center(child: CircularProgressIndicator()));
               // return Scaffold(body: BuildLoginFresh());

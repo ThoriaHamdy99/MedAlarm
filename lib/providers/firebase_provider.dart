@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
+import 'package:med_alarm/models/sign_up_model.dart';
 import 'package:med_alarm/models/user.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
@@ -115,7 +116,21 @@ class FirebaseProvider with ChangeNotifier {
     });
   }
 
-  insertNewUser(
+  insertUserFromSUModel(String uid, SignUpModel model) async {
+    await insertUser(
+      uid,
+      model.email.trim(),
+      model.type.trim(),
+      model.firstname.trim(),
+      model.lastname.trim(),
+      model.phoneNumber.trim(),
+      model.address.trim(),
+      model.dob,
+      speciality: model.speciality,
+    );
+  }
+
+  insertUser(
       String uid,
       String email,
       String type,
@@ -158,6 +173,35 @@ class FirebaseProvider with ChangeNotifier {
     initNewUserContacts(uid);
   }
 
+  updateUser() async {
+    User user = UserProvider.instance.currentUser;
+    if(user.type == 'Patient')
+      await firestore
+          .collection('Users')
+          .doc(user.uid)
+          .set({
+        'firstname': user.firstname,
+        'lastname': user.lastname,
+        'profPicURL': user.profPicURL,
+        'phoneNumber': user.phoneNumber,
+        'address': user.address,
+        'dob': user.dob,
+      });
+    else if(user.type == 'Doctor')
+      await firestore
+          .collection('Users')
+          .doc(user.uid)
+          .set({
+        'speciality': (user as Doctor).speciality,
+        'firstname': user.firstname,
+        'lastname': user.lastname,
+        'profPicURL': user.profPicURL,
+        'phoneNumber': user.phoneNumber,
+        'address': user.address,
+        'dob': user.dob,
+      });
+  }
+
   Future getUser(String userUid) async {
     return await firestore.collection('Users').doc(userUid).get();
   }
@@ -178,7 +222,8 @@ class FirebaseProvider with ChangeNotifier {
 
   logout() async {
     try{
-      await SQLHelper.getInstant().deleteUser();
+      int res = await SQLHelper.getInstant().deleteUser();
+      if(res != 1) throw '';
       await removeDeviceToken();
       auth.signOut();
     } catch(e) {

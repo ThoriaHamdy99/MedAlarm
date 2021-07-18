@@ -63,61 +63,18 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
 
   void _submitAuthForm(BuildContext ctx) async {
     try {
-
-
       Auth.UserCredential auth = await FirebaseProvider.instance.auth
           .createUserWithEmailAndPassword(
               email: this.signUpModel.email.trim(),
               password: this.signUpModel.password.trim());
 
-
-      await fbPro.insertNewUser(
-        auth.user.uid,
-        this.signUpModel.email.trim(),
-        this.signUpModel.type.trim(),
-        this.signUpModel.firstname.trim(),
-        this.signUpModel.lastname.trim(),
-        this.signUpModel.phoneNumber.trim(),
-        this.signUpModel.address.trim(),
-        this.signUpModel.dob,
-        speciality: this.signUpModel.speciality,
-      );
-
-      // print('+++++++++++++++++++++++ From Sign Up +++++++++++++++++++++++');
-      // print(auth.user.uid);
-      // print(this.signUpModel.email.trim());
-      // print(this.signUpModel.type.trim());
-      // print(this.signUpModel.firstname.trim());
-      // print(this.signUpModel.lastname.trim());
-      // print(this.signUpModel.phoneNumber.trim());
-      // print(this.signUpModel.address.trim());
-      // print(Timestamp.fromDate(DateTime.parse(date)));
-      // print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+      await fbPro.insertUserFromSUModel(auth.user.uid, this.signUpModel);
       if (this.signUpModel.type.trim() == 'Patient')
-        UserProvider.instance.currentUser = Patient(
-          uid: auth.user.uid,
-          email: this.signUpModel.email.trim(),
-          type: this.signUpModel.type.trim(),
-          firstname: this.signUpModel.firstname.trim(),
-          lastname: this.signUpModel.lastname.trim(),
-          profPicURL: '',
-          phoneNumber: this.signUpModel.phoneNumber.trim(),
-          address: this.signUpModel.address.trim(),
-          dob: Timestamp.fromDate( this.signUpModel.dob ),
-        );
+        UserProvider.instance.currentUser = Patient
+          .fromSignUpModel(auth.user.uid, this.signUpModel);
       else if (this.signUpModel.type.trim() == 'Doctor')
-        UserProvider.instance.currentUser = Doctor(
-          uid: auth.user.uid,
-          email: this.signUpModel.email.trim(),
-          type: this.signUpModel.type.trim(),
-          speciality: this.signUpModel.speciality.trim(),
-          firstname: this.signUpModel.firstname.trim(),
-          lastname: this.signUpModel.lastname.trim(),
-          profPicURL: '',
-          phoneNumber: this.signUpModel.phoneNumber.trim(),
-          address: this.signUpModel.address.trim(),
-          dob: Timestamp.fromDate( this.signUpModel.dob ),
-        );
+        UserProvider.instance.currentUser = Doctor
+          .fromSignUpModel(auth.user.uid, this.signUpModel);
 
       await FirebaseProvider.instance.registerDeviceToken();
       SQLHelper.getInstant().insertUser();
@@ -145,27 +102,12 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
       print(this.signUpModel.email.trim());
       print(e);
     }
-
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) {
-    //       if (Users.patientUser) {
-    //         return Patient();
-    //       } else if (Users.doctorUser) {
-    //         return Doctor();
-    //       } else {
-    //         return Admin();
-    //       }
-    //     }
-    //     ,
-    //   ),
-    //);
   }
 
   void _submit() {
     final isValid = _formKey.currentState.validate();
     FocusScope.of(context).unfocus();
-    if (isValid) {
+    if (isValid && signUpModel.dob != null) {
       _formKey.currentState.save();
       print(signUpModel.email);
       _submitAuthForm(context);
@@ -238,12 +180,13 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
             child: Container(
               height: MediaQuery.of(context).size.height * 0.7,
               width: MediaQuery.of(context).size.width,
-              decoration: new BoxDecoration(
-                  color: Color(0xFFF3F3F5),
-                  borderRadius: new BorderRadius.only(
-                    topLeft: const Radius.circular(50.0),
-                    topRight: const Radius.circular(50.0),
-                  )),
+              decoration: BoxDecoration(
+                color: Color(0xFFF3F3F5),
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(25.0),
+                  topRight: const Radius.circular(25.0),
+                ),
+              ),
               child: buildBody(),
             ),
           ),
@@ -458,6 +401,8 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                           validator: (value) {
                             if (!isNumeric(value)) {
                               return 'Please enter a valid phone number!';
+                            } else if (value.length != 11) {
+                              return 'Please enter a valid phone number!';
                             } else if (value.isEmpty) {
                               return 'Phone field can\'t be empty!';
                             }
@@ -466,7 +411,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                           onSaved: (String value) {
                             this.signUpModel.phoneNumber = value;
                           },
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.phone,
                           style: TextStyle(
                               color: widget.textColor ?? Color(0xFF0F2E48),
                               fontSize: 14),
@@ -496,12 +441,24 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                       child: SingleChildScrollView(
                         child: Column(children: <Widget>[
                           Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              child: PanelTitle(
-                                title: "Birth Date",
-                                isRequired: true,
-                              )),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            child: PanelTitle(
+                              title: "Birth Date",
+                              isRequired: true,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 5),
+                            child: Text(
+                              this.signUpModel.dob == null ?
+                              'Not Selected':
+                              this.signUpModel.dob.toIso8601String().substring(0, 10),
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
                           ElevatedButton  (
                             style: ElevatedButton.styleFrom(
                               shape: new RoundedRectangleBorder(
@@ -509,14 +466,14 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                               ),
                               primary:
                                   Theme.of(context).accentColor, // background
-                              onPrimary: Colors.amber, // foreground
+                              onPrimary: Colors.white, // foreground
                             ),
-                            child: new Icon(Icons.date_range),
+                            child: Icon(Icons.date_range),
                             onPressed: () =>   showRoundedDatePicker(
                               context: context,
-                              initialDate: DateTime(DateTime.now().year - 100),
+                              initialDate: DateTime(DateTime.now().year - 40),
                               firstDate: DateTime(DateTime.now().year - 100),
-                              lastDate: DateTime(DateTime.now().year ),
+                              lastDate: DateTime(DateTime.now().year - 10),
                               borderRadius: 16,
                               onTapDay: (DateTime dateTime, bool available) {
                                 if (!available) {
@@ -528,7 +485,9 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                                         },)
                                       ],));
                                 }
-                                this.signUpModel.dob = dateTime;
+                                setState(() {
+                                  this.signUpModel.dob = dateTime;
+                                });
                                 return available;
                               },
                             ),

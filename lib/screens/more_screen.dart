@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/screens/report/report_screen.dart';
+
+import '../main.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({Key key}) : super(key: key);
@@ -19,6 +22,8 @@ class MoreScreen extends StatelessWidget {
             measurementTile(context),
             Divider(height: 0,),
             reportTile(context),
+            Divider(height: 0,),
+            logoutTile(context),
           ],
         ),
       ),
@@ -64,6 +69,24 @@ class MoreScreen extends StatelessWidget {
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(ReportScreen.id);
+      },
+    );
+  }
+
+  ListTile logoutTile(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        Icons.logout_outlined,
+        size: 50,
+        color: Colors.red,
+      ),
+      title: Text('Logout'),
+      contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      onTap: () {
+        FirebaseProvider.instance.logout();
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => MyApp(),
+        ));
       },
     );
   }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:med_alarm/models/user.dart';
 
 class Patient extends User {
@@ -33,5 +34,29 @@ class Patient extends User {
     phoneNumber = doc.get('phoneNumber');
     address = doc.get('address');
     dob = doc.get('dob');
+  }
+
+  Patient.fromMap(doc) {
+    uid = doc['uid'];
+    email = doc['email'];
+    type = doc['type'];
+    firstname = doc['firstname'];
+    lastname = doc['lastname'];
+    profPicURL = doc['profPicURL'];
+    phoneNumber = doc['phoneNumber'];
+    address = doc['address'];
+    dob = Timestamp.fromMillisecondsSinceEpoch(doc['dob']);
+  }
+
+  Patient.fromSignUpModel(uid, model) { 
+    this.uid = uid;
+    email = model.email.trim();
+    type = model.type.trim();
+    firstname = model.firstname.trim();
+    lastname = model.lastname.trim();
+    profPicURL = '';
+    phoneNumber = model.phoneNumber.trim();
+    address = model.address.trim();
+    dob = Timestamp.fromDate(model.dob);
   }
 }

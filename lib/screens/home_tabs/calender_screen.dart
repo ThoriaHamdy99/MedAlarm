@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/screens/medicine/med_details.dart';
-import 'package:med_alarm/main.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/models/med_day.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -62,32 +60,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(hello),
-        actions: [
-          DropdownButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: Theme.of(context).primaryIconTheme.color,
-            ),
-            items: [
-              DropdownMenuItem(
-                child: Row(children: [
-                  Icon(Icons.exit_to_app),
-                  SizedBox(width: 8),
-                  Text('Logout')
-                ]),
-                value: 'logout',
-              ),
-            ],
-            onChanged: (itemIdentifier) {
-              if (itemIdentifier == 'logout') {
-                FirebaseProvider.instance.logout();
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => MyApp(),
-                ));
-              }
-            },
-          ),
-        ],
+        // actions: [
+        //   DropdownButton(
+        //     icon: Icon(
+        //       Icons.more_vert,
+        //       color: Theme.of(context).primaryIconTheme.color,
+        //     ),
+        //     items: [
+        //       DropdownMenuItem(
+        //         child: Row(children: [
+        //           Icon(Icons.exit_to_app),
+        //           SizedBox(width: 8),
+        //           Text('Logout')
+        //         ]),
+        //         value: 'logout',
+        //       ),
+        //     ],
+        //     onChanged: (itemIdentifier) {
+        //       if (itemIdentifier == 'logout') {
+        //         FirebaseProvider.instance.logout();
+        //         Navigator.of(context).pushReplacement(MaterialPageRoute(
+        //           builder: (context) => MyApp(),
+        //         ));
+        //       }
+        //     },
+        //   ),
+        // ],
       ),
       body: Stack(
         children: [
