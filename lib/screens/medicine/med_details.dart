@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:intl/intl.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/home_screen.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 import 'package:validators/validators.dart';
-import 'package:med_alarm/screens/home_tabs/calender_screen.dart';
 
-//TextEditingController medNameController = new TextEditingController();
 Medicine medInfo = new Medicine();
 final _formKey = new GlobalKey<FormState>();
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -353,13 +352,14 @@ class _ReminderDetailsContainer extends StatefulWidget {
 
 class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
   SQLHelper _sqlHelper = SQLHelper();
+  // DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
+  bool beforeNow = true;
 
   @override
   void initState() {
     medInfo.startDate = DateTime.now();
-    medInfo.endDate = DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
+    medInfo.endDate = DateTime.now().add(Duration(days: 1));
     medInfo.startTime = DateTime.now();
     super.initState();
   }
@@ -394,11 +394,16 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         child: PanelTitle(
                           title: "Pick up Start date",
                           isRequired: true,
+                        ),
+                      ),
+                      Text(
+                        DateFormat.yMMMd().format(medInfo.startDate),
+                        style: TextStyle(
+                          fontSize: 15,
                         ),
                       ),
                       ElevatedButton(
@@ -416,32 +421,57 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         onPressed: () =>
                           showRoundedDatePicker(
                             context: context,
+                            theme: Theme.of(context),
+                            initialDate: medInfo.startDate,
                             firstDate: DateTime.now().subtract(Duration(days: 1)),
                             lastDate: DateTime(DateTime.now().year + 10),
                             borderRadius: 16,
                             onTapDay: (DateTime dateTime, bool available) {
                               if (!available) {
                                 showDialog(
-                                    context: context,
-                                    builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
-                                      CupertinoDialogAction(child: Text("OK"),onPressed: (){
-                                        Navigator.pop(context);
-                                      },)
-                                    ],));
+                                  context: context,
+                                  builder: (c) => AlertDialog(
+                                    title: Text("This date cannot be selected."),
+                                    actions: <Widget>[
+                                      CupertinoDialogAction(
+                                        child: Text("OK"),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               }
-                              medInfo.startDate = dateTime;
-                              endDate = dateTime;
+                              setState(() {
+                                medInfo.startDate = dateTime;
+                                medInfo.endDate = medInfo.startDate.add(Duration(days: 1));
+                                endDate = dateTime;
+                                if (medInfo.startDate.toIso8601String().substring(0 ,10)
+                                    == DateTime.now().toIso8601String().substring(0 ,10)) {
+                                  if (medInfo.startDate
+                                      .difference(medInfo.startTime
+                                      .subtract(Duration(minutes: 1)))
+                                      .inMilliseconds <= 0) {
+                                    beforeNow = false;
+                                  } else beforeNow = true;
+                                } else beforeNow = false;
+                              });
                               return available;
                             },
                           ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         child: PanelTitle(
                           title: "Pick up end date",
                           isRequired: true,
-                        )),
+                        ),
+                      ),
+                      Text(
+                        DateFormat.yMMMd().format(medInfo.endDate),
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           shape: new RoundedRectangleBorder(
@@ -454,6 +484,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         onPressed: () =>
                           showRoundedDatePicker(
                             context: context,
+                            theme: Theme.of(context),
                             initialDate: endDate.add(Duration(days: 1)),
                             firstDate: endDate.add(Duration(days: 1)),
                             lastDate: DateTime(DateTime.now().year + 10),
@@ -461,14 +492,21 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             onTapDay: (DateTime dateTime, bool available) {
                               if (!available) {
                                 showDialog(
-                                    context: context,
-                                    builder: (c) => AlertDialog(title: Text("This date cannot be selected."),actions: <Widget>[
-                                      CupertinoDialogAction(child: Text("OK"),onPressed: (){
-                                        Navigator.pop(context);
-                                      },)
-                                    ],));
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: Text("This date cannot be selected."),
+                                    actions: <Widget>[
+                                      CupertinoDialogAction(
+                                        child: Text("OK"),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               }
-                               medInfo.endDate = dateTime;
+                              setState(() {
+                                medInfo.endDate = dateTime;
+                              });
                               return available;
                             },
                           ),
@@ -496,7 +534,21 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         itemHeight: 40,
                         isForce2Digits: true,
                         onTimeChange: (time) {
-                          medInfo.startTime = time;
+                          setState(() {
+                            if(medInfo.startDate.difference(time).inDays == 0) {
+                              time = time.subtract(Duration(minutes: 1));
+                              medInfo.startDate = DateTime.now();
+                              if (medInfo.startTime.difference(time)
+                                  .inMilliseconds <= 0) {
+                                medInfo.startTime = time;
+                                beforeNow = false;
+                              } else beforeNow = true;
+                            }
+                            else {
+                              medInfo.startTime = time;
+                              beforeNow = false;
+                            }
+                          });
                         },
                       ),
                       SizedBox(
@@ -516,6 +568,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             borderRadius: BorderRadius.circular(50.0)),
                         onPressed: () async {
                           try {
+                            if(beforeNow) throw 'Choose time after now';
                             if (!await _sqlHelper.insertMedicine(medInfo)) {
                               print('Med Not Inserted');
                               return;
@@ -525,7 +578,11 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             Navigator.pushReplacementNamed(
                                 context, HomeScreen.id);
                           } catch (e) {
-
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(e.toString()),
+                              duration: Duration(seconds: 3),
+                              backgroundColor: Theme.of(context).errorColor,
+                            ));
                           }
                         },
                         child: Text(

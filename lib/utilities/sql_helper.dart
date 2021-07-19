@@ -172,7 +172,8 @@ class SQLHelper {
       }
     } catch (e) {
       print(e);
-      return false;
+      throw 'Medicine name already exists';
+      // return false;
     }
     return false;
   }
