@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
@@ -38,6 +39,15 @@ class _EditProfileState extends State<EditProfile> {
 
   final ImagePicker profPicPicker = ImagePicker();
   User user;
+
+  get tfBorder => OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.grey),
+    borderRadius: BorderRadius.circular(10),
+  );
+
+  get tfFBorder => OutlineInputBorder(
+    borderSide: BorderSide(color: Theme.of(context).accentColor,width: 2),
+  );
 
   @override
   void initState() {
@@ -240,20 +250,12 @@ class _EditProfileState extends State<EditProfile> {
     return TextFormField(
       controller: firstnameController,
       validator: (value) {
-        if (value.isEmpty) return "firstname can't be empty";
-
+        if (value.isEmpty) return "First name can't be empty";
         return null;
       },
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-          color: Theme.of(context).accentColor,
-          width: 2,
-        )),
+        border: tfBorder,
+        focusedBorder: tfFBorder,
         labelText: "First Name",
         hintText: "First Name",
       ),
@@ -265,19 +267,11 @@ class _EditProfileState extends State<EditProfile> {
       controller: lastnameController,
       validator: (value) {
         if (value.isEmpty) return "Last name can't be empty";
-
         return null;
       },
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-          color: Theme.of(context).accentColor,
-          width: 2,
-        )),
+        border: tfBorder,
+        focusedBorder: tfFBorder,
         labelText: "Last Name",
         hintText: "Last Name",
       ),
@@ -288,20 +282,13 @@ class _EditProfileState extends State<EditProfile> {
     return TextFormField(
       controller: phoneNumberController,
       validator: (value) {
-        if (value.isEmpty) return "Phone Number can't be empty";
-
+        if (value.isEmpty) return 'Phone number can\'t be empty';
+        else if (value.length != 11) return 'Phone number must be 11 digits';
         return null;
       },
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-          color: Theme.of(context).accentColor,
-          width: 2,
-        )),
+        border: tfBorder,
+        focusedBorder: tfFBorder,
         labelText: "Phone Number",
         hintText: "Phone Number",
       ),
@@ -313,19 +300,11 @@ class _EditProfileState extends State<EditProfile> {
       controller: addressController,
       validator: (value) {
         if (value.isEmpty) return "Address can't be empty";
-
         return null;
       },
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-          color: Theme.of(context).accentColor,
-          width: 2,
-        )),
+        border: tfBorder,
+        focusedBorder: tfFBorder,
         labelText: "Address",
         hintText: "Address",
       ),
@@ -348,9 +327,7 @@ class _EditProfileState extends State<EditProfile> {
             Padding(
               padding: EdgeInsets.only(bottom: 5),
               child: Text(
-                dob == null ?
-                'Not Selected':
-                dob.toIso8601String().substring(0, 10),
+                DateFormat.yMMMd().format(dob),
                 style: TextStyle(
                   fontSize: 15,
                 ),
@@ -374,18 +351,17 @@ class _EditProfileState extends State<EditProfile> {
                 onTapDay: (DateTime dateTime, bool available) {
                   if (!available) {
                     showDialog(
-                        context: context,
-                        builder: (c) => AlertDialog(
-                              title: Text("This date cannot be selected."),
-                              actions: <Widget>[
-                                CupertinoDialogAction(
-                                  child: Text("OK"),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                )
-                              ],
-                            ));
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text("This date cannot be selected."),
+                        actions: <Widget>[
+                          CupertinoDialogAction(
+                            child: Text("OK"),
+                            onPressed: () => Navigator.pop(context),
+                          )
+                        ],
+                      ),
+                    );
                   }
                   setState(() {
                     dob = dateTime;

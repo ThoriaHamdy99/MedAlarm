@@ -101,34 +101,39 @@ class SQLHelper {
 
   Future<User> getUser() async {
     Database db = await database;
-    List<Map<String, dynamic>> result = await db.rawQuery('''SELECT * FROM User;''');
-    if(result[0]['type'] == 'Patient')
-      return Patient(
-        uid: result[0]['uid'],
-        email: result[0]['email'],
-        type: result[0]['type'],
-        firstname: result[0]['firstname'],
-        lastname: result[0]['lastname'],
-        profPicURL: result[0]['profPicURL'],
-        phoneNumber: result[0]['phoneNumber'],
-        address: result[0]['address'],
-        dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
-      );
-    else if(result[0]['type'] == 'Doctor')
-      return Doctor(
-        uid: result[0]['uid'],
-        email: result[0]['email'],
-        type: result[0]['type'],
-        speciality: result[0]['speciality'],
-        firstname: result[0]['firstname'],
-        lastname: result[0]['lastname'],
-        profPicURL: result[0]['profPicURL'],
-        phoneNumber: result[0]['phoneNumber'],
-        address: result[0]['address'],
-        dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
-      );
-    print('Function getUser is not fine');
-    return null;
+    try {
+      List<Map<String, dynamic>> result = await db.rawQuery(
+          '''SELECT * FROM User;''');
+      if (result[0]['type'] == 'Patient')
+        return Patient(
+          uid: result[0]['uid'],
+          email: result[0]['email'],
+          type: result[0]['type'],
+          firstname: result[0]['firstname'],
+          lastname: result[0]['lastname'],
+          profPicURL: result[0]['profPicURL'],
+          phoneNumber: result[0]['phoneNumber'],
+          address: result[0]['address'],
+          dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
+        );
+      else if (result[0]['type'] == 'Doctor')
+        return Doctor(
+          uid: result[0]['uid'],
+          email: result[0]['email'],
+          type: result[0]['type'],
+          speciality: result[0]['speciality'],
+          firstname: result[0]['firstname'],
+          lastname: result[0]['lastname'],
+          profPicURL: result[0]['profPicURL'],
+          phoneNumber: result[0]['phoneNumber'],
+          address: result[0]['address'],
+          dob: Timestamp.fromMillisecondsSinceEpoch(result[0]['dob']),
+        );
+      return Patient();
+    } catch (e) {
+      print('Function getUser is not fine');
+      return Patient();
+    }
   }
 
   Future<bool> deleteUser() async {

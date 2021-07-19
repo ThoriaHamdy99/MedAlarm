@@ -38,7 +38,7 @@ class MoreScreen extends StatelessWidget {
         size: 50,
         color: Theme.of(context).accentColor,
       ),
-      title: Text('Edit Profile'),
+      title: Text('View Profile'),
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(UserProfile.id);

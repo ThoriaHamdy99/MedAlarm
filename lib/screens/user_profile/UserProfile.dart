@@ -29,7 +29,7 @@ class _UserProfileState extends State {
   Widget build(BuildContext context) {
     String convertedDate;
     convertedDate =
-        DateFormat.yMMMd().add_jm().format(currentUser.dob.toDate());
+        DateFormat.yMMMd().format(currentUser.dob.toDate());
 
     return Scaffold(
       appBar: AppBar(

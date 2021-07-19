@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/user.dart';
@@ -441,8 +442,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                       child: SingleChildScrollView(
                         child: Column(children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
+                            padding: EdgeInsets.symmetric(horizontal: 10),
                             child: PanelTitle(
                               title: "Birth Date",
                               isRequired: true,
@@ -453,7 +453,8 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                             child: Text(
                               this.signUpModel.dob == null ?
                               'Not Selected':
-                              this.signUpModel.dob.toIso8601String().substring(0, 10),
+                              // this.signUpModel.dob.toIso8601String().substring(0, 10),
+                              DateFormat.yMMMd().format(this.signUpModel.dob),
                               style: TextStyle(
                                 fontSize: 15,
                               ),
