@@ -136,12 +136,12 @@ class SQLHelper {
     try {
       // await db.rawDelete("DELETE FROM User");
       await deleteTables();
-      await db.close();
-      dbHelper = null;
+      // await db.close();
+      // dbHelper = null;
       return true;
     } catch (e) {
-      await db.close();
-      dbHelper = null;
+      // await db.close();
+      // dbHelper = null;
       return false;
     }
   }

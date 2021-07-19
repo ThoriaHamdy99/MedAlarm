@@ -290,17 +290,7 @@ class _ChatRoomState extends State<ChatRoom> {
     if (image == null) return;
     File file = File(image.path);
 
-    FirebaseStorage storage = FirebaseStorage.instanceFor(
-        bucket: 'gs://medalarm-fcai2021.appspot.com',
-    );
-
-    Reference ref =
-        storage.ref('media/$messagesPath/${DateTime.now()}');
-    UploadTask storageUploadTask = ref.putFile(file);
-    TaskSnapshot storageTaskSnapshot =
-        await storageUploadTask.whenComplete(() => null);
-    String url = await storageTaskSnapshot.ref.getDownloadURL();
-    sendMessage(url: url);
+    sendMessage(url: await fbPro.uploadImage(messagesPath, file));
   }
 }
 

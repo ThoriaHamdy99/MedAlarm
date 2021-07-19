@@ -59,4 +59,16 @@ class Patient extends User {
     address = model.address.trim();
     dob = Timestamp.fromDate(model.dob);
   }
+
+  Patient.fromPatient(patient) {
+    uid = patient.uid;
+    email = patient.email;
+    type = patient.type;
+    firstname = patient.firstname;
+    lastname = patient.lastname;
+    profPicURL = patient.profPicURL;
+    phoneNumber = patient.phoneNumber;
+    address = patient.address;
+    dob = patient.dob;
+  }
 }

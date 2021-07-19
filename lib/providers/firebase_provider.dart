@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
@@ -173,33 +174,35 @@ class FirebaseProvider with ChangeNotifier {
     initNewUserContacts(uid);
   }
 
-  updateUser() async {
-    User user = UserProvider.instance.currentUser;
-    if(user.type == 'Patient')
-      await firestore
-          .collection('Users')
-          .doc(user.uid)
-          .set({
-        'firstname': user.firstname,
-        'lastname': user.lastname,
-        'profPicURL': user.profPicURL,
-        'phoneNumber': user.phoneNumber,
-        'address': user.address,
-        'dob': user.dob,
-      });
-    else if(user.type == 'Doctor')
-      await firestore
-          .collection('Users')
-          .doc(user.uid)
-          .set({
-        'speciality': (user as Doctor).speciality,
-        'firstname': user.firstname,
-        'lastname': user.lastname,
-        'profPicURL': user.profPicURL,
-        'phoneNumber': user.phoneNumber,
-        'address': user.address,
-        'dob': user.dob,
-      });
+  Future<bool> updateUser(User user) async {
+    try {
+      if (user.type == 'Patient')
+        await firestore
+            .collection('Users')
+            .doc(user.uid)
+            .update({
+          'firstname': user.firstname,
+          'lastname': user.lastname,
+          'profPicURL': user.profPicURL,
+          'phoneNumber': user.phoneNumber,
+          'address': user.address,
+          'dob': user.dob,
+        });
+      else if (user.type == 'Doctor')
+        await firestore
+            .collection('Users')
+            .doc(user.uid)
+            .update({
+          'speciality': (user as Doctor).speciality,
+          'firstname': user.firstname,
+          'lastname': user.lastname,
+          'profPicURL': user.profPicURL,
+          'phoneNumber': user.phoneNumber,
+          'address': user.address,
+          'dob': user.dob,
+        });
+      return true;
+    } catch (e) {return false;}
   }
 
   Future getUser(String userUid) async {
@@ -218,6 +221,41 @@ class FirebaseProvider with ChangeNotifier {
         .collection('Contacts')
         .doc('_init')
         .set({});
+  }
+
+  Future<String> uploadImage(messagesPath, image) async {
+    try {
+      FirebaseStorage storage = FirebaseStorage.instanceFor(
+        bucket: 'gs://medalarm-fcai2021.appspot.com',
+      );
+      Reference ref =
+      storage.ref('media/$messagesPath/${DateTime.now()}');
+      UploadTask storageUploadTask = ref.putFile(image);
+      TaskSnapshot storageTaskSnapshot =
+      await storageUploadTask.whenComplete(() => null);
+      String url = await storageTaskSnapshot.ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  Future<String> uploadProfPic(image) async {
+    try {
+      FirebaseStorage storage = FirebaseStorage.instanceFor(
+        bucket: 'gs://medalarm-fcai2021.appspot.com',
+      );
+
+      Reference ref =
+      storage.ref('profPic/${auth.currentUser.uid}/${DateTime.now()}');
+      UploadTask storageUploadTask = ref.putFile(image);
+      TaskSnapshot storageTaskSnapshot =
+      await storageUploadTask.whenComplete(() => null);
+      String url = await storageTaskSnapshot.ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      return '';
+    }
   }
 
   logout() async {

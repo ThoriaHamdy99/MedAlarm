@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/screens/report/report_screen.dart';
+import 'package:med_alarm/screens/user_profile/UserProfile.dart';
 
 import '../main.dart';
 
@@ -39,7 +40,9 @@ class MoreScreen extends StatelessWidget {
       ),
       title: Text('Edit Profile'),
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pushNamed(UserProfile.id);
+      },
     );
   }
 

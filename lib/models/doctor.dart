@@ -65,4 +65,17 @@ class Doctor extends User {
     dob = Timestamp.fromDate(model.dob);
     speciality = model.speciality;
   }
+
+  Doctor.fromDoctor(doctor) {
+    uid = doctor.uid;
+    email = doctor.email;
+    type = doctor.type;
+    speciality = doctor.speciality;
+    firstname = doctor.firstname;
+    lastname = doctor.lastname;
+    profPicURL = doctor.profPicURL;
+    phoneNumber = doctor.phoneNumber;
+    address = doctor.address;
+    dob = doctor.dob;
+  }
 }

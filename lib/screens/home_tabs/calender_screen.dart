@@ -87,12 +87,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String hello = "Hello ";
+    String hello = "";
     if (UserProvider.instance.currentUser.type == 'Doctor') hello += 'Dr/';
     hello += UserProvider.instance.currentUser.firstname;
     return Scaffold(
       appBar: AppBar(
         title: Text(hello),
+        titleSpacing: 5,
+        leading: Container(
+          padding: EdgeInsets.all(5),
+          child: (UserProvider.instance.currentUser.profPicURL == '') ?
+            Icon(Icons.account_circle) :
+            CircleAvatar(
+              backgroundImage: NetworkImage(
+                UserProvider.instance.currentUser.profPicURL,
+              ),
+            ),
+        ),
       ),
       body: Stack(
         children: [
