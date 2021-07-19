@@ -358,9 +358,18 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
 
   @override
   void initState() {
-    medInfo.startDate = DateTime.now();
-    medInfo.endDate = DateTime.now().add(Duration(days: 1));
+    /*
+    initialDate: medInfo.endDate,
+    firstDate: medInfo.startDate.add(Duration(days: 1)),
+    */
+    setState(() {
+    medInfo.startDate = DateTime.parse(DateTime.now().toIso8601String().substring(0,10));
+    medInfo.endDate = medInfo.startDate.add(Duration(days: 1, hours: 1));
+    print(medInfo.startDate.add(Duration(days: 1)));
+    print(medInfo.endDate);
     medInfo.startTime = DateTime.now();
+
+    });
     super.initState();
   }
 
@@ -446,15 +455,6 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                                 if (medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
                                     medInfo.endDate.toIso8601String().substring(0 ,10)) >= 0)
                                   medInfo.endDate = medInfo.startDate.add(Duration(days: 1));
-                                if (medInfo.startDate.toIso8601String().substring(0 ,10)
-                                    == DateTime.now().toIso8601String().substring(0 ,10)) {
-                                  if (medInfo.startTime
-                                      .difference(DateTime.now()
-                                      .subtract(Duration(minutes: 1)))
-                                      .inMilliseconds <= 0) {
-                                    beforeNow = true;
-                                  } else beforeNow = false;
-                                } else beforeNow = false;
                               });
                               return available;
                             },
@@ -535,21 +535,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         itemHeight: 40,
                         isForce2Digits: true,
                         onTimeChange: (time) {
-                          setState(() {
-                            if(medInfo.startDate.difference(time).inDays == 0) {
-                              time = time.subtract(Duration(minutes: 1));
-                              medInfo.startDate = DateTime.now();
-                              if (medInfo.startTime.difference(time)
-                                  .inMilliseconds <= 0) {
-                                medInfo.startTime = time;
-                                beforeNow = false;
-                              } else beforeNow = true;
-                            }
-                            else {
-                              medInfo.startTime = time;
-                              beforeNow = false;
-                            }
-                          });
+                            medInfo.startTime = time.subtract(Duration(minutes: 1));
                         },
                       ),
                       SizedBox(
@@ -569,7 +555,16 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             borderRadius: BorderRadius.circular(50.0)),
                         onPressed: () async {
                           try {
-                            if(beforeNow) throw 'Choose time after now';
+                            if (medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
+                                medInfo.startTime.toIso8601String().substring(0 ,10)) == 0) {
+                              print(medInfo.startTime);
+                              print(DateTime.now());
+                              if(medInfo.startTime.difference(
+                                  DateTime.now()
+                              ).inSeconds < 0) {
+                                throw 'Choose time after now';
+                              }
+                            }
                             if (!await _sqlHelper.insertMedicine(medInfo)) {
                               print('Med Not Inserted');
                               return;
