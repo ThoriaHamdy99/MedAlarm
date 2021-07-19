@@ -42,20 +42,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   List<Medicine> _getEventsForDay(DateTime day) {
+    String dayString = day.toIso8601String().substring(0, 10);
     List<Medicine> allMedsForDay = [];
     for (int i = 0; i < allMeds.length; ++i) {
-      if (allMeds[i].startDate.difference(day).inDays <= 0
-        && day.difference(allMeds[i].endDate).inDays <= 0) {
+      if (allMeds[i].startDate.toIso8601String().substring(0, 10)
+          .compareTo(dayString) <= 0
+        && dayString.compareTo(allMeds[i].endDate
+          .toIso8601String().substring(0, 10)) <= 0) {
         if (allMeds[i].interval == 'daily')
           allMedsForDay.add(allMeds[i]);
         else if(allMeds[i].interval == 'weekly'
-          && allMeds[i].startDate.weekday == day.weekday) {
+          && allMeds[i].startDate.weekday == day.weekday)
           allMedsForDay.add(allMeds[i]);
-        }
         else if (allMeds[i].interval == 'monthly'
-          && allMeds[i].startDate.day == day.day) {
+          && allMeds[i].startDate.day == day.day)
           allMedsForDay.add(allMeds[i]);
-        }
       }
     }
     return allMedsForDay;

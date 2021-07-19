@@ -353,7 +353,7 @@ class _ReminderDetailsContainer extends StatefulWidget {
 class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
   SQLHelper _sqlHelper = SQLHelper();
   // DateTime startDate = DateTime.now();
-  DateTime endDate = DateTime.now();
+  // DateTime endDate = DateTime.now();
   bool beforeNow = true;
 
   @override
@@ -443,16 +443,17 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                               }
                               setState(() {
                                 medInfo.startDate = dateTime;
-                                medInfo.endDate = medInfo.startDate.add(Duration(days: 1));
-                                endDate = dateTime;
+                                if (medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
+                                    medInfo.endDate.toIso8601String().substring(0 ,10)) >= 0)
+                                  medInfo.endDate = medInfo.startDate.add(Duration(days: 1));
                                 if (medInfo.startDate.toIso8601String().substring(0 ,10)
                                     == DateTime.now().toIso8601String().substring(0 ,10)) {
-                                  if (medInfo.startDate
-                                      .difference(medInfo.startTime
+                                  if (medInfo.startTime
+                                      .difference(DateTime.now()
                                       .subtract(Duration(minutes: 1)))
                                       .inMilliseconds <= 0) {
-                                    beforeNow = false;
-                                  } else beforeNow = true;
+                                    beforeNow = true;
+                                  } else beforeNow = false;
                                 } else beforeNow = false;
                               });
                               return available;
@@ -485,8 +486,8 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                           showRoundedDatePicker(
                             context: context,
                             theme: Theme.of(context),
-                            initialDate: endDate.add(Duration(days: 1)),
-                            firstDate: endDate.add(Duration(days: 1)),
+                            initialDate: medInfo.endDate,
+                            firstDate: medInfo.startDate.add(Duration(days: 1)),
                             lastDate: DateTime(DateTime.now().year + 10),
                             borderRadius: 16,
                             onTapDay: (DateTime dateTime, bool available) {
