@@ -44,11 +44,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
   List<Medicine> _getEventsForDay(DateTime day) {
     List<Medicine> allMedsForDay = [];
     for (int i = 0; i < allMeds.length; ++i) {
+      var daysAdded = allMeds[i].startDate.add(Duration(days: 7));
+      var monthAdded = allMeds[i].startDate.add(Duration(days: 30));
       if ((allMeds[i].startDate.isBefore(day) &&
               allMeds[i].endDate.isAfter(day)) ||
-          allMeds[i].startDate.isAtSameMomentAs(day) ||
-          allMeds[i].endDate.isAtSameMomentAs(day))
-        allMedsForDay.add(allMeds[i]);
+          allMeds[i].startDate.day == day.day ||
+          allMeds[i].endDate.day == day.day)
+        if(allMeds[i].interval == "daily")
+          allMedsForDay.add(allMeds[i]);
+        else if(allMeds[i].interval == "weakly" && (allMeds[i].startDate.day == day.day ||
+                ( daysAdded.day == day.day &&
+                    (daysAdded.isBefore(allMeds[i].endDate)
+                        || daysAdded.day == allMeds[i].endDate.day) ) ))
+          allMedsForDay.add(allMeds[i]);
+        else if(allMeds[i].interval == "monthly" && (allMeds[i].startDate.day == day.day ||
+                ( monthAdded.day == day.day &&
+                    (monthAdded.isBefore(allMeds[i].endDate)
+                        || monthAdded.day == allMeds[i].endDate.day) ) ))
+          allMedsForDay.add(allMeds[i]);
+
     }
     return allMedsForDay;
   }
@@ -144,58 +158,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
               const SizedBox(height: 1),
-              /*SizedBox(
-                height: 20,
-              ),
-              Text(
-                getTime(med1.startTime),
-                style: TextStyle(
-                  fontSize: 25,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              Card(
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 12.0),
-                elevation: 5,
-                shadowColor: Colors.green,
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  onTap: () {
-                    print("............");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SelectedMed(med1),
-                      ),
-                    );
-                  },
-                  child: ListTile(
-                    title: Column(
-                      children: [
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          med1.medName,
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 12,
-                        ),
-                        Text('take ' + "${2/*med1.dose.amountOfDose*/} " + "${med1.medType}"),
-                        SizedBox(
-                          height: 8,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),*/
               FutureBuilder<List<Medicine>>(
                   future: _sqlHelper.getAllMedicines(),
                   builder: (ctx, snapShot) {
@@ -262,8 +224,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ),
                         );
                       }
-                      print(allMeds);
-                      print(snapShot.data.length);
+                      //print(allMeds);
+                      //print(snapShot.data.length);
                       allMeds = snapShot.data;
                       _selectedMeds.value = _getEventsForDay(_selectedDay);
                       return _selectedMeds.value.isEmpty
@@ -297,7 +259,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                               height: 20,
                                             ),
                                             Text(
-                                              "8.00 AM",
+                                              "${getTime(value[index].startTime)}",
                                               style: TextStyle(
                                                 fontSize: 20,
                                               ),
@@ -314,36 +276,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                               clipBehavior: Clip.antiAlias,
                                               child: ListTile(
                                                 onTap: () =>
-                                                    print('${value[index]}'),
-                                                title: InkWell(
-                                                  onTap: () {
-                                                    return Container(
-                                                      color: Colors.blue,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Text("meddd"),
-                                                    );
-                                                  },
-                                                  child: Column(
-                                                    children: [
-                                                      SizedBox(
-                                                        height: 8,
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext context){
+                                                          return AlertDialog(
+
+                                                          );
+                                                        }),
+                                                title: Column(
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 8,
+                                                    ),
+                                                    Text(
+                                                      '${value[index].medName}',
+                                                      style: TextStyle(
+                                                        fontSize: 20,
                                                       ),
-                                                      Text(
-                                                        '${value[index]}',
-                                                        style: TextStyle(
-                                                          fontSize: 20,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 12,
-                                                      ),
-                                                      Text('${value[index]}'),
-                                                      SizedBox(
-                                                        height: 8,
-                                                      ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 12,
+                                                    ),
+                                                    Text('take 1 ${value[index].medType}',
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                      ),),
+                                                    SizedBox(
+                                                      height: 8,
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ),
@@ -401,7 +362,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     borderRadius: BorderRadius.circular(20)),
                                 onPressed: () {
                                   Navigator.of(context)
-                                      .pushNamed(MedDetails.id);
+                                      .pushNamed(MedDetails.id,
+                                  arguments: {
+                                        'selectedDay' : _selectedDay
+                                  });
                                 },
                                 child: Text(
                                   "Add Medicine",
@@ -481,7 +445,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           backgroundColor: Theme.of(context).accentColor,
           child: Icon(Icons.add),
           onPressed: () {
-            Navigator.of(context).pushNamed(MedDetails.id);
+            Navigator.of(context).pushNamed(MedDetails.id,
+                arguments: {
+                  'selectedDay' : _selectedDay
+                });
           },
         ),
       ),

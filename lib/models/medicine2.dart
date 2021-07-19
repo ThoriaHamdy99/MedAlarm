@@ -46,24 +46,31 @@ class Medicine {
       "startTime": this.startTime,
       "interval": this.interval,
       "intervalTime": this.intervalTime,
-      //"dose": this.dose
+      //"doses": this.doses
     };
   }
 
-  factory Medicine.fromMap(Map<String, dynamic> parsedJson) {
+  factory Medicine.fromMap(map) {
     print('map');
+    print(map['name']);
+    print(map['type']);
+    print(map['medAmount']);
+    print(map['doseAmount']);
+    print(map['nDoses']);
+    print(map['interval']);
+    print(map['intervalTime']);
     var med =  Medicine(
-      medName: parsedJson['name'],
-      medType: parsedJson['type'],
-      startDate: DateTime.fromMillisecondsSinceEpoch(parsedJson['startDate']),
-      endDate: DateTime.fromMillisecondsSinceEpoch(parsedJson['endDate']),
-      medAmount: parsedJson['medAmount'],
-      doseAmount: parsedJson['doseAmount'],
-      numOfDoses: parsedJson['nDoses'],
-      interval: parsedJson['interval'],
-      startTime: DateTime.fromMillisecondsSinceEpoch(parsedJson['startTime']),
-      intervalTime: parsedJson['intervalTime'],
-      // dose: parsedJson['dose'],
+      medName: map['name'],
+      medType: map['type'],
+      medAmount: map['medAmount'],
+      doseAmount: map['doseAmount'],
+      numOfDoses: map['nDoses'],
+      interval: map['interval'],
+      intervalTime: map['intervalTime'],
+      startDate: DateTime.fromMillisecondsSinceEpoch(map['startDate']),
+      endDate: DateTime.fromMillisecondsSinceEpoch(map['endDate']),
+      startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
+      // doses: parsedJson['doses'],
     );
     print('done');
     return med;

@@ -21,9 +21,10 @@ class MedDetails extends StatefulWidget {
 }
 
 class _MedDetailsState extends State<MedDetails> {
+
+
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -74,6 +75,7 @@ class _BottomContainerState extends State<_BottomContainer> {
     medInfo.interval = durationValue;
     medInfo.intervalTime = dropDownValueDoses;
     medInfo.numOfDoses = (24 / dropDownValueDoses).round();
+    medInfo.doseAmount = 2;
     super.initState();
   }
 

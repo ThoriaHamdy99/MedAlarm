@@ -48,7 +48,7 @@ class SQLHelper {
               profPicURL TEXT NOT NULL,
               phoneNumber TEXT NOT NULL,
               address TEXT NOT NULL,
-              dob INT NOT NULL)''');
+              dob INT NOT NULL);''');
 
     await db.execute('''CREATE TABLE Medicine(
               name TEXT PRIMARY KEY,
@@ -60,14 +60,13 @@ class SQLHelper {
               nDoses INT NOT NULL,
               startTime INT NOT NULL,
               interval TEXT NOT NULL,
-              intervalTime INT)''');
+              intervalTime INT);''');
 
     await db.execute('''CREATE TABLE Dose(
               name TEXT NOT NULL REFERENCES Medicine(name),
               dateTime INT NOT NULL,
               taken INT NOT NULL,
-              FOREIGN KEY (name),
-              PRIMARY KEY (name, dateTime))''');
+              PRIMARY KEY (name, dateTime));''');
   }
 
   Future<int> insertUser() async {
@@ -212,6 +211,7 @@ class SQLHelper {
       result.forEach((medicine) => medicines.add(Medicine.fromMap(medicine)));
       return medicines;
     } catch (e) {
+      print(e);
       throw e;
     }
   }
@@ -228,13 +228,13 @@ class SQLHelper {
     }
   }
 
-  Future<bool> insertDose(Medicine med, Dose dose) async {
+  Future<bool> insertDose(String medName, Dose dose) async {
     Database db = await this.database;
     var result;
     try {
       result = await db.rawInsert('''insert into Dose
         values(
-        '${med.medName}',
+        '${medName}',
         '${dose.dateTime.millisecondsSinceEpoch}',
         '${dose.taken ? 1 : 0}')''');
       print('+++++++++++++++++++++ From InsertDose +++++++++++++++++++++');
