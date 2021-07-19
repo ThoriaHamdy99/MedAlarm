@@ -51,14 +51,6 @@ class Medicine {
   }
 
   factory Medicine.fromMap(map) {
-    print('map');
-    print(map['name']);
-    print(map['type']);
-    print(map['medAmount']);
-    print(map['doseAmount']);
-    print(map['nDoses']);
-    print(map['interval']);
-    print(map['intervalTime']);
     var med =  Medicine(
       medName: map['name'],
       medType: map['type'],
@@ -72,7 +64,6 @@ class Medicine {
       startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
       // doses: parsedJson['doses'],
     );
-    print('done');
     return med;
   }
 }

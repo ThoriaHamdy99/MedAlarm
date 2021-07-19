@@ -184,18 +184,18 @@ class SQLHelper {
       var result = await db.rawQuery(
           'SELECT * FROM Medicine WHERE name = $medName;');
       if (result.isEmpty) return null;
-      print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
-      print(result[0]['name']);
-      print(result[0]['type']);
-      print(DateTime.fromMillisecondsSinceEpoch(result[0]['startDate']));
-      print(DateTime.fromMillisecondsSinceEpoch(result[0]['endDate']));
-      print(result[0]['medAmount']);
-      print(result[0]['doseAmount']);
-      print(result[0]['nDoses']);
-      print(DateTime.fromMillisecondsSinceEpoch(result[0]['startTime']));
-      print(result[0]['interval']);
-      print(result[0]['intervalTime']);
-      print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+      // print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
+      // print(result[0]['name']);
+      // print(result[0]['type']);
+      // print(DateTime.fromMillisecondsSinceEpoch(result[0]['startDate']));
+      // print(DateTime.fromMillisecondsSinceEpoch(result[0]['endDate']));
+      // print(result[0]['medAmount']);
+      // print(result[0]['doseAmount']);
+      // print(result[0]['nDoses']);
+      // print(DateTime.fromMillisecondsSinceEpoch(result[0]['startTime']));
+      // print(result[0]['interval']);
+      // print(result[0]['intervalTime']);
+      // print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
       return Medicine.fromMap(result[0]);
     } catch (e) {
       return null;

@@ -66,7 +66,7 @@ class _BottomContainerState extends State<_BottomContainer> {
   int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
   var items = ['Pill', 'Solution', 'Injection', 'Drops', 'Powder', 'other'];
-  var durationItems = ['daily', 'weakly', 'monthly'];
+  var durationItems = ['daily', 'weekly', 'monthly'];
   bool isDaily = true;
 
   @override
@@ -353,6 +353,7 @@ class _ReminderDetailsContainer extends StatefulWidget {
 
 class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
   SQLHelper _sqlHelper = SQLHelper();
+  DateTime endDate = DateTime.now();
 
   @override
   void initState() {
@@ -415,7 +416,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         onPressed: () =>
                           showRoundedDatePicker(
                             context: context,
-                            firstDate: DateTime.now(),
+                            firstDate: DateTime.now().subtract(Duration(days: 1)),
                             lastDate: DateTime(DateTime.now().year + 10),
                             borderRadius: 16,
                             onTapDay: (DateTime dateTime, bool available) {
@@ -429,6 +430,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                                     ],));
                               }
                               medInfo.startDate = dateTime;
+                              endDate = dateTime;
                               return available;
                             },
                           ),
@@ -452,7 +454,8 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         onPressed: () =>
                           showRoundedDatePicker(
                             context: context,
-                            firstDate: DateTime.now(),
+                            initialDate: endDate.add(Duration(days: 1)),
+                            firstDate: endDate.add(Duration(days: 1)),
                             lastDate: DateTime(DateTime.now().year + 10),
                             borderRadius: 16,
                             onTapDay: (DateTime dateTime, bool available) {
@@ -512,13 +515,18 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50.0)),
                         onPressed: () async {
-                          if(!await _sqlHelper.insertMedicine(medInfo)) {
-                            print('Med Not Inserted');
-                            return;
+                          try {
+                            if (!await _sqlHelper.insertMedicine(medInfo)) {
+                              print('Med Not Inserted');
+                              return;
+                            }
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            Navigator.pushReplacementNamed(
+                                context, HomeScreen.id);
+                          } catch (e) {
+
                           }
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                          Navigator.pushReplacementNamed(context, HomeScreen.id);
                         },
                         child: Text(
                           "Done",

@@ -22,9 +22,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay;
   final firstDay = DateTime(
-      DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
+      DateTime.now().year, DateTime.now().month - 5, DateTime.now().day);
   final lastDay = DateTime(
-      DateTime.now().year, DateTime.now().month + 3, DateTime.now().day);
+      DateTime.now().year, DateTime.now().month + 5, DateTime.now().day);
 
   // bool _check = false;
 
@@ -37,32 +37,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   void dispose() {
-    // _selectedMeds.dispose();
+    _selectedMeds.dispose();
     super.dispose();
   }
 
   List<Medicine> _getEventsForDay(DateTime day) {
     List<Medicine> allMedsForDay = [];
     for (int i = 0; i < allMeds.length; ++i) {
-      var daysAdded = allMeds[i].startDate.add(Duration(days: 7));
-      var monthAdded = allMeds[i].startDate.add(Duration(days: 30));
-      if ((allMeds[i].startDate.isBefore(day) &&
-              allMeds[i].endDate.isAfter(day)) ||
-          allMeds[i].startDate.day == day.day ||
-          allMeds[i].endDate.day == day.day)
-        if(allMeds[i].interval == "daily")
+      if (allMeds[i].startDate.difference(day).inDays <= 0
+        && day.difference(allMeds[i].endDate).inDays <= 0) {
+        if (allMeds[i].interval == 'daily')
           allMedsForDay.add(allMeds[i]);
-        else if(allMeds[i].interval == "weakly" && (allMeds[i].startDate.day == day.day ||
-                ( daysAdded.day == day.day &&
-                    (daysAdded.isBefore(allMeds[i].endDate)
-                        || daysAdded.day == allMeds[i].endDate.day) ) ))
+        else if(allMeds[i].interval == 'weekly'
+          && allMeds[i].startDate.weekday == day.weekday) {
           allMedsForDay.add(allMeds[i]);
-        else if(allMeds[i].interval == "monthly" && (allMeds[i].startDate.day == day.day ||
-                ( monthAdded.day == day.day &&
-                    (monthAdded.isBefore(allMeds[i].endDate)
-                        || monthAdded.day == allMeds[i].endDate.day) ) ))
+        }
+        else if (allMeds[i].interval == 'monthly'
+          && allMeds[i].startDate.day == day.day) {
           allMedsForDay.add(allMeds[i]);
-
+        }
+      }
     }
     return allMedsForDay;
   }
@@ -85,6 +79,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _selectedMeds.value = _getEventsForDay(_selectedDay);
     String hello = "";
     if (UserProvider.instance.currentUser.type == 'Doctor') hello += 'Dr/';
     hello += UserProvider.instance.currentUser.firstname;
@@ -92,10 +87,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       appBar: AppBar(
         title: Text(hello),
         titleSpacing: 5,
-        leading: Container(
+        leading:
+        Container(
           padding: EdgeInsets.all(5),
           child: (UserProvider.instance.currentUser.profPicURL == '') ?
-            Icon(Icons.account_circle) :
+            Icon(Icons.account_circle, size: 50,) :
             CircleAvatar(
               backgroundImage: NetworkImage(
                 UserProvider.instance.currentUser.profPicURL,
@@ -227,7 +223,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       //print(allMeds);
                       //print(snapShot.data.length);
                       allMeds = snapShot.data;
-                      _selectedMeds.value = _getEventsForDay(_selectedDay);
+                      // _selectedMeds.value = _getEventsForDay(_selectedDay);
                       return _selectedMeds.value.isEmpty
                           ? Expanded(
                               child: Container(
@@ -451,20 +447,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 });
           },
         ),
-      ),
-    );
-  }
-
-  BottomNavigationBarItem buildBottomNavigationBarItem(
-      IconData icon, String text) {
-    return BottomNavigationBarItem(
-      icon: Icon(
-        icon,
-        color: Theme.of(context).accentColor,
-      ),
-      title: Text(
-        text,
-        style: TextStyle(color: Colors.black),
       ),
     );
   }

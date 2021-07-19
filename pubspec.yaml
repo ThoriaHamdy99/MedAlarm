@@ -61,11 +61,15 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_rounded_date_picker:
+#  http:
+#  geolocator:
+#  google_maps_flutter:
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.7.4
+
 
 flutter_icons:
   android: "launcher_icon"
