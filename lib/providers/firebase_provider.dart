@@ -247,7 +247,7 @@ class FirebaseProvider with ChangeNotifier {
       );
 
       Reference ref =
-      storage.ref('profPic/${auth.currentUser.uid}/${DateTime.now()}');
+      storage.ref('profPic/${auth.currentUser.uid}');
       UploadTask storageUploadTask = ref.putFile(image);
       TaskSnapshot storageTaskSnapshot =
       await storageUploadTask.whenComplete(() => null);
