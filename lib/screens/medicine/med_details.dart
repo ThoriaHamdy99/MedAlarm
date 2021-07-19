@@ -169,7 +169,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                         return null;
                       },
                       onChanged: (value) {
-                        medInfo.amountOfMed = int.parse(value);
+                        medInfo.medAmount = int.parse(value);
                       },
                       keyboardType: TextInputType.number,
                       style: TextStyle(

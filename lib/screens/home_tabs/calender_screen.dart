@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/med_details.dart';
-import 'package:med_alarm/main.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/providers/user_provider.dart';
-import 'package:med_alarm/screens/medicine/selected_med.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
@@ -16,23 +13,10 @@ class CalendarScreen extends StatefulWidget {
   _CalendarScreenState createState() => _CalendarScreenState();
 }
 
-Medicine med1 = Medicine(
-  medName:     "medName",
-  medType:     "pill",
-  startDate:   DateTime.now(),
-  endDate:     DateTime.now(),
-  amountOfMed: 10,
-  startTime:  DateTime.now(),
-  interval:       "daily",
-  numOfDoses:    2,
-  intervalTime:   8,
-  dose: Dose(amountOfDose: 2, dateTime: DateTime.now(), taken: false),
-);
-
 List<Medicine> allMeds = [];
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  SQLHelper _sqlHelper = SQLHelper();
+  SQLHelper _sqlHelper = SQLHelper.getInstant();
   ValueNotifier<List<Medicine>> _selectedMeds = ValueNotifier([]);
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
@@ -47,7 +31,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void initState() {
     _selectedDay = _focusedDay;
-    //_selectedMeds = ValueNotifier(_getEventsForDay(_selectedDay));
+    _selectedMeds.value = _getEventsForDay(_selectedDay);
     super.initState();
   }
 
@@ -213,7 +197,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),*/
               FutureBuilder<List<Medicine>>(
-                  future: SQLHelper.getInstant().getAllMedicines(),
+                  future: _sqlHelper.getAllMedicines(),
                   builder: (ctx, snapShot) {
                     if (snapShot.hasData) {
                       if (snapShot.data.isEmpty) {

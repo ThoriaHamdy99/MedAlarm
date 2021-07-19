@@ -1,6 +1,6 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/user.dart';
@@ -55,11 +55,19 @@ class SQLHelper {
               type TEXT NOT NULL,
               startDate INT NOT NULL,
               endDate INT NOT NULL,
-              amount INT NOT NULL,
+              medAmount INT NOT NULL,
+              doseAmount INT NOT NULL,
               nDoses INT NOT NULL,
               startTime INT NOT NULL,
               interval TEXT NOT NULL,
               intervalTime INT)''');
+
+    await db.execute('''CREATE TABLE Dose(
+              name TEXT NOT NULL REFERENCES Medicine(name),
+              dateTime INT NOT NULL,
+              taken INT NOT NULL,
+              FOREIGN KEY (name),
+              PRIMARY KEY (name, dateTime))''');
   }
 
   Future<int> insertUser() async {
@@ -137,18 +145,7 @@ class SQLHelper {
   }
 
   Future<bool> deleteUser() async {
-    Database db = await database;
-    try {
-      // await db.rawDelete("DELETE FROM User");
-      await deleteTables();
-      // await db.close();
-      // dbHelper = null;
-      return true;
-    } catch (e) {
-      // await db.close();
-      // dbHelper = null;
-      return false;
-    }
+    return await logout();
   }
 
   Future<bool> insertMedicine(Medicine med) async {
@@ -156,14 +153,15 @@ class SQLHelper {
     var result;
     try {
       result = await db.rawInsert('''insert into Medicine(
-        name, type, startDate, endDate, amount,
+        name, type, startDate, endDate, medAmount, doseAmount,
         nDoses, startTime, interval, intervalTime)
         values(
         '${med.medName}',
         '${med.medType}',
         '${med.startDate.millisecondsSinceEpoch}',
         '${med.endDate.millisecondsSinceEpoch}',
-        '${med.amountOfMed}',
+        '${med.medAmount}',
+        '${med.doseAmount}',
         '${med.numOfDoses}',
         '${med.startTime.millisecondsSinceEpoch}',
         '${med.interval}',
@@ -192,7 +190,8 @@ class SQLHelper {
       print(result[0]['type']);
       print(DateTime.fromMillisecondsSinceEpoch(result[0]['startDate']));
       print(DateTime.fromMillisecondsSinceEpoch(result[0]['endDate']));
-      print(result[0]['amount']);
+      print(result[0]['medAmount']);
+      print(result[0]['doseAmount']);
       print(result[0]['nDoses']);
       print(DateTime.fromMillisecondsSinceEpoch(result[0]['startTime']));
       print(result[0]['interval']);
@@ -213,18 +212,83 @@ class SQLHelper {
       result.forEach((medicine) => medicines.add(Medicine.fromMap(medicine)));
       return medicines;
     } catch (e) {
-      return [];
+      throw e;
     }
   }
 
-  Future<int> deleteMedicine(String medName) async {
+  Future<bool> deleteMedicine(String medName) async {
     Database db = await database;
     try {
-      int result = await db.rawDelete(
+      if(!await deleteMedicineDoses(medName)) throw 'Doses aren\'t deleted';
+      await db.rawDelete(
           "DELETE FROM Medicine WHERE name = $medName");
-      return result;
+      return true;
     } catch (e) {
-      return 0;
+      return false;
+    }
+  }
+
+  Future<bool> insertDose(Medicine med, Dose dose) async {
+    Database db = await this.database;
+    var result;
+    try {
+      result = await db.rawInsert('''insert into Dose
+        values(
+        '${med.medName}',
+        '${dose.dateTime.millisecondsSinceEpoch}',
+        '${dose.taken ? 1 : 0}')''');
+      print('+++++++++++++++++++++ From InsertDose +++++++++++++++++++++');
+      if(result != null) {
+        print('Dose Added');
+        return true;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+    return false;
+  }
+
+  Future<List<Dose>> getMedicineDoses(String medName) async {
+    Database db = await database;
+    List<Dose> doses = [];
+    try {
+      var result = await db.rawQuery('SELECT * FROM Dose WHERE name = $medName;');
+      print(result.length);
+      result.forEach((dose) => doses.add(Dose.fromMap(dose)));
+      return doses;
+    } catch (e) {
+      throw '$medName is not found to add its doses';
+    }
+  }
+
+  Future<bool> deleteDose(String medName, DateTime time) async {
+    Database db = await database;
+    try {
+      await db.rawDelete(
+          "DELETE FROM Dose WHERE name = $medName AND dateTime = $time");
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteMedicineDoses(String medName) async {
+    Database db = await database;
+    try {
+      await db.rawDelete("DELETE FROM Dose WHERE name = $medName");
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> logout() async {
+    try {
+      await deleteTables();
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -232,5 +296,6 @@ class SQLHelper {
     Database db = await database;
     await db.execute('DELETE FROM User');
     await db.execute('DELETE FROM Medicine');
+    await db.execute('DELETE FROM Dose');
   }
 }

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
 class Dose {
-  final int amountOfDose;
-  final DateTime dateTime;
-  final bool taken;
+  DateTime dateTime;
+  bool taken;
 
   Dose({
-    @required this.amountOfDose,
-    @required this.dateTime,
-    @required this.taken,
+    this.dateTime,
+    this.taken,
   });
+
+  factory Dose.fromMap(map) {
+    return Dose(
+      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime']),
+      taken: map['taken'] == 1 ? true : false,
+    );
+  }
 }

@@ -5,24 +5,26 @@ class Medicine {
   String medType;
   DateTime startDate;
   DateTime endDate;
-  int amountOfMed;
+  int medAmount;
+  int doseAmount;
   String interval;
   int intervalTime;
   DateTime startTime;
   int numOfDoses;
-  Dose dose;
+  List<Dose> doses;
 
   Medicine({
     this.medName,
     this.medType,
     this.startDate,
     this.endDate,
-    this.amountOfMed,
+    this.medAmount,
+    this.doseAmount,
     this.startTime,
     this.interval,
     this.numOfDoses,
     this.intervalTime,
-    this.dose
+    this.doses
   });
 
   // String get getName => medicineName;
@@ -38,7 +40,8 @@ class Medicine {
       "type": this.medType,
       "start": this.startDate,
       "end": this.endDate,
-      "amount": this.amountOfMed,
+      "medAmount": this.medAmount,
+      "doseAmount": this.doseAmount,
       "nDoses": this.numOfDoses,
       "startTime": this.startTime,
       "interval": this.interval,
@@ -54,7 +57,8 @@ class Medicine {
       medType: parsedJson['type'],
       startDate: DateTime.fromMillisecondsSinceEpoch(parsedJson['startDate']),
       endDate: DateTime.fromMillisecondsSinceEpoch(parsedJson['endDate']),
-      amountOfMed: parsedJson['amount'],
+      medAmount: parsedJson['medAmount'],
+      doseAmount: parsedJson['doseAmount'],
       numOfDoses: parsedJson['nDoses'],
       interval: parsedJson['interval'],
       startTime: DateTime.fromMillisecondsSinceEpoch(parsedJson['startTime']),
