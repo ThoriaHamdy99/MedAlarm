@@ -5,7 +5,7 @@ import 'package:med_alarm/screens/report/report_screen.dart';
 import 'package:med_alarm/models/med_day.dart';
 
 import 'chat/chats_screen.dart';
-import 'empty.dart';
+import 'medicine_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   static const id = "HOME_SCREEN";
@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _tabs = [
     CalendarScreen(),
-    EmptyScreen(),
+    MedicineScreen(),
     ChatsScreen(),
     MoreScreen(),
   ];
