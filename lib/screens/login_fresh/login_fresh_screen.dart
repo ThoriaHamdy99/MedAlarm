@@ -68,12 +68,17 @@ class BuildLoginFresh extends StatelessWidget {
         isRequest(true);
 
         Future.delayed(Duration(seconds: 5), () {
-          print('-------------- function call----------------');
-          print(user);
-          print(password);
-          print('--------------   end call   ----------------');
-
+          // print('-------------- function call----------------');
+          // print(user);
+          // print(password);
+          // print('--------------   end call   ----------------');
           isRequest(false);
+
+          ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
+            content: Text('Check your internet Connection'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Theme.of(_context).errorColor,
+          ));
         });
       },
       logo: './assets/MED ALARM.png',
@@ -93,9 +98,9 @@ class BuildLoginFresh extends StatelessWidget {
           (BuildContext _context, Function isRequest, String email) {
         isRequest(true);
 
-        Future.delayed(Duration(seconds: 3), () async {
-          print('-------------- function call----------------');
-          print(email);
+        Future.delayed(Duration(seconds: 5), () async {
+          // print('-------------- function call----------------');
+          // print(email);
           final _auth = FirebaseAuth.instance;
           _auth.sendPasswordResetEmail(email: email).then((onVal) {
             Navigator.pop(_context, true);

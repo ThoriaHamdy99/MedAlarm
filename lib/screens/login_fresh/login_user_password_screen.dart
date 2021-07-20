@@ -324,11 +324,17 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
                             }
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(message),
+                              duration: Duration(seconds: 3),
                               backgroundColor: Theme.of(context).errorColor,
                             ));
                           } catch (e) {
                             print(this._textEditingControllerUser.text.trim());
                             print(e);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Check your internet Connection'),
+                              duration: Duration(seconds: 3),
+                              backgroundColor: Theme.of(context).errorColor,
+                            ));
                           }
 
                         },

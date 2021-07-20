@@ -123,12 +123,15 @@ class _SearchContactState extends State<SearchContact> {
                           // subtitle: ,
                           leading: Hero(
                             tag: user.uid,
-                            child: user.profPicURL.isEmpty ? Icon(
-                              Icons.account_circle,
-                              size: 50,
-                              color: Theme.of(context).accentColor,
-                            ):
-                            Image.network(user.profPicURL),
+                            child: (user.profPicURL.isEmpty) ?
+                            Icon(Icons.account_circle, size: 50.0) :
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4.0),
+                              child: CircleAvatar(
+                                radius: 21.0,
+                                backgroundImage: NetworkImage(user.profPicURL),
+                              ),
+                            )
                           ),
                           trailing: addRemButton,
                           onTap: () async {

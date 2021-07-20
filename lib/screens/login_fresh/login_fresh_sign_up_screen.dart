@@ -62,6 +62,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
 
   void _submitAuthForm(BuildContext ctx) async {
     try {
+      print('here');
       Auth.UserCredential auth = await FirebaseProvider.instance.auth
           .createUserWithEmailAndPassword(
               email: this.signUpModel.email.trim(),
@@ -100,6 +101,12 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
     } catch (e) {
       print(this.signUpModel.email.trim());
       print(e);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Check your internet Connection'),
+        duration: Duration(seconds: 3),
+        backgroundColor: Theme.of(context).errorColor,
+      ));
     }
   }
 
@@ -113,6 +120,12 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
     } else {
       print('form is invalid');
     }
+  }
+
+  @override
+  void initState() {
+    signUpModel.speciality = _ddlValue;
+    super.initState();
   }
 
   @override
@@ -688,9 +701,10 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: GestureDetector(
                             onTap: () {
+                              _submit();
                               widget.funSignUp(context, this.setIsRequest,
-                                  this.signUpModel, _submit());
-                            },
+                                  this.signUpModel);
+                              },
                             child: SizedBox(
                                 height: MediaQuery.of(context).size.height * 0.07,
                                 width: MediaQuery.of(context).size.width * 0.7,

@@ -269,26 +269,36 @@ class FirebaseProvider with ChangeNotifier {
   }
 
   getLoggedUserInfo() async {
-    var value = await firestore
-        .collection("Users")
-        .doc(auth.currentUser.uid)
-        .get();
-    if(value.get('type') == 'Patient')
-      UserProvider.instance.currentUser = Patient.fromDoc(auth.currentUser.uid, value);
-    else if(value.get('type') == 'Doctor')
-      UserProvider.instance.currentUser = Doctor.fromDoc(auth.currentUser.uid, value);
+    try {
+      var value = await firestore
+          .collection("Users")
+          .doc(auth.currentUser.uid)
+          .get();
+      if (value.get('type') == 'Patient')
+        UserProvider.instance.currentUser =
+            Patient.fromDoc(auth.currentUser.uid, value);
+      else if (value.get('type') == 'Doctor')
+        UserProvider.instance.currentUser =
+            Doctor.fromDoc(auth.currentUser.uid, value);
+    } catch (e) {
+      throw 'Can\'t get user data';
+    }
   }
 
   Future<String> getDeviceToken() async {
     return await firebaseMessaging.getToken();
   }
 
-  Future<void> registerDeviceToken() async {
-    String token = await getDeviceToken();
-    await firestore
-        .collection('Users/${auth.currentUser.uid}/Tokens')
-        .doc('$token')
-        .set({'token': token});
+  registerDeviceToken() async {
+    try {
+      String token = await getDeviceToken();
+      await firestore
+          .collection('Users/${auth.currentUser.uid}/Tokens')
+          .doc('$token')
+          .set({'token': token});
+    } catch (e) {
+      throw 'Can\'t register device token';
+    }
   }
 
   Future<void> removeDeviceToken() async {
