@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/providers/user_provider.dart';
-import 'package:med_alarm/screens/medicine/med_details.dart';
+import 'package:med_alarm/screens/medicine/med_details_screen.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/screens/home_screen.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
@@ -62,7 +62,6 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
 
   void _submitAuthForm(BuildContext ctx) async {
     try {
-      print('here');
       Auth.UserCredential auth = await FirebaseProvider.instance.auth
           .createUserWithEmailAndPassword(
               email: this.signUpModel.email.trim(),
@@ -77,7 +76,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
             Doctor.fromSignUpModel(auth.user.uid, this.signUpModel);
 
       await FirebaseProvider.instance.registerDeviceToken();
-      SQLHelper.getInstant().insertUser();
+      await SQLHelper.getInstant().insertUser();
 
       Navigator.of(context).pop();
       Navigator.of(context).pushReplacement(

@@ -37,8 +37,8 @@ class SQLHelper {
   }
 
   void _createDatabase(Database db, int version) async {
-    print('///////////////////////////////////////////');
-    await db.execute('''CREATE TABLE User(
+    try {
+      await db.execute('''CREATE TABLE User(
               uid TEXT PRIMARY KEY,
               email TEXT NOT NULL,
               type TEXT NOT NULL,
@@ -50,8 +50,9 @@ class SQLHelper {
               address TEXT NOT NULL,
               dob INT NOT NULL);''');
 
-    await db.execute('''CREATE TABLE Medicine(
-              name TEXT PRIMARY KEY,
+      await db.execute('''CREATE TABLE Medicine(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL UNIQUE,
               type TEXT NOT NULL,
               startDate INT NOT NULL,
               endDate INT NOT NULL,
@@ -62,11 +63,17 @@ class SQLHelper {
               interval TEXT NOT NULL,
               intervalTime INT);''');
 
-    await db.execute('''CREATE TABLE Dose(
+      await db.execute('''CREATE TABLE Dose(
               name TEXT NOT NULL REFERENCES Medicine(name),
               dateTime INT NOT NULL,
               taken INT NOT NULL,
               PRIMARY KEY (name, dateTime));''');
+
+      print('DB Initialized successfully');
+    } catch (e) {
+      print(e);
+      throw 'DB Initialization failed';
+    }
   }
 
   Future<int> insertUser() async {
@@ -178,7 +185,7 @@ class SQLHelper {
     return false;
   }
 
-  Future<bool> updateMedicine(Medicine med, String medName) async {
+  Future<bool> updateMedicine(Medicine med) async {
     Database db = await this.database;
     var result;
     try {
@@ -194,7 +201,7 @@ class SQLHelper {
         startTime = '${med.startTime.millisecondsSinceEpoch}',
         interval = '${med.interval}',
         intervalTime = '${med.intervalTime}'
-        WHERE name = '$medName';''');
+        WHERE id = '${med.id}';''');
       print('+++++++++++++++++++++ From UpdateMedicine +++++++++++++++++++++');
       if(result != null) {
         print('Medicine Updated');

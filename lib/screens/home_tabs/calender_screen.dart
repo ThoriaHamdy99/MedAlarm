@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/screens/medicine/med_details.dart';
+import 'package:med_alarm/screens/medicine/med_details_screen.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -370,8 +370,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
       floatingActionButton: new Visibility(
         visible: allMeds.isEmpty ? false : true,
         child: FloatingActionButton(
-          backgroundColor: Theme.of(context).accentColor,
-          child: Icon(Icons.add),
+          // backgroundColor: Theme.of(context).accentColor,
+          child: Icon(Icons.add, color: Colors.white,),
           onPressed: () {
             Navigator.of(context).pushNamed(MedDetails.id).whenComplete(() {
               setState(() {});

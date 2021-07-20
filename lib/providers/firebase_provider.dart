@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/sign_up_model.dart';
@@ -261,9 +262,31 @@ class FirebaseProvider with ChangeNotifier {
 
   uploadMedicinesMerge() async {
     try {
-
+      List<Medicine> medicines = await SQLHelper.getInstant().getAllMedicines();
+      if(medicines.isNotEmpty) {
+        for(var med in medicines) {
+          await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
+              .doc(med.medName)
+              .set(med.toMap(), SetOptions(merge: true));
+          List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.medName);
+          if(doses.isNotEmpty) {
+            for (var dose in doses) {
+              await firestore.collection(
+                  'Medicines/'
+                      '${auth.currentUser.uid}/'
+                      'Medicines/'
+                      '${med.id}/'
+                      'Doses')
+                  .doc(dose.dateTime.toIso8601String())
+                  .set(dose.toMap(), SetOptions(merge: true));
+            }
+          }
+        }
+      } else throw 'There is no medicines to upload its data';
     } catch (e) {
-
+      print(e);
+      throw e;
+      // throw 'Can\'t Upload Medicines';
     }
   }
 
@@ -272,23 +295,60 @@ class FirebaseProvider with ChangeNotifier {
       List<Medicine> medicines = await SQLHelper.getInstant().getAllMedicines();
       if(medicines.isNotEmpty) {
         await firestore.collection('Medicines')
-            .doc(auth.currentUser.uid).delete();
+          .doc(auth.currentUser.uid).delete();
         for(var med in medicines) {
           await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
-              .doc(med.medName)
-              .set(med.toMap());
+            .doc(med.medName)
+            .set(med.toDoc());
+          List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.medName);
+          if(doses.isNotEmpty) {
+            for (var dose in doses) {
+              await firestore.collection(
+                'Medicines/'
+                '${auth.currentUser.uid}/'
+                'Medicines/'
+                '${med.id}/'
+                'Doses')
+                  .doc(dose.dateTime.toIso8601String())
+                  .set(dose.toMap());
+            }
+          }
         }
       }
     } catch (e) {
-
+      print(e);
+      throw 'Can\'t Upload Medicines';
     }
   }
 
-  getMedicines() async {
+  Future<List<Medicine>> getMedicines() async {
     try {
-
+      var medicinesDocs = await firestore
+          .collection('Medicines/${auth.currentUser.uid}/Medicines').get();
+      if(medicinesDocs.docs.isNotEmpty) {
+        List<Medicine> medicines = [];
+        for(var doc in medicinesDocs.docs) {
+          medicines.add(Medicine.fromDoc(doc));
+          var dosesDocs = await firestore
+              .collection(
+              'Medicines/'
+              '${auth.currentUser.uid}/'
+              'Medicines/'
+              '${doc.get('id')}/'
+              'Doses').get();
+          if(dosesDocs.docs.isNotEmpty) {
+            List<Dose> doses = [];
+            for(var doseDoc in dosesDocs.docs) {
+              doses.add(Dose.fromDoc(doseDoc));
+            }
+            medicines[medicines.length - 1].doses = doses;
+          }
+        }
+        return medicines;
+      }
+      return [];
     } catch (e) {
-
+      return [];
     }
   }
 

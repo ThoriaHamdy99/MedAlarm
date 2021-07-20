@@ -4,7 +4,6 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/screens/medicine/medicine_info.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
 class EditMedicine extends StatefulWidget {
@@ -22,7 +21,6 @@ class _EditMedicineState extends State<EditMedicine> {
 
   _EditMedicineState(this.sMedicine);
 
-  String oldMedName;
   var medNameController;
   var medAmountController;
   var doseAmountController;
@@ -46,7 +44,6 @@ class _EditMedicineState extends State<EditMedicine> {
 
   @override
   void initState() {
-    oldMedName = sMedicine.medName;
     medNameController = TextEditingController(text: sMedicine.medName);
     medAmountController = TextEditingController(text: "${sMedicine.medAmount}");
     doseAmountController = TextEditingController(text: "${sMedicine.doseAmount}");
@@ -119,10 +116,13 @@ class _EditMedicineState extends State<EditMedicine> {
                       sMedicine.medName = medNameController.text;
                       sMedicine.medAmount =  int.parse(medAmountController.text);
                       sMedicine.doseAmount = int.parse(doseAmountController.text);
-                      await _sqlHelper.updateMedicine(sMedicine, oldMedName);
+                      await _sqlHelper.updateMedicine(sMedicine);
                       setState(() {
                         circular = true;
                       });
+                      print('==============');
+                      print(widget.sMedicine.id);
+                      print('==============');
                       Navigator.of(context).pop();
                       // Navigator.of(context).pushReplacementNamed(MedicineInfo.id);
                     }

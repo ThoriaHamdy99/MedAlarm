@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/screens/medicine/edit_medicine.dart';
+import 'package:med_alarm/screens/medicine/edit_medicine_screen.dart';
 import 'package:med_alarm/service/chatbot.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
-import '../medicine/med_details.dart';
+import '../medicine/med_details_screen.dart';
 
 class MedicineScreen extends StatefulWidget {
   static const id = 'EMPTY_SCREEN';

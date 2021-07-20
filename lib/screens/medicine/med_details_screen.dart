@@ -67,24 +67,22 @@ class _BottomContainer extends StatefulWidget {
 
 class _BottomContainerState extends State<_BottomContainer> {
   String dropDownValue = 'Pill';
-  String durationValue = 'daily';
-  int dropDownValueDoses = 12;
+  String durationValue = 'once';
+  int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
   var items = ['Pill', 'Solution', 'Injection', 'Drops', 'Powder', 'other'];
-  var durationItems = ['daily', 'weekly', 'monthly'];
-  bool isDaily = true;
-  var dropnumDoses = [1, 2, 3, 4];
-  var dropnumDosesValue = 2;
-  var dropAmountDose = [1,2,3,4];
-  var dropAmountDoseValue = 1;
+  var durationItems = ['once', 'daily', 'weekly', 'monthly'];
+  bool isDaily = false;
+  var dropnDoses6H = [2, 3, 4];
+  var dropnDoses8H = [2, 3];
+  var dropnDosesValue = 2;
 
   @override
   void initState() {
     medInfo.medType = dropDownValue;
     medInfo.interval = durationValue;
     medInfo.intervalTime = dropDownValueDoses;
-    medInfo.doseAmount = dropAmountDoseValue;
-    medInfo.numOfDoses = dropnumDosesValue;
+    medInfo.numOfDoses = dropnDosesValue;
     super.initState();
   }
 
@@ -107,13 +105,6 @@ class _BottomContainerState extends State<_BottomContainer> {
     return Container(
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
         height: double.infinity,
-        // decoration: BoxDecoration(
-        //   borderRadius: BorderRadius.only(
-        //     topLeft: Radius.circular(50),
-        //     topRight: Radius.circular(50),
-        //   ),
-        //   color: Colors.white,
-        // ),
         width: double.infinity,
         child: SingleChildScrollView(
           child: Form(
@@ -172,9 +163,9 @@ class _BottomContainerState extends State<_BottomContainer> {
                 TextFormField(
                   validator: (value) {
                     if (!isNumeric(value))
-                      return "please enter amount of medicine as a number!!";
+                      return "please enter amount of medicine as a number";
                     else if (value.isEmpty)
-                      return "please enter amount of medicine!!";
+                      return "please enter amount of medicine";
                     return null;
                   },
                   onChanged: (value) {
@@ -187,29 +178,56 @@ class _BottomContainerState extends State<_BottomContainer> {
                   maxLines: 1,
                   decoration: InputDecoration(
                     border: UnderlineInputBorder(),
-                    labelText: 'Enter number',
+                    labelText: 'Enter medicine amount',
                   ),
                 ),
                 PanelTitle(
                   title: "Amount of each dose",
                   isRequired: true,
                 ),
-                new DropdownButton(
-                  value: dropAmountDoseValue,
-                  icon: Icon(Icons.keyboard_arrow_down),
-                  items: dropAmountDose.map((int item) {
-                    return DropdownMenuItem(
-                        value: item, child: Text(item.toString()));
-                  }).toList(),
-                  onChanged: (var newValue) {
-                    // if (newValue != null) {
-                    setState(() {
-                      dropAmountDoseValue = newValue;
-                    });
-                    // }
-                    medInfo.doseAmount = dropAmountDoseValue;
+                TextFormField(
+                  validator: (value) {
+                    if (!isNumeric(value))
+                      return "please enter amount of dose as a number";
+                    else if (value.isEmpty)
+                      return "please enter amount of each dose";
+                    else if (int.parse(value) > medInfo.medAmount)
+                      return "Current med amount is not enough for next dose";
+                    return null;
                   },
+                  onChanged: (value) {
+                    medInfo.doseAmount = int.parse(value);
+                  },
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Enter dose amount',
+                  ),
                 ),
+                // PanelTitle(
+                //   title: "Amount of each dose",
+                //   isRequired: true,
+                // ),
+                // new DropdownButton(
+                //   value: dropAmountDoseValue,
+                //   icon: Icon(Icons.keyboard_arrow_down),
+                //   items: dropAmountDose.map((int item) {
+                //     return DropdownMenuItem(
+                //         value: item, child: Text(item.toString()));
+                //   }).toList(),
+                //   onChanged: (var newValue) {
+                //     // if (newValue != null) {
+                //     setState(() {
+                //       dropAmountDoseValue = newValue;
+                //     });
+                //     // }
+                //     medInfo.doseAmount = dropAmountDoseValue;
+                //   },
+                // ),
                 PanelTitle(
                   title: "Duration",
                   isRequired: true,
@@ -224,31 +242,12 @@ class _BottomContainerState extends State<_BottomContainer> {
                     if (newValue != null) {
                       setState(() {
                         durationValue = newValue as String;
-                        if (durationValue != "daily") isDaily = false;
+                        if (durationValue != 'daily')
+                          isDaily = false;
                         else isDaily = true;
                       });
                     }
                     medInfo.interval = durationValue;
-                  },
-                ),
-                PanelTitle(
-                  title: "Number of doses",
-                  isRequired: true,
-                ),
-                new DropdownButton(
-                  value: dropnumDosesValue,
-                  icon: Icon(Icons.keyboard_arrow_down),
-                  items: dropnumDoses.map((int item) {
-                    return DropdownMenuItem(
-                        value: item, child: Text(item.toString()));
-                  }).toList(),
-                  onChanged: (var newValue) {
-                    // if (newValue != null) {
-                    setState(() {
-                      dropnumDosesValue = newValue;
-                    });
-                    // }
-                    medInfo.numOfDoses = dropnumDosesValue;
                   },
                 ),
                 Visibility(
@@ -260,7 +259,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                         title: "Hours between each dose",
                         isRequired: true,
                       ),
-                      new DropdownButton(
+                      DropdownButton(
                         value: dropDownValueDoses,
                         icon: Icon(Icons.keyboard_arrow_down),
                         items: doses.map((int item) {
@@ -269,11 +268,58 @@ class _BottomContainerState extends State<_BottomContainer> {
                         }).toList(),
                         onChanged: (var newValue) {
                           // if (newValue != null) {
-                            setState(() {
-                              dropDownValueDoses = newValue;
-                            });
+                          setState(() {
+                            dropDownValueDoses = newValue;
+                          });
                           // }
                           medInfo.intervalTime = dropDownValueDoses;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: isDaily,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if(medInfo.intervalTime == 6 || medInfo.intervalTime == 8)
+                      PanelTitle(
+                        title: "Number of doses per day",
+                        isRequired: true,
+                      ),
+                      if(medInfo.intervalTime == 6)
+                      DropdownButton(
+                        value: dropnDosesValue,
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        items: dropnDoses6H.map((int item) {
+                          return DropdownMenuItem(
+                              value: item, child: Text(item.toString()));
+                        }).toList(),
+                        onChanged: (newValue) {
+                          // if (newValue != null) {
+                          setState(() {
+                            dropnDosesValue = newValue;
+                          });
+                          // }
+                          medInfo.numOfDoses = dropnDosesValue;
+                        },
+                      ),
+                      if(medInfo.intervalTime == 8)
+                      DropdownButton(
+                        value: dropnDosesValue,
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        items: dropnDoses8H.map((int item) {
+                          return DropdownMenuItem(
+                              value: item, child: Text(item.toString()));
+                        }).toList(),
+                        onChanged: (newValue) {
+                          // if (newValue != null) {
+                          setState(() {
+                            dropnDosesValue = newValue;
+                          });
+                          // }
+                          medInfo.numOfDoses = dropnDosesValue;
                         },
                       ),
                     ],

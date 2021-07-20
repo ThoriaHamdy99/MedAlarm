@@ -7,7 +7,7 @@ import 'package:med_alarm/screens/user_profile/edit_profile.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'notification/localNotification.dart';
 import 'providers/firebase_provider.dart';
-import 'screens/medicine/med_details.dart';
+import 'screens/medicine/med_details_screen.dart';
 import 'screens/home_tabs/calender_screen.dart';
 import 'screens/login_fresh/login_fresh_screen.dart';
 import 'screens/report/report_screen.dart';
