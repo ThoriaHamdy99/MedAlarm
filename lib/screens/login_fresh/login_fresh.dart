@@ -88,9 +88,12 @@ class _LoginFreshState extends State<LoginFresh> {
               height: MediaQuery.of(context).size.height * 0.45,
               width: MediaQuery.of(context).size.width * 0.60,
               child: Center(
-                child: Image.asset(
-                  widget.pathLogo,
-                  fit: BoxFit.contain,
+                child: Hero(
+                  tag: 'hero-login',
+                  child: Image.asset(
+                    widget.pathLogo,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),

@@ -99,23 +99,43 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
               width: MediaQuery.of(context).size.width,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 20),
-                        child: Hero(
-                          tag: 'hero-login',
-                          child: Image.asset(
-                            widget.logo,
-                            fit: BoxFit.contain,
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: AppBar().preferredSize.height + 10,
+                    ),
+                    child: Row(
+                      children: [
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width / 3,
+                          ),
+                          child: Hero(
+                            tag: 'hero-login',
+                            child: Image.asset(
+                              './assets/logo.png',
+                              fit: BoxFit.fitWidth,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.3,
+                            maxWidth: MediaQuery.of(context).size.width * 3 / 5,
+                          ),
+                          child: Hero(
+                            tag: 'hero-login1',
+                            child: Image.asset(
+                              widget.logo,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -304,7 +324,7 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
                                     password: this
                                         ._textEditingControllerPassword
                                         .text
-                                        .trim());
+                                        .trim()).timeout(Duration(seconds: 5));
 
                             await FirebaseProvider.instance.getLoggedUserInfo();
                             await FirebaseProvider.instance.registerDeviceToken();

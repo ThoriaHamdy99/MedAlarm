@@ -81,20 +81,40 @@ class _LoginFreshResetPasswordState extends State<LoginFreshResetPassword> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 20),
-                        child: Hero(
-                          tag: 'hero-login',
-                          child: Image.asset(
-                            widget.logo,
-                            fit: BoxFit.contain,
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: AppBar().preferredSize.height + 10,
+                    ),
+                    child: Row(
+                      children: [
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width / 3,
+                          ),
+                          child: Hero(
+                            tag: 'hero-login',
+                            child: Image.asset(
+                              './assets/logo.png',
+                              fit: BoxFit.fitWidth,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.3,
+                            maxWidth: MediaQuery.of(context).size.width * 3 / 5,
+                          ),
+                          child: Hero(
+                            tag: 'hero-login1',
+                            child: Image.asset(
+                              widget.logo,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

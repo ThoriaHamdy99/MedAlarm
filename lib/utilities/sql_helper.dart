@@ -75,10 +75,10 @@ class SQLHelper {
     User user = UserProvider.instance.currentUser;
     var result;
     if(UserProvider.instance.currentUser.type == 'Patient')
-      result = await db.rawInsert('''insert into User(
+      result = await db.rawInsert('''INSERT INTO User(
         uid, email, type, firstname,
         lastname, profPicURL, phoneNumber, address, dob)
-        values(
+        VALUES(
         '${user.uid.toString()}',
         '${user.email}',
         '${user.type}',
@@ -89,10 +89,10 @@ class SQLHelper {
         '${user.address}',
         '${user.dob.toDate().millisecondsSinceEpoch}')''');
     else if(UserProvider.instance.currentUser.type == 'Doctor')
-      result = await db.rawInsert('''insert into User(
+      result = await db.rawInsert('''INSERT INTO User(
         uid, email, type, speciality, firstname,
         lastname, profPicURL, phoneNumber, address, dob)
-        values(
+        VALUES(
         '${user.uid.toString()}',
         '${user.email}',
         '${user.type}',
@@ -151,10 +151,10 @@ class SQLHelper {
     Database db = await this.database;
     var result;
     try {
-      result = await db.rawInsert('''insert into Medicine(
+      result = await db.rawInsert('''INSERT INTO Medicine(
         name, type, startDate, endDate, medAmount, doseAmount,
         nDoses, startTime, interval, intervalTime)
-        values(
+        VALUES(
         '${med.medName}',
         '${med.medType}',
         '${med.startDate.millisecondsSinceEpoch}',
@@ -173,6 +173,36 @@ class SQLHelper {
     } catch (e) {
       print(e);
       throw 'Medicine name already exists';
+      // return false;
+    }
+    return false;
+  }
+
+  Future<bool> updateMedicine(Medicine med, String medName) async {
+    Database db = await this.database;
+    var result;
+    try {
+      result = await db.rawUpdate('''UPDATE Medicine
+        SET
+        name = '${med.medName}',
+        type = '${med.medType}',
+        startDate = '${med.startDate.millisecondsSinceEpoch}',
+        endDate = '${med.endDate.millisecondsSinceEpoch}',
+        medAmount = '${med.medAmount}',
+        doseAmount = '${med.doseAmount}',
+        nDoses = '${med.numOfDoses}',
+        startTime = '${med.startTime.millisecondsSinceEpoch}',
+        interval = '${med.interval}',
+        intervalTime = '${med.intervalTime}',
+        WHERE name = '$medName';''');
+      print('+++++++++++++++++++++ From UpdateMedicine +++++++++++++++++++++');
+      if(result != null) {
+        print('Medicine Updated');
+        return true;
+      }
+    } catch (e) {
+      print(e);
+      throw 'Medicine hasn\'t updated';
       // return false;
     }
     return false;
