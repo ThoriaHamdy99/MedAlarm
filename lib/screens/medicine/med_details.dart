@@ -62,19 +62,23 @@ class _BottomContainer extends StatefulWidget {
 class _BottomContainerState extends State<_BottomContainer> {
   String dropDownValue = 'Pill';
   String durationValue = 'daily';
-  int dropDownValueDoses = 6;
+  int dropDownValueDoses = 12;
   var doses = [6, 8, 12, 24];
   var items = ['Pill', 'Solution', 'Injection', 'Drops', 'Powder', 'other'];
   var durationItems = ['daily', 'weekly', 'monthly'];
   bool isDaily = true;
+  var dropnumDoses = [1, 2, 3, 4];
+  var dropnumDosesValue = 2;
+  var dropAmountDose = [1,2,3,4];
+  var dropAmountDoseValue = 1;
 
   @override
   void initState() {
     medInfo.medType = dropDownValue;
     medInfo.interval = durationValue;
     medInfo.intervalTime = dropDownValueDoses;
-    medInfo.numOfDoses = (24 / dropDownValueDoses).round();
-    medInfo.doseAmount = 2;
+    medInfo.doseAmount = dropAmountDoseValue;
+    medInfo.numOfDoses = dropnumDosesValue;
     super.initState();
   }
 
@@ -117,7 +121,6 @@ class _BottomContainerState extends State<_BottomContainer> {
                       isRequired: true,
                     ),
                     TextFormField(
-
                       validator: (value) {
                         if (value.isEmpty)
                           return "please enter name of medicine!!";
@@ -158,7 +161,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                       },
                     ),
                     PanelTitle(
-                      title: "amount of medicine",
+                      title: "Amount of medicine",
                       isRequired: true,
                     ),
                     TextFormField(
@@ -182,7 +185,26 @@ class _BottomContainerState extends State<_BottomContainer> {
                         labelText: 'Enter number',
                       ),
                     ),
-
+                    PanelTitle(
+                      title: "Amount of each dose",
+                      isRequired: true,
+                    ),
+                    new DropdownButton(
+                      value: dropAmountDoseValue,
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      items: dropAmountDose.map((int item) {
+                        return DropdownMenuItem(
+                            value: item, child: Text(item.toString()));
+                      }).toList(),
+                      onChanged: (var newValue) {
+                        // if (newValue != null) {
+                        setState(() {
+                          dropAmountDoseValue = newValue;
+                        });
+                        // }
+                        medInfo.doseAmount = dropAmountDoseValue;
+                      },
+                    ),
                     PanelTitle(
                       title: "Duration",
                       isRequired: true,
@@ -204,13 +226,33 @@ class _BottomContainerState extends State<_BottomContainer> {
                         medInfo.interval = durationValue;
                       },
                     ),
+                    PanelTitle(
+                      title: "Number of doses",
+                      isRequired: true,
+                    ),
+                    new DropdownButton(
+                      value: dropnumDosesValue,
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      items: dropnumDoses.map((int item) {
+                        return DropdownMenuItem(
+                            value: item, child: Text(item.toString()));
+                      }).toList(),
+                      onChanged: (var newValue) {
+                        // if (newValue != null) {
+                        setState(() {
+                          dropnumDosesValue = newValue;
+                        });
+                        // }
+                        medInfo.numOfDoses = dropnumDosesValue;
+                      },
+                    ),
                     Visibility(
                       visible: isDaily,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           PanelTitle(
-                            title: "hours between each dose",
+                            title: "Hours between each dose",
                             isRequired: true,
                           ),
                           new DropdownButton(
@@ -227,7 +269,6 @@ class _BottomContainerState extends State<_BottomContainer> {
                                 });
                               // }
                               medInfo.intervalTime = dropDownValueDoses;
-                              medInfo.numOfDoses = (24 / dropDownValueDoses).round();
                             },
                           ),
                         ],

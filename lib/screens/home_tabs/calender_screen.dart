@@ -26,6 +26,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   final lastDay = DateTime(
       DateTime.now().year, DateTime.now().month + 5, DateTime.now().day);
 
+  var isSwitched = true;
+
   // bool _check = false;
 
   @override
@@ -167,16 +169,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // ClipRRect(
-                                //     borderRadius: BorderRadius.circular(8.0),
-                                //     child: Image.asset(
-                                //       "assets/images/medImage2.gif",
-                                //       fit: BoxFit.fill,
-                                //       height: 100,
-                                //     )),
-                                // SizedBox(
-                                //   height: 20,
-                                // ),
+                                ClipRRect(
+                                    borderRadius: BorderRadius.circular(50.0),
+                                    child: Image.asset(
+                                      "assets/medicine_image1.jpg",
+                                      fit: BoxFit.fill,
+                                      height: 100,
+                                    )),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 Text(
                                   "Monitor your med schedule",
                                   style: TextStyle(
@@ -189,7 +191,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   height: 10,
                                 ),
                                 Text(
-                                  "No Meds Today",
+                                  "No Medicine added",
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.black54,
@@ -221,8 +223,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ),
                         );
                       }
-                      //print(allMeds);
-                      //print(snapShot.data.length);
                       allMeds = snapShot.data;
                       // _selectedMeds.value = _getEventsForDay(_selectedDay);
                       return _selectedMeds.value.isEmpty
@@ -231,11 +231,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 color: Color.fromRGBO(224, 240, 228, 0.5),
                                 width: double.infinity,
                                 child: Center(
-                                  child: Text(
-                                    "No meds Today",
-                                    style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ClipRRect(
+                                          borderRadius: BorderRadius.circular(50.0),
+                                          child: Image.asset(
+                                            "assets/medicine_image1.jpg",
+                                            fit: BoxFit.fill,
+                                            height: 100,
+                                          )),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text(
+                                        "No medicine added until now",
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -252,17 +267,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       itemBuilder: (context, index) {
                                         return Column(
                                           children: [
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            Text(
-                                              "${getTime(value[index].startTime)}",
-                                              style: TextStyle(
-                                                fontSize: 20,
+                                            Padding(
+                                              padding: EdgeInsets.only( top: 20.0, bottom: 10.0),
+                                              child: Text(
+                                                "${getTime(value[index].startTime)}",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                ),
                                               ),
-                                            ),
-                                            SizedBox(
-                                              height: 6,
                                             ),
                                             Card(
                                               margin: EdgeInsets.symmetric(
@@ -272,34 +284,42 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                               shadowColor: Colors.green,
                                               clipBehavior: Clip.antiAlias,
                                               child: ListTile(
-                                                onTap: () =>
-                                                    showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext context){
-                                                          return AlertDialog(
-
-                                                          );
-                                                        }),
-                                                title: Column(
+                                                title: Row(
                                                   children: [
-                                                    SizedBox(
-                                                      height: 8,
+                                                    Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets.only(left: 10.0, top: 10.0),
+                                                              child: Text(
+                                                                '${value[index].medName}',
+                                                                style: TextStyle(
+                                                                  fontSize: 22,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0),
+                                                              child: Text('take ${value[index].doseAmount} ${value[index].medType}',
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                ),),
+                                                            ),
+                                                          ],
+                                                        ),
                                                     ),
-                                                    Text(
-                                                      '${value[index].medName}',
-                                                      style: TextStyle(
-                                                        fontSize: 20,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 12,
-                                                    ),
-                                                    Text('take 1 ${value[index].medType}',
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                      ),),
-                                                    SizedBox(
-                                                      height: 8,
+
+                                                    Switch(
+                                                      value: isSwitched,
+                                                      onChanged: (value){
+                                                        setState(() {
+                                                          isSwitched = value;
+                                                        });
+                                                      },
+                                                      activeColor: Theme.of(context).accentColor,
+                                                      inactiveThumbColor: Colors.white12,
+
                                                     ),
                                                   ],
                                                 ),
@@ -313,127 +333,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 },
                               ),
                             );
-                    } else if (snapShot.hasData && snapShot.data == []) {
-                      return Expanded(
-                        child: Container(
-                          color: Color.fromRGBO(224, 240, 228, 0.5),
-                          width: double.infinity,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // ClipRRect(
-                              //     borderRadius: BorderRadius.circular(8.0),
-                              //     child: Image.asset(
-                              //       "assets/images/medImage2.gif",
-                              //       fit: BoxFit.fill,
-                              //       height: 100,
-                              //     )),
-                              // SizedBox(
-                              //   height: 20,
-                              // ),
-                              Text(
-                                "Monitor your med schedule",
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                "No Meds Today",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              RaisedButton(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 110),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20)),
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pushNamed(MedDetails.id,
-                                  arguments: {
-                                        'selectedDay' : _selectedDay
-                                  });
-                                },
-                                child: Text(
-                                  "Add Medicine",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                color: Theme.of(context).accentColor,
-                              )
-                            ],
-                          ),
-                        ),
-                      );
                     }
                     return Center(child: CircularProgressIndicator());
                   }),
             ],
           ),
-          /*
-          if (_check == true)
-            Container(
-              color: Colors.black45,
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(80),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                // print(allEvents);
-                                allEvents[_selectedDay] = [Event("med3")];
-                                // print(allEvents);
-                              });
-                            },
-                            child: Text(
-                              "Add Medicine",
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                primary: Colors.white70)),
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
-                            onPressed: () {
-
-                            },
-                            child: Text(
-                              "Add Dose",
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                primary: Colors.white70)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-           */
         ],
       ),
       floatingActionButton: new Visibility(
@@ -442,10 +346,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           backgroundColor: Theme.of(context).accentColor,
           child: Icon(Icons.add),
           onPressed: () {
-            Navigator.of(context).pushNamed(MedDetails.id,
-                arguments: {
-                  'selectedDay' : _selectedDay
-                });
+            Navigator.of(context).pushNamed(MedDetails.id);
           },
         ),
       ),
