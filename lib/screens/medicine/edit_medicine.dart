@@ -4,12 +4,12 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/screens/medicine/medicine%20_info.dart';
+import 'package:med_alarm/screens/medicine/medicine_info.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
 class EditMedicine extends StatefulWidget {
-  static const id = 'EDIT_MEDICINE';
-  Medicine sMedicine;
+  static const id = 'EDIT_MEDICINE_SCREEN';
+  final Medicine sMedicine;
 
   EditMedicine(this.sMedicine);
 
@@ -57,10 +57,14 @@ class _EditMedicineState extends State<EditMedicine> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).accentColor,
-        iconTheme: IconThemeData(
-            color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
         ),
+        centerTitle: true,
+        elevation: 5,
         title: Text(
           "Edit Medication",
           style: TextStyle(
@@ -75,59 +79,12 @@ class _EditMedicineState extends State<EditMedicine> {
                 "Delete",
                 style: TextStyle(fontSize: 20, color: Colors.redAccent),
               ),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        elevation: 10,
-                        title: Text(
-                          "Delete medicine!",
-                          style: TextStyle(
-                            color: Theme.of(context).accentColor,
-                            fontSize: 23,
-                          ),
-                        ),
-                        content: Text(
-                          "Would you like to delete ${sMedicine.medName} medicine?",
-                          style: TextStyle(color: Colors.black54, fontSize: 20),
-                        ),
-                        actions: [
-                          FlatButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(
-                                  color: Colors.redAccent,
-                                ),
-                              )),
-                          FlatButton(
-                              onPressed: () async {
-                                try {
-                                  await _sqlHelper
-                                      .deleteMedicine(sMedicine.medName);
-                                  //await _sqlHelper.getMedicine(sMedicine.medName);
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  setState(() {});
-                                } catch (e) {}
-                              },
-                              child: Text(
-                                "Ok",
-                                style: TextStyle(
-                                  color: Colors.redAccent,
-                                ),
-                              )),
-                        ],
-                      );
-                    });
+              onPressed: () async {
+                await confirmDeleteMed(context);
               },
             ),
           )
         ],
-        elevation: 0.0,
       ),
       body: Container(
         height: double.infinity,
@@ -167,7 +124,7 @@ class _EditMedicineState extends State<EditMedicine> {
                         circular = true;
                       });
                       Navigator.of(context).pop();
-                      Navigator.of(context).pushReplacementNamed(MedicineInfo.id);
+                      // Navigator.of(context).pushReplacementNamed(MedicineInfo.id);
                     }
                   },
                   child: Container(
@@ -194,6 +151,56 @@ class _EditMedicineState extends State<EditMedicine> {
         ),
       ),
     );
+  }
+
+  confirmDeleteMed(BuildContext context) async {
+    showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      elevation: 10,
+                      title: Text(
+                        "Delete medicine!",
+                        style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                          fontSize: 23,
+                        ),
+                      ),
+                      content: Text(
+                        "Would you like to delete ${sMedicine.medName} medicine?",
+                        style: TextStyle(color: Colors.black54, fontSize: 20),
+                      ),
+                      actions: [
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                              ),
+                            )),
+                        FlatButton(
+                            onPressed: () async {
+                              try {
+                                await _sqlHelper
+                                    .deleteMedicine(sMedicine.medName);
+                                //await _sqlHelper.getMedicine(sMedicine.medName);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                setState(() {});
+                              } catch (e) {}
+                            },
+                            child: Text(
+                              "Ok",
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                              ),
+                            )),
+                      ],
+                    );
+                  });
   }
 
   //--------------------------------------------------

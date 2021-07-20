@@ -72,13 +72,14 @@ class BuildLoginFresh extends StatelessWidget {
           // print(user);
           // print(password);
           // print('--------------   end call   ----------------');
-          isRequest(false);
-
-          ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
-            content: Text('Check your internet Connection'),
-            duration: Duration(seconds: 3),
-            backgroundColor: Theme.of(_context).errorColor,
-          ));
+          try {
+            isRequest(false);
+            ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
+              content: Text('Check your internet Connection'),
+              duration: Duration(seconds: 3),
+              backgroundColor: Theme.of(_context).errorColor,
+            ));
+          } catch (e) {}
         });
       },
       logo: './assets/MED ALARM.png',

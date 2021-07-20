@@ -27,27 +27,33 @@ class _MedDetailsState extends State<MedDetails> {
     return new Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Theme
-            .of(context)
-            .accentColor,
-        iconTheme: IconThemeData(
-          color: Color(0xFFF8F4F4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
         ),
         centerTitle: true,
+        elevation: 5,
+        // backgroundColor: Theme
+        //     .of(context)
+        //     .accentColor,
+        // iconTheme: IconThemeData(
+        //   color: Color(0xFFF8F4F4),
+        // ),
         title: Text(
           "Medicine Details",
           style: TextStyle(
-            fontFamily: "Angel",
-            fontSize: 32,
+            // fontFamily: "Angel",
+            // fontSize: 32,
             color: Colors.white,
           ),
         ),
-        elevation: 0.0,
       ),
       body: Container(
-        color: Theme
-            .of(context)
-            .accentColor,
+        // color: Theme
+        //     .of(context)
+        //     .accentColor,
         child: _BottomContainer(),
       ),
     );
@@ -99,217 +105,219 @@ class _BottomContainerState extends State<_BottomContainer> {
       }
     }
     return Container(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
         height: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(50),
-            topRight: Radius.circular(50),
-          ),
-          color: Colors.white,
-        ),
+        // decoration: BoxDecoration(
+        //   borderRadius: BorderRadius.only(
+        //     topLeft: Radius.circular(50),
+        //     topRight: Radius.circular(50),
+        //   ),
+        //   color: Colors.white,
+        // ),
         width: double.infinity,
-        child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 30),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    PanelTitle(
-                      title: "Medicine Name",
-                      isRequired: true,
-                    ),
-                    TextFormField(
-                      validator: (value) {
-                        if (value.isEmpty)
-                          return "please enter name of medicine!!";
-                        return null;
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                        medInfo.medName = value;
-
-                        });
-                      },
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'Enter name of medicine',
-                      ),
-                    ),
-                    PanelTitle(
-                      title: "Medicine Type:",
-                      isRequired: true,
-                    ),
-                    new DropdownButton(
-                      value: dropDownValue,
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      items: items.map((String item) {
-                        return DropdownMenuItem(value: item, child: Text(item));
-                      }).toList(),
-                      onChanged: (var newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            dropDownValue = newValue as String;
-                          });
-                        }
-                        medInfo.medType = dropDownValue;
-                      },
-                    ),
-                    PanelTitle(
-                      title: "Amount of medicine",
-                      isRequired: true,
-                    ),
-                    TextFormField(
-                      validator: (value) {
-                        if (!isNumeric(value))
-                          return "please enter amount of medicine as a number!!";
-                        else if (value.isEmpty)
-                          return "please enter amount of medicine!!";
-                        return null;
-                      },
-                      onChanged: (value) {
-                        medInfo.medAmount = int.parse(value);
-                      },
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                      maxLines: 1,
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'Enter number',
-                      ),
-                    ),
-                    PanelTitle(
-                      title: "Amount of each dose",
-                      isRequired: true,
-                    ),
-                    new DropdownButton(
-                      value: dropAmountDoseValue,
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      items: dropAmountDose.map((int item) {
-                        return DropdownMenuItem(
-                            value: item, child: Text(item.toString()));
-                      }).toList(),
-                      onChanged: (var newValue) {
-                        // if (newValue != null) {
-                        setState(() {
-                          dropAmountDoseValue = newValue;
-                        });
-                        // }
-                        medInfo.doseAmount = dropAmountDoseValue;
-                      },
-                    ),
-                    PanelTitle(
-                      title: "Duration",
-                      isRequired: true,
-                    ),
-                    new DropdownButton(
-                      value: durationValue,
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      items: durationItems.map((String item) {
-                        return DropdownMenuItem(value: item, child: Text(item));
-                      }).toList(),
-                      onChanged: (var newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            durationValue = newValue as String;
-                            if (durationValue != "daily") isDaily = false;
-                            else isDaily = true;
-                          });
-                        }
-                        medInfo.interval = durationValue;
-                      },
-                    ),
-                    PanelTitle(
-                      title: "Number of doses",
-                      isRequired: true,
-                    ),
-                    new DropdownButton(
-                      value: dropnumDosesValue,
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      items: dropnumDoses.map((int item) {
-                        return DropdownMenuItem(
-                            value: item, child: Text(item.toString()));
-                      }).toList(),
-                      onChanged: (var newValue) {
-                        // if (newValue != null) {
-                        setState(() {
-                          dropnumDosesValue = newValue;
-                        });
-                        // }
-                        medInfo.numOfDoses = dropnumDosesValue;
-                      },
-                    ),
-                    Visibility(
-                      visible: isDaily,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PanelTitle(
-                            title: "Hours between each dose",
-                            isRequired: true,
-                          ),
-                          new DropdownButton(
-                            value: dropDownValueDoses,
-                            icon: Icon(Icons.keyboard_arrow_down),
-                            items: doses.map((int item) {
-                              return DropdownMenuItem(
-                                  value: item, child: Text(item.toString()));
-                            }).toList(),
-                            onChanged: (var newValue) {
-                              // if (newValue != null) {
-                                setState(() {
-                                  dropDownValueDoses = newValue;
-                                });
-                              // }
-                              medInfo.intervalTime = dropDownValueDoses;
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    RaisedButton(
-                      elevation: 10,
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 25,
-                      ),
-                      textColor: Colors.white,
-                      color: Theme
-                          .of(context)
-                          .accentColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0)),
-                      onPressed: () {
-
-                        _submit();
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            " Next ",
-                            style: TextStyle(
-                              fontFamily: "Angel",
-                              fontSize: 28,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Icon(Icons.arrow_forward)
-                        ],
-                      ),
-                    ),
-                  ],
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                PanelTitle(
+                  title: "Medicine Name",
+                  isRequired: true,
                 ),
-              ),
-            )));
+                TextFormField(
+                  validator: (value) {
+                    if (value.isEmpty)
+                      return "please enter name of medicine!!";
+                    return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                    medInfo.medName = value;
+
+                    });
+                  },
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                  decoration: InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Enter name of medicine',
+                  ),
+                ),
+                PanelTitle(
+                  title: "Medicine Type:",
+                  isRequired: true,
+                ),
+                new DropdownButton(
+                  value: dropDownValue,
+                  icon: Icon(Icons.keyboard_arrow_down),
+                  items: items.map((String item) {
+                    return DropdownMenuItem(value: item, child: Text(item));
+                  }).toList(),
+                  onChanged: (var newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        dropDownValue = newValue as String;
+                      });
+                    }
+                    medInfo.medType = dropDownValue;
+                  },
+                ),
+                PanelTitle(
+                  title: "Amount of medicine",
+                  isRequired: true,
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (!isNumeric(value))
+                      return "please enter amount of medicine as a number!!";
+                    else if (value.isEmpty)
+                      return "please enter amount of medicine!!";
+                    return null;
+                  },
+                  onChanged: (value) {
+                    medInfo.medAmount = int.parse(value);
+                  },
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Enter number',
+                  ),
+                ),
+                PanelTitle(
+                  title: "Amount of each dose",
+                  isRequired: true,
+                ),
+                new DropdownButton(
+                  value: dropAmountDoseValue,
+                  icon: Icon(Icons.keyboard_arrow_down),
+                  items: dropAmountDose.map((int item) {
+                    return DropdownMenuItem(
+                        value: item, child: Text(item.toString()));
+                  }).toList(),
+                  onChanged: (var newValue) {
+                    // if (newValue != null) {
+                    setState(() {
+                      dropAmountDoseValue = newValue;
+                    });
+                    // }
+                    medInfo.doseAmount = dropAmountDoseValue;
+                  },
+                ),
+                PanelTitle(
+                  title: "Duration",
+                  isRequired: true,
+                ),
+                new DropdownButton(
+                  value: durationValue,
+                  icon: Icon(Icons.keyboard_arrow_down),
+                  items: durationItems.map((String item) {
+                    return DropdownMenuItem(value: item, child: Text(item));
+                  }).toList(),
+                  onChanged: (var newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        durationValue = newValue as String;
+                        if (durationValue != "daily") isDaily = false;
+                        else isDaily = true;
+                      });
+                    }
+                    medInfo.interval = durationValue;
+                  },
+                ),
+                PanelTitle(
+                  title: "Number of doses",
+                  isRequired: true,
+                ),
+                new DropdownButton(
+                  value: dropnumDosesValue,
+                  icon: Icon(Icons.keyboard_arrow_down),
+                  items: dropnumDoses.map((int item) {
+                    return DropdownMenuItem(
+                        value: item, child: Text(item.toString()));
+                  }).toList(),
+                  onChanged: (var newValue) {
+                    // if (newValue != null) {
+                    setState(() {
+                      dropnumDosesValue = newValue;
+                    });
+                    // }
+                    medInfo.numOfDoses = dropnumDosesValue;
+                  },
+                ),
+                Visibility(
+                  visible: isDaily,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      PanelTitle(
+                        title: "Hours between each dose",
+                        isRequired: true,
+                      ),
+                      new DropdownButton(
+                        value: dropDownValueDoses,
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        items: doses.map((int item) {
+                          return DropdownMenuItem(
+                              value: item, child: Text(item.toString()));
+                        }).toList(),
+                        onChanged: (var newValue) {
+                          // if (newValue != null) {
+                            setState(() {
+                              dropDownValueDoses = newValue;
+                            });
+                          // }
+                          medInfo.intervalTime = dropDownValueDoses;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15),
+                  child: RaisedButton(
+                    elevation: 10,
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 25,
+                    ),
+                    textColor: Colors.white,
+                    color: Theme
+                        .of(context)
+                        .accentColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0)),
+                    onPressed: () {
+
+                      _submit();
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          " Next ",
+                          style: TextStyle(
+                            fontFamily: "Angel",
+                            fontSize: 28,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward)
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }
 
@@ -356,27 +364,33 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme
-            .of(context)
-            .accentColor,
-        iconTheme: IconThemeData(
-          color: Color(0xFFF8F4F4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
         ),
+        elevation: 5,
+        // backgroundColor: Theme
+        //     .of(context)
+        //     .accentColor,
+        // iconTheme: IconThemeData(
+        //   color: Color(0xFFF8F4F4),
+        // ),
         centerTitle: true,
         title: Text(
           "Medicine Details",
-          style: TextStyle(
-            fontFamily: "Angel",
-            fontSize: 32,
-            color: Colors.white,
-          ),
+          // style: TextStyle(
+          //   fontFamily: "Angel",
+          //   fontSize: 32,
+          //   color: Colors.white,
+          // ),
         ),
-        elevation: 0.0,
       ),
       body: Container(
-        color: Theme
-            .of(context)
-            .accentColor,
+        // color: Theme
+        //     .of(context)
+        //     .accentColor,
         child: Container(
           child: _ReminderDetailsContainer(),
         ),
@@ -426,9 +440,9 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
           const Locale('en', 'US'),
         ],
         home: Scaffold(
-            backgroundColor: Theme
-                .of(context)
-                .accentColor,
+            // backgroundColor: Theme
+            //     .of(context)
+            //     .accentColor,
             body: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
@@ -447,7 +461,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         child: PanelTitle(
                           title: "Pick up Start date",
-                          isRequired: true,
+                          isRequired: false,
                         ),
                       ),
                       Text(
@@ -505,7 +519,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         child: PanelTitle(
                           title: "Pick up end date",
-                          isRequired: true,
+                          isRequired: false,
                         ),
                       ),
                       Text(
@@ -558,7 +572,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             horizontal: 10, vertical: 10),
                         child: PanelTitle(
                           title: "Pick up time for first reminder",
-                          isRequired: true,
+                          isRequired: false,
                         )),
                       TimePickerSpinner(
                         is24HourMode: false,

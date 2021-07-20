@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:med_alarm/notification/localNotification.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/screens/report/report_screen.dart';
-import 'package:med_alarm/screens/user_profile/UserProfile.dart';
+import 'package:med_alarm/screens/user_profile/user_profile.dart';
 
-import '../main.dart';
+import '../../main.dart';
+import '../sync_meds_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({Key key}) : super(key: key);
@@ -12,7 +14,22 @@ class MoreScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('More'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
+        title: Text(
+          'More',
+          style: TextStyle(
+            // fontFamily: "Angel",
+            // fontSize: 32,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
@@ -20,9 +37,13 @@ class MoreScreen extends StatelessWidget {
           children: [
             editProfileTile(context),
             Divider(height: 0,),
+            syncDataTile(context),
+            Divider(height: 0,),
             measurementTile(context),
             Divider(height: 0,),
             reportTile(context),
+            Divider(height: 0,),
+            notificationTile(context),
             Divider(height: 0,),
             logoutTile(context),
           ],
@@ -42,6 +63,21 @@ class MoreScreen extends StatelessWidget {
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(UserProfile.id);
+      },
+    );
+  }
+
+  ListTile syncDataTile(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        Icons.sync_outlined,
+        size: 50,
+        color: Theme.of(context).accentColor,
+      ),
+      title: Text('Synchronize Data'),
+      contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      onTap: () {
+        Navigator.of(context).pushNamed(SyncMedsScreen.id);
       },
     );
   }
@@ -72,6 +108,21 @@ class MoreScreen extends StatelessWidget {
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(ReportScreen.id);
+      },
+    );
+  }
+
+  ListTile notificationTile(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        Icons.notifications_none_outlined,
+        size: 50,
+        color: Theme.of(context).accentColor,
+      ),
+      title: Text('Notification'),
+      contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      onTap: () {
+        Navigator.of(context).pushNamed(LocalNotificationScreen.id);
       },
     );
   }

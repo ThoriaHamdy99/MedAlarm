@@ -27,6 +27,14 @@ class _SearchContactState extends State<SearchContact> {
       onTap: () => FocusManager.instance.primaryFocus.unfocus(),
       child: Scaffold(
         appBar: AppBar(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+          ),
+          centerTitle: true,
+          elevation: 5,
           title: TextField(
             autofocus: true,
             style: TextStyle(color: Colors.white),

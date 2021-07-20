@@ -10,7 +10,7 @@ import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/providers/user_provider.dart';
 import 'package:med_alarm/screens/medicine/med_details.dart';
-import 'package:med_alarm/screens/user_profile/UserProfile.dart';
+import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 import '/models/user.dart';
 

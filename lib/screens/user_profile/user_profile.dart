@@ -7,7 +7,7 @@ import 'dart:io';
 
 import '../../main.dart';
 import '../home_screen.dart';
-import 'EditProfile.dart';
+import 'edit_profile.dart';
 import '/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';

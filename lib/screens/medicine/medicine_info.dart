@@ -4,7 +4,7 @@ import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/edit_medicine.dart';
 class MedicineInfo extends StatefulWidget {
   static const id = 'MEDICINE_INFO';
-  Medicine medicine;
+  final Medicine medicine;
   MedicineInfo(this.medicine);
   @override
   _MedicineInfoState createState() => _MedicineInfoState(this.medicine);
@@ -17,9 +17,17 @@ class _MedicineInfoState extends State<MedicineInfo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
         ),
+        centerTitle: true,
+        elevation: 5,
+        // iconTheme: IconThemeData(
+        //   color: Colors.white,
+        // ),
         title: Text('Medication Info',
           style: TextStyle(
             color: Colors.white,

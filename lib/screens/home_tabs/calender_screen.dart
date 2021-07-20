@@ -4,6 +4,7 @@ import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/med_details.dart';
 import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
@@ -83,27 +84,46 @@ class _CalendarScreenState extends State<CalendarScreen> {
     hello += UserProvider.instance.currentUser.firstname;
     return Scaffold(
       appBar: AppBar(
-        title: Text(hello),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
+        title: Text(
+          hello,
+          style: TextStyle(
+            // fontFamily: "Angel",
+            // fontSize: 32,
+            color: Colors.white,
+          ),
+        ),
         titleSpacing: 5,
         leading:
-        Container(
-          child: (UserProvider.instance.currentUser.profPicURL == '') ?
-            CircleAvatar(
-              child: Icon(
-                Icons.account_circle,
-                color: Colors.white,
-                size: AppBar().preferredSize.height,
-              ),
-              backgroundColor: Colors.transparent,
-            ) :
-            Container(
-              padding: EdgeInsets.all(5),
-              child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                  UserProvider.instance.currentUser.profPicURL,
+        InkWell(
+          borderRadius: BorderRadius.circular(30),
+          onTap: () {Navigator.of(context).pushNamed(UserProfile.id);},
+          child: Container(
+            child: (UserProvider.instance.currentUser.profPicURL == '') ?
+              CircleAvatar(
+                child: Icon(
+                  Icons.account_circle,
+                  color: Colors.white,
+                  size: AppBar().preferredSize.height,
+                ),
+                backgroundColor: Colors.transparent,
+              ) :
+              Container(
+                padding: EdgeInsets.all(5),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    UserProvider.instance.currentUser.profPicURL,
+                  ),
                 ),
               ),
-            ),
+          ),
         ),
       ),
       body: Stack(
@@ -211,7 +231,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       borderRadius: BorderRadius.circular(20)),
                                   onPressed: () {
                                     Navigator.of(context)
-                                        .pushNamed(MedDetails.id);
+                                        .pushNamed(MedDetails.id).whenComplete(() {
+                                          setState(() {});
+                                          _selectedMeds.value = _getEventsForDay(_selectedDay);
+                                    });
                                   },
                                   child: Text(
                                     "Add Medicine",
@@ -350,7 +373,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           backgroundColor: Theme.of(context).accentColor,
           child: Icon(Icons.add),
           onPressed: () {
-            Navigator.of(context).pushNamed(MedDetails.id);
+            Navigator.of(context).pushNamed(MedDetails.id).whenComplete(() {
+              setState(() {});
+              _selectedMeds.value = _getEventsForDay(_selectedDay);
+            });
           },
         ),
       ),

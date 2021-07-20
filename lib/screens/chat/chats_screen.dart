@@ -36,9 +36,22 @@ class _ChatsScreenState extends State<ChatsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
         backgroundColor: Theme.of(context).accentColor,
         title: Text(
           'Chats',
+          style: TextStyle(
+            // fontFamily: "Angel",
+            // fontSize: 32,
+            color: Colors.white,
+          ),
         ),
         actions: [
           IconButton(icon: Icon(Icons.search), onPressed: () {
@@ -66,6 +79,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 },
               ),
             ),
+            if(UserProvider.instance.currentUser.type == 'Patient')
             Divider(height: 0, thickness: 1),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(

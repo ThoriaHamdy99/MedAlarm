@@ -52,6 +52,14 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
         titleSpacing: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -75,6 +83,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
               'Chat Bot',
               style: TextStyle(
                 fontSize: 16,
+                color: Colors.white,
               ),
             ),
           ],

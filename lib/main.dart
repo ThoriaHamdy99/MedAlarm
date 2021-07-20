@@ -2,9 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:med_alarm/screens/chat/chatbot_screen.dart';
-import 'package:med_alarm/screens/medicine/edit_medicine.dart';
-import 'package:med_alarm/screens/user_profile/EditProfile.dart';
-import 'package:med_alarm/screens/user_profile/UserProfile.dart';
+import 'package:med_alarm/screens/sync_meds_screen.dart';
+import 'package:med_alarm/screens/user_profile/edit_profile.dart';
+import 'package:med_alarm/screens/user_profile/user_profile.dart';
+import 'notification/localNotification.dart';
 import 'providers/firebase_provider.dart';
 import 'screens/medicine/med_details.dart';
 import 'screens/home_tabs/calender_screen.dart';
@@ -52,6 +53,10 @@ class _MyAppState extends State<MyApp> {
       title: 'MedAlarm',
       theme: ThemeData(
         primarySwatch: Colors.cyan,
+        primaryIconTheme: IconThemeData(color: Colors.white),
+        primaryTextTheme: TextTheme(
+            headline6: TextStyle(color: Colors.white),
+        ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       builder: (context, child) {
@@ -73,6 +78,8 @@ class _MyAppState extends State<MyApp> {
         ChatBotScreen.id: (context) => ChatBotScreen(),
         UserProfile.id: (context) => UserProfile(),
         EditProfile.id: (context) => EditProfile(),
+        SyncMedsScreen.id: (context) => SyncMedsScreen(),
+        LocalNotificationScreen.id: (context) => LocalNotificationScreen(),
       },
     );
   }

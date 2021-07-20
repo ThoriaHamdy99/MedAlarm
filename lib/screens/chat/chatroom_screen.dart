@@ -81,6 +81,14 @@ class _ChatRoomState extends State<ChatRoom> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
         // backgroundColor: Colors.blueAccent,
         // leading: FlatButton(
         //   onPressed: () {
@@ -125,6 +133,7 @@ class _ChatRoomState extends State<ChatRoom> {
                   widget.otherUser.firstname + ' ' + widget.otherUser.lastname,
                   style: TextStyle(
                     fontSize: 16,
+                    color: Colors.white
                   ),
                 ),
                 SizedBox(
@@ -134,6 +143,7 @@ class _ChatRoomState extends State<ChatRoom> {
                   widget.otherUser.phoneNumber,
                   style: TextStyle(
                     fontSize: 14,
+                    color: Colors.white
                   ),
                 ),
               ],

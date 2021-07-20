@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:med_alarm/models/doctor.dart';
+import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/sign_up_model.dart';
 import 'package:med_alarm/models/user.dart';
@@ -255,6 +256,39 @@ class FirebaseProvider with ChangeNotifier {
       return url;
     } catch (e) {
       return '';
+    }
+  }
+
+  uploadMedicinesMerge() async {
+    try {
+
+    } catch (e) {
+
+    }
+  }
+
+  uploadMedicinesReplace() async {
+    try {
+      List<Medicine> medicines = await SQLHelper.getInstant().getAllMedicines();
+      if(medicines.isNotEmpty) {
+        await firestore.collection('Medicines')
+            .doc(auth.currentUser.uid).delete();
+        for(var med in medicines) {
+          await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
+              .doc(med.medName)
+              .set(med.toMap());
+        }
+      }
+    } catch (e) {
+
+    }
+  }
+
+  getMedicines() async {
+    try {
+
+    } catch (e) {
+
     }
   }
 
