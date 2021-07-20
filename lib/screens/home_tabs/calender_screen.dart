@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/med_details.dart';
@@ -72,12 +73,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       });
       _selectedMeds.value = _getEventsForDay(selectedDay);
     }
-  }
-  
-  String getTime(DateTime dateTime){
-    var hours = dateTime.hour >= 0 && dateTime.hour <= 9 ? "0" + "${dateTime.hour}" : "${dateTime.hour}";
-    var min = dateTime.minute >= 0 && dateTime.minute <= 9 ? "0" + "${dateTime.minute}" : "${dateTime.minute}";
-    return hours + ":" + min;
   }
 
   @override
@@ -254,7 +249,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                         height: 20,
                                       ),
                                       Text(
-                                        "No medicine added until now",
+                                        "No medicine today",
                                         style: TextStyle(
                                             fontSize: 25,
                                             fontWeight: FontWeight.bold),
@@ -279,7 +274,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                             Padding(
                                               padding: EdgeInsets.only( top: 20.0, bottom: 10.0),
                                               child: Text(
-                                                "${getTime(value[index].startTime)}",
+                                                DateFormat.Hm().format(value[index].startTime),
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                 ),

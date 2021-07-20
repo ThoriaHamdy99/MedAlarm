@@ -193,7 +193,7 @@ class SQLHelper {
         nDoses = '${med.numOfDoses}',
         startTime = '${med.startTime.millisecondsSinceEpoch}',
         interval = '${med.interval}',
-        intervalTime = '${med.intervalTime}',
+        intervalTime = '${med.intervalTime}'
         WHERE name = '$medName';''');
       print('+++++++++++++++++++++ From UpdateMedicine +++++++++++++++++++++');
       if(result != null) {
@@ -252,9 +252,10 @@ class SQLHelper {
     try {
       if(!await deleteMedicineDoses(medName)) throw 'Doses aren\'t deleted';
       await db.rawDelete(
-          "DELETE FROM Medicine WHERE name = $medName");
+          "DELETE FROM Medicine WHERE name = '$medName'");
       return true;
     } catch (e) {
+      print(e);
       return false;
     }
   }
@@ -300,6 +301,7 @@ class SQLHelper {
           "DELETE FROM Dose WHERE name = $medName AND dateTime = $time");
       return true;
     } catch (e) {
+      print(e);
       return false;
     }
   }
@@ -307,7 +309,7 @@ class SQLHelper {
   Future<bool> deleteMedicineDoses(String medName) async {
     Database db = await database;
     try {
-      await db.rawDelete("DELETE FROM Dose WHERE name = $medName");
+      await db.rawDelete("DELETE FROM Dose WHERE name = '$medName';");
       return true;
     } catch (e) {
       return false;

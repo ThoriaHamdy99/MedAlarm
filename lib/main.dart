@@ -1,9 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/chat/chatbot_screen.dart';
-import 'package:med_alarm/screens/medicine/selected_med.dart';
+import 'package:med_alarm/screens/medicine/edit_medicine.dart';
 import 'package:med_alarm/screens/user_profile/EditProfile.dart';
 import 'package:med_alarm/screens/user_profile/UserProfile.dart';
 import 'providers/firebase_provider.dart';
