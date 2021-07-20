@@ -98,14 +98,21 @@ class _ChatRoomState extends State<ChatRoom> {
           children: [
             Hero(
               tag: widget.otherUser.uid,
-              child: Container(
-                height: 50,
-                child: widget.otherUser.profPicURL.isEmpty ? Icon(
+              child: (widget.otherUser.profPicURL == '') ?
+              Container(
+                child: Icon(
                   Icons.account_circle,
-                  size: 50,
                   color: Colors.white,
-                ):
-                Image.network(widget.otherUser.profPicURL),
+                  size: AppBar().preferredSize.height-10,
+                ),
+              ) :
+              Container(
+                padding: EdgeInsets.all(3),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    widget.otherUser.profPicURL,
+                  ),
+                ),
               ),
             ),
             SizedBox(

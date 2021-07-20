@@ -71,6 +71,7 @@ class _LoginFreshState extends State<LoginFresh> {
       children: [
 
         Container(
+          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
           decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topRight,

@@ -76,7 +76,7 @@ class BuildLoginFresh extends StatelessWidget {
           isRequest(false);
         });
       },
-      logo: './assets/logo_head.png',
+      logo: './assets/MED ALARM.png',
       isFooter: true,
       widgetFooter: this.widgetFooter(),
       isResetPassword: true,
@@ -88,7 +88,7 @@ class BuildLoginFresh extends StatelessWidget {
 
   Widget widgetResetPassword() {
     return LoginFreshResetPassword(
-      logo: 'assets/logo_head.png',
+      logo: 'assets/MED ALARM.png',
       funResetPassword:
           (BuildContext _context, Function isRequest, String email) {
         isRequest(true);
@@ -139,7 +139,7 @@ class BuildLoginFresh extends StatelessWidget {
     return LoginFreshSignUp(
         isFooter: true,
         widgetFooter: this.widgetFooter(),
-        logo: 'assets/logo_head.png',
+        logo: 'assets/MED ALARM.png',
         funSignUp: (BuildContext _context, Function isRequest,
             SignUpModel signUpModel) {
           isRequest(true);

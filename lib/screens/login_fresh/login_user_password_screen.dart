@@ -68,19 +68,19 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
         : widget.loginFreshWords;
 
     return Scaffold(
-      appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor:
-              widget.backgroundColor ?? ColorConstants.PrimaryColor,
-          centerTitle: true,
-          elevation: 0,
-          title: Text(
-            this.loginFreshWords.login,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-          )),
+      // appBar: AppBar(
+      //     iconTheme: IconThemeData(color: Colors.white),
+      //     backgroundColor:
+      //         widget.backgroundColor ?? ColorConstants.PrimaryColor,
+      //     centerTitle: true,
+      //     elevation: 0,
+      //     title: Text(
+      //       this.loginFreshWords.login,
+      //       maxLines: 1,
+      //       overflow: TextOverflow.ellipsis,
+      //       style: TextStyle(
+      //           color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+      //     )),
       body: Stack(
         children: <Widget>[
           Align(
@@ -106,7 +106,7 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 3),
+                            horizontal: 20, vertical: 20),
                         child: Hero(
                           tag: 'hero-login',
                           child: Image.asset(
@@ -122,15 +122,28 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
             ),
           ),
           Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              child: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+          Align(
             alignment: Alignment.bottomCenter,
             child: Container(
+              margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               height: MediaQuery.of(context).size.height * 0.7,
               width: MediaQuery.of(context).size.width,
               decoration: new BoxDecoration(
                   color: Color(0xFFF3F3F5),
                   borderRadius: new BorderRadius.only(
-                    topLeft: const Radius.circular(50.0),
-                    topRight: const Radius.circular(50.0),
+                    topLeft: const Radius.circular(25.0),
+                    topRight: const Radius.circular(25.0),
                   )),
               child: buildBody(),
             ),

@@ -90,12 +90,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
         titleSpacing: 5,
         leading:
         Container(
-          padding: EdgeInsets.all(5),
           child: (UserProvider.instance.currentUser.profPicURL == '') ?
-            Icon(Icons.account_circle, size: 50,) :
             CircleAvatar(
-              backgroundImage: NetworkImage(
-                UserProvider.instance.currentUser.profPicURL,
+              child: Icon(
+                Icons.account_circle,
+                color: Colors.white,
+                size: AppBar().preferredSize.height,
+              ),
+              backgroundColor: Colors.transparent,
+            ) :
+            Container(
+              padding: EdgeInsets.all(5),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(
+                  UserProvider.instance.currentUser.profPicURL,
+                ),
               ),
             ),
         ),
@@ -145,9 +154,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     }
                   },
                   headerStyle: HeaderStyle(
-                    titleCentered: true,
+                    titleCentered: false,
                     formatButtonShowsNext: false,
-                    formatButtonVisible: false,
+                    formatButtonVisible: true,
                     titleTextStyle: TextStyle(
                       fontSize: 18,
                     ),

@@ -344,6 +344,7 @@ class _EditProfileState extends State<EditProfile> {
               child: Icon(Icons.date_range),
               onPressed: () => showRoundedDatePicker(
                 context: context,
+                theme: Theme.of(context),
                 initialDate: dob,
                 firstDate: DateTime(DateTime.now().year - 100),
                 lastDate: DateTime(DateTime.now().year - 10),

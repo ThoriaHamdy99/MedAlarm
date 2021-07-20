@@ -185,12 +185,15 @@ class _ContactTileState extends State<ContactTile> {
                 ),
                 leading: Hero(
                   tag: widget.contact.user.uid,
-                  child: widget.contact.user.profPicURL.isEmpty ? Icon(
-                    Icons.account_circle,
-                    size: 50,
-                    color: Theme.of(context).accentColor,
-                  ) :
-                  Image.network(widget.contact.user.profPicURL),
+                  child: (widget.contact.user.profPicURL.isEmpty) ?
+                    Icon(Icons.account_circle, size: 50.0) :
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4.0),
+                      child: CircleAvatar(
+                        radius: 21.0,
+                        backgroundImage: NetworkImage(widget.contact.user.profPicURL),
+                      ),
+                    ),
                 ),
                 trailing: Container(
                   padding: EdgeInsets.only(right: 5),
