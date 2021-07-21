@@ -66,21 +66,9 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
     loginFreshWords = (widget.loginFreshWords == null)
         ? LoginFreshWords()
         : widget.loginFreshWords;
-
+    double headerSize = MediaQuery.of(context).size.height * 0.3
+        - MediaQuery.of(context).padding.top;
     return Scaffold(
-      // appBar: AppBar(
-      //     iconTheme: IconThemeData(color: Colors.white),
-      //     backgroundColor:
-      //         widget.backgroundColor ?? ColorConstants.PrimaryColor,
-      //     centerTitle: true,
-      //     elevation: 0,
-      //     title: Text(
-      //       this.loginFreshWords.login,
-      //       maxLines: 1,
-      //       overflow: TextOverflow.ellipsis,
-      //       style: TextStyle(
-      //           color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-      //     )),
       body: Stack(
         children: <Widget>[
           Align(
@@ -99,38 +87,49 @@ class _LoginFreshUserAndPasswordState extends State<LoginFreshUserAndPassword> {
               width: MediaQuery.of(context).size.width,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    margin: EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: AppBar().preferredSize.height + 10,
+                      vertical: MediaQuery.of(context).padding.top,
                     ),
-                    child: Row(
+                    child: Column(
                       children: [
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width / 3,
-                          ),
-                          child: Hero(
-                            tag: 'hero-login',
-                            child: Image.asset(
-                              './assets/logo.png',
-                              fit: BoxFit.fitWidth,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Hero(
+                              tag: 'hero-login1',
+                              child: Container(
+                                height: headerSize / 3,
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                      './assets/logo_MED_ALARM.png',
+                                    ),
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height * 0.3,
-                            maxWidth: MediaQuery.of(context).size.width * 3 / 5,
-                          ),
-                          child: Hero(
-                            tag: 'hero-login1',
-                            child: Image.asset(
-                              widget.logo,
-                              fit: BoxFit.fitWidth,
+                        Hero(
+                          tag: 'hero-login',
+                          child: Container(
+                            width: headerSize * 2 / 3,
+                            height: headerSize * 2 / 3,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  './assets/logo.png',
+                                ),
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
                         ),

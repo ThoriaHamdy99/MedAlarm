@@ -268,7 +268,7 @@ class FirebaseProvider with ChangeNotifier {
           await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
               .doc(med.medName)
               .set(med.toMap(), SetOptions(merge: true));
-          List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.medName);
+          List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.id);
           if(doses.isNotEmpty) {
             for (var dose in doses) {
               await firestore.collection(
@@ -277,7 +277,7 @@ class FirebaseProvider with ChangeNotifier {
                       'Medicines/'
                       '${med.id}/'
                       'Doses')
-                  .doc(dose.dateTime.toIso8601String())
+                  .doc(dose.doseTime.toIso8601String())
                   .set(dose.toMap(), SetOptions(merge: true));
             }
           }
@@ -300,7 +300,7 @@ class FirebaseProvider with ChangeNotifier {
           await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
             .doc(med.medName)
             .set(med.toDoc());
-          List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.medName);
+          List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.id);
           if(doses.isNotEmpty) {
             for (var dose in doses) {
               await firestore.collection(
@@ -309,7 +309,7 @@ class FirebaseProvider with ChangeNotifier {
                 'Medicines/'
                 '${med.id}/'
                 'Doses')
-                  .doc(dose.dateTime.toIso8601String())
+                  .doc(dose.doseTime.toIso8601String())
                   .set(dose.toMap());
             }
           }
@@ -341,7 +341,7 @@ class FirebaseProvider with ChangeNotifier {
             for(var doseDoc in dosesDocs.docs) {
               doses.add(Dose.fromDoc(doseDoc));
             }
-            medicines[medicines.length - 1].doses = doses;
+            medicines[medicines.length - 1].addDoses(doses);
           }
         }
         return medicines;
@@ -354,7 +354,7 @@ class FirebaseProvider with ChangeNotifier {
 
   logout() async {
     try{
-      if(!await SQLHelper.getInstant().deleteUser()) throw '';
+      if(!await SQLHelper.getInstant().deleteUser()) throw 'Error in logout';
       await removeDeviceToken();
       auth.signOut();
     } catch(e) {

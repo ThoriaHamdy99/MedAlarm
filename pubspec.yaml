@@ -35,18 +35,14 @@ dependencies:
   firebase_storage:
 
   image_picker:
-  path:
 
   path_provider:
   auto_direction:
 
-  shared_preferences:
-  provider:
   table_calendar:
   validators:
   sqflite:
 
-  dependencies:
   intl:
   screenshot:
   pdf:
@@ -58,8 +54,8 @@ dependencies:
   flutter_launcher_icons:
 
   flutter_time_picker_spinner:
-  flutter_localizations:
-    sdk: flutter
+#  flutter_localizations:
+#    sdk: flutter
   flutter_rounded_date_picker:
 
   rxdart:

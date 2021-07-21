@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:med_alarm/notification/notification.dart';
+import 'package:med_alarm/screens/alarm/alarm_screen.dart';
 import 'package:med_alarm/screens/chat/chatbot_screen.dart';
 import 'package:med_alarm/screens/sync_meds_screen.dart';
 import 'package:med_alarm/screens/user_profile/edit_profile.dart';
@@ -11,7 +13,6 @@ import 'screens/medicine/med_details_screen.dart';
 import 'screens/home_tabs/calender_screen.dart';
 import 'screens/login_fresh/login_fresh_screen.dart';
 import 'screens/report/report_screen.dart';
-import 'utilities/push_notifications.dart';
 import 'utilities/scroll_behavior.dart';
 import 'providers/user_provider.dart';
 import 'screens/chat/chatroom_screen.dart';
@@ -21,36 +22,36 @@ import 'screens/search_contact_screen.dart';
 import 'utilities/sql_helper.dart';
 import 'models/user.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+    notification.initialize();
+    WidgetsFlutterBinding.ensureInitialized();
+  } catch (e) {
+    print(e);
+  }
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
-    runApp(new MyApp());
-  });
+      .then((_) {runApp(MyApp());});
 }
 
 class MyApp extends StatefulWidget {
-  //You have to create a list with the type of login's that you are going to import into your application
+  final Map map;
+
+  MyApp({this.map});
 
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  
-  @override
-  void initState() {
-    super.initState();
-    PushNotificationsManager().init();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'MedAlarm',
+      title: 'Med Alarm',
       theme: ThemeData(
         primarySwatch: Colors.cyan,
         primaryIconTheme: IconThemeData(color: Colors.white),
@@ -59,6 +60,7 @@ class _MyAppState extends State<MyApp> {
         ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      navigatorKey: navigatorKey,
       builder: (context, child) {
         return ScrollConfiguration(
           behavior: MyBehavior(),
@@ -85,6 +87,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _getLandingPage() {
+    // if(widget.map != null) {
+    //   return AlarmScreen(widget.map);
+    // }
     return FutureBuilder<User> (
       future: SQLHelper.getInstant().getUser(),
       builder: (context, snapShot) {
@@ -101,8 +106,6 @@ class _MyAppState extends State<MyApp> {
             //     snapShot.data.email) {
               // if (Users.patientUser) {
               var auth = FirebaseProvider.instance.auth;
-              print(auth.currentUser.uid);
-              print(auth.currentUser.email);
               UserProvider.instance.currentUser = snapShot.data;
               return HomeScreen();
             }

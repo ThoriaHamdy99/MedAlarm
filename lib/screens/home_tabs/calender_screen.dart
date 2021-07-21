@@ -53,7 +53,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           .compareTo(dayString) <= 0
         && dayString.compareTo(allMeds[i].endDate
           .toIso8601String().substring(0, 10)) <= 0) {
-        if (allMeds[i].interval == 'daily')
+        if (allMeds[i].interval == 'once'
+            && isSameDay(allMeds[i].startDate, day))
+          allMedsForDay.add(allMeds[i]);
+        else if (allMeds[i].interval == 'daily')
           allMedsForDay.add(allMeds[i]);
         else if(allMeds[i].interval == 'weekly'
           && allMeds[i].startDate.weekday == day.weekday)

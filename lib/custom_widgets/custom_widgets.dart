@@ -130,6 +130,7 @@ class _ContactTileState extends State<ContactTile> {
   FirebaseProvider fbPro = FirebaseProvider.instance;
   String msgPath;
   Message msg;
+  String name = '';
 
   @override
   void initState() {
@@ -139,6 +140,9 @@ class _ContactTileState extends State<ContactTile> {
     } else {
       msgPath = widget.contact.user.uid + widget.auth.currentUser.uid;
     }
+    if(widget.contact.user.type == 'Doctor')
+      name = 'Dr/';
+    name += widget.contact.user.firstname + ' ' + widget.contact.user.lastname;
   }
 
   @override
@@ -164,7 +168,7 @@ class _ContactTileState extends State<ContactTile> {
                   horizontal: 5,
                 ),
                 title: Text(
-                  widget.contact.user.firstname + ' ' + widget.contact.user.lastname,
+                  name,
                 ),
                 subtitle: RichText(
                   maxLines: 1,

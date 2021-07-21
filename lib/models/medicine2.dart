@@ -6,31 +6,35 @@ class Medicine {
   int id;
   String medName;
   String medType;
+  String description;
   DateTime startDate;
   DateTime endDate;
   int medAmount;
   int doseAmount;
+  int numOfDoses;
+  DateTime startTime;
   String interval;
   int intervalTime;
-  DateTime startTime;
-  int numOfDoses;
-  String description;
-  List<Dose> doses;
+  List<Dose> dosesTaken;
+  List<Dose> dosesSnoozed;
+  List<Dose> dosesSkipped;
 
   Medicine({
     this.id,
     this.medName,
     this.medType,
+    this.description,
     this.startDate,
     this.endDate,
     this.medAmount,
     this.doseAmount,
+    this.numOfDoses,
     this.startTime,
     this.interval,
-    this.numOfDoses,
     this.intervalTime,
-    this.description,
-    this.doses
+    this.dosesTaken,
+    this.dosesSnoozed,
+    this.dosesSkipped
   });
 
   // String get getName => medicineName;
@@ -77,6 +81,43 @@ class Medicine {
     return med;
   }
 
+  Map<String, String> toMapString() {
+    return {
+      "id": '$id',
+      "name": medName,
+      "type": medType,
+      "start": '${startDate.millisecondsSinceEpoch}',
+      "end": '${endDate.millisecondsSinceEpoch}',
+      "medAmount": '$medAmount',
+      "doseAmount": '$doseAmount',
+      "nDoses": '$numOfDoses',
+      "startTime": '${startTime.millisecondsSinceEpoch}',
+      "interval": interval,
+      "intervalTime": '$intervalTime',
+      "description": description,
+      //"doses": this.doses
+    };
+  }
+
+  factory Medicine.fromMapString(Map<String, String> map) {
+    var med =  Medicine(
+      id: int.parse(map['id']),
+      medName: map['name'],
+      medType: map['type'],
+      medAmount: int.parse(map['medAmount']),
+      doseAmount: int.parse(map['doseAmount']),
+      numOfDoses: int.parse(map['numOfDoses']),
+      interval: map['interval'],
+      intervalTime: int.parse(map['intervalTime']),
+      startDate: DateTime.fromMillisecondsSinceEpoch(int.parse(map['startDate'])),
+      endDate: DateTime.fromMillisecondsSinceEpoch(int.parse(map['endDate'])),
+      startTime: DateTime.fromMillisecondsSinceEpoch(int.parse(map['startTime'])),
+      description: map['description'],
+      // doses: parsedJson['doses'],
+    );
+    return med;
+  }
+
   Map<String, dynamic> toDoc() {
     return {
       "id": id,
@@ -111,5 +152,25 @@ class Medicine {
       description: doc.get('description'),
     );
     return med;
+  }
+
+  addDoses(List<Dose> doses) {
+    for(var dose in doses) {
+      if(dose.snoozed) dosesSnoozed.add(dose);
+      if(dose.taken) dosesTaken.add(dose);
+      else dosesSkipped.add(dose);
+    }
+  }
+
+  addTakenDose(map) {
+    dosesTaken.add(Dose.fromMap(map));
+  }
+
+  addSnoozedDose(map) {
+    dosesSnoozed.add(Dose.fromMap(map));
+  }
+
+  addSkippedDose(map) {
+    dosesSkipped.add(Dose.fromMap(map));
   }
 }

@@ -120,13 +120,14 @@ class _LoginFreshState extends State<LoginFresh> {
                     children: [
                       buildLoginWith(),
                       buildTypeLogin(context),
-                      (widget.isExploreApp == null ||
-                              widget.isExploreApp == false)
-                          ? SizedBox()
-                          : SizedBox(
-                              height: 20,
-                            ),
-                      buildExploreApp(context),
+                      // (widget.isExploreApp == null ||
+                      //         widget.isExploreApp == false)
+                      //     ? SizedBox()
+                      //     : SizedBox(
+                      //         height: 20,
+                      //       ),
+                      // buildExploreApp(context),
+                      SizedBox(height: 30),
                       (widget.isSignUp == null || widget.isSignUp == false)
                           ? SizedBox()
                           : buildSignUp(),

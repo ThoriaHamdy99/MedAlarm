@@ -26,6 +26,7 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   final FirebaseProvider fbPro = FirebaseProvider.instance;
+  String name = '';
   String messagesPath;
   File image;
 
@@ -74,7 +75,9 @@ class _ChatRoomState extends State<ChatRoom> {
     } else {
       messagesPath = widget.otherUser.uid + widget.auth.currentUser.uid;
     }
-    print('path 2 : $messagesPath');
+    if(widget.otherUser.type == 'Doctor')
+      name = 'Dr/';
+    name += widget.otherUser.firstname + ' ' + widget.otherUser.lastname;
   }
 
   @override
@@ -130,7 +133,7 @@ class _ChatRoomState extends State<ChatRoom> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.otherUser.firstname + ' ' + widget.otherUser.lastname,
+                  name,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white

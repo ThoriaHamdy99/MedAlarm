@@ -33,6 +33,14 @@ class _UserProfileState extends State {
 
     return Scaffold(
       appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
         title: const Text('User Profile'),
         actions: [
           IconButton(

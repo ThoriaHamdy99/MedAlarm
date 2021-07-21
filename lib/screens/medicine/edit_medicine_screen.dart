@@ -155,52 +155,52 @@ class _EditMedicineState extends State<EditMedicine> {
 
   confirmDeleteMed(BuildContext context) async {
     showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      elevation: 10,
-                      title: Text(
-                        "Delete medicine!",
-                        style: TextStyle(
-                          color: Theme.of(context).accentColor,
-                          fontSize: 23,
-                        ),
-                      ),
-                      content: Text(
-                        "Would you like to delete ${sMedicine.medName} medicine?",
-                        style: TextStyle(color: Colors.black54, fontSize: 20),
-                      ),
-                      actions: [
-                        FlatButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              "Cancel",
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                              ),
-                            )),
-                        FlatButton(
-                            onPressed: () async {
-                              try {
-                                await _sqlHelper
-                                    .deleteMedicine(sMedicine.medName);
-                                //await _sqlHelper.getMedicine(sMedicine.medName);
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                setState(() {});
-                              } catch (e) {}
-                            },
-                            child: Text(
-                              "Ok",
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                              ),
-                            )),
-                      ],
-                    );
-                  });
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          elevation: 10,
+          title: Text(
+            "Delete medicine!",
+            style: TextStyle(
+              color: Theme.of(context).accentColor,
+              fontSize: 23,
+            ),
+          ),
+          content: Text(
+            "Would you like to delete ${sMedicine.medName} medicine?",
+            style: TextStyle(color: Colors.black54, fontSize: 20),
+          ),
+          actions: [
+            FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                  ),
+                )),
+            FlatButton(
+                onPressed: () async {
+                  try {
+                    await _sqlHelper
+                        .deleteMedicine(sMedicine.id);
+                    //await _sqlHelper.getMedicine(sMedicine.medName);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    setState(() {});
+                  } catch (e) {}
+                },
+                child: Text(
+                  "Ok",
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                  ),
+                )),
+          ],
+        );
+      });
   }
 
   //--------------------------------------------------
@@ -365,80 +365,79 @@ class _EditMedicineState extends State<EditMedicine> {
   //--------------------------------------------------
   Padding startDatePicker(BuildContext context) {
     return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            top: 3.0, left: 10.0, right: 10.0),
-                        child: Text(
-                          "Start date",
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMd().format(sMedicine.startDate),
-                        style: TextStyle(
-                          fontSize: 15,
-                        ),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
-                          ),
-                          primary:
-                              Theme.of(context).accentColor, // background
-                          onPrimary: Colors.white, // foreground
-                        ),
-                        child: new Icon(Icons.date_range),
-                        onPressed: () => showRoundedDatePicker(
-                          context: context,
-                          theme: Theme.of(context),
-                          initialDate: sMedicine.startDate,
-                          firstDate:
-                              DateTime.now().subtract(Duration(days: 1)),
-                          lastDate: DateTime(DateTime.now().year + 10),
-                          borderRadius: 16,
-                          onTapDay: (DateTime dateTime, bool available) {
-                            if (!available) {
-                              showDialog(
-                                context: context,
-                                builder: (c) => AlertDialog(
-                                  title:
-                                      Text("This date cannot be selected."),
-                                  actions: <Widget>[
-                                    CupertinoDialogAction(
-                                      child: Text("OK"),
-                                      onPressed: () => Navigator.pop(context),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                            setState(() {
-                              sMedicine.startDate = dateTime;
-                              if (sMedicine.startDate
-                                      .toIso8601String()
-                                      .substring(0, 10)
-                                      .compareTo(sMedicine.endDate
-                                          .toIso8601String()
-                                          .substring(0, 10)) >=
-                                  0)
-                                sMedicine.endDate = sMedicine.startDate
-                                    .add(Duration(days: 1));
-                            });
-                            return available;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+      padding:
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 3.0, left: 10.0, right: 10.0),
+              child: Text(
+                "Start date",
+                style: TextStyle(
+                    fontSize: 25, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Text(
+              DateFormat.yMMMd().format(sMedicine.startDate),
+              style: TextStyle(
+                fontSize: 15,
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(50.0),
                 ),
-              );
+                primary:
+                    Theme.of(context).accentColor, // background
+                onPrimary: Colors.white, // foreground
+              ),
+              child: new Icon(Icons.date_range),
+              onPressed: () => showRoundedDatePicker(
+                context: context,
+                theme: Theme.of(context),
+                initialDate: sMedicine.startDate,
+                firstDate:
+                    DateTime.now().subtract(Duration(days: 1)),
+                lastDate: DateTime(DateTime.now().year + 10),
+                borderRadius: 16,
+                onTapDay: (DateTime dateTime, bool available) {
+                  if (!available) {
+                    showDialog(
+                      context: context,
+                      builder: (c) => AlertDialog(
+                        title: Text("This date cannot be selected."),
+                        actions: <Widget>[
+                          CupertinoDialogAction(
+                            child: Text("OK"),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  setState(() {
+                    sMedicine.startDate = dateTime;
+                    if (sMedicine.startDate
+                            .toIso8601String()
+                            .substring(0, 10)
+                            .compareTo(sMedicine.endDate
+                                .toIso8601String()
+                                .substring(0, 10)) >=
+                        0)
+                      sMedicine.endDate = sMedicine.startDate
+                          .add(Duration(days: 1));
+                  });
+                  return available;
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
   //--------------------------------------------------
 
@@ -501,10 +500,10 @@ class _EditMedicineState extends State<EditMedicine> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Duration        ', style: TextStyle(fontSize: 18,)),
+          Text('Duration', style: TextStyle(fontSize: 18,)),
           DropdownButton(
             value: sMedicine.interval,
-            items: <String>['daily', 'weekly', 'monthly',
+            items: <String>['once', 'daily', 'weekly', 'monthly',
             ].map((String value) {
               return DropdownMenuItem(
                   value: value, child: Text(value));
@@ -527,13 +526,13 @@ class _EditMedicineState extends State<EditMedicine> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Medication Type        ', style: TextStyle(fontSize: 18,)),
+                    Text('Medication Type', style: TextStyle(fontSize: 18,)),
                     DropdownButton(
                       value: sMedicine.medType,
                       items: <String>[
-                        'Pill',
-                        'Solution',
-                        'Injection',
+                        'Pills',
+                        'Solutions',
+                        'Injections',
                         'Drops',
                         'Powder',
                         'other'

@@ -67,11 +67,15 @@ class _ChatsScreenState extends State<ChatsScreen> {
               child: ListTile(
                 leading: Hero(
                   tag: 'ChatBot',
-                  child: Icon(
-                    Icons.android,
-                    size: 40,
-                    color: Theme.of(context).accentColor,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Image.asset('./assets/chatbot.png'),
                   ),
+                  // Icon(
+                  //   Icons.android,
+                  //   size: 40,
+                  //   color: Theme.of(context).accentColor,
+                  // ),
                 ),
                 title: Text('Chat Bot', style: TextStyle(fontSize: 16)),
                 onTap: () {

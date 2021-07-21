@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/screens/home_tabs/calender_screen.dart';
+import 'package:med_alarm/utilities/push_notifications.dart';
 
 import 'chat/chats_screen.dart';
 import 'home_tabs/medicine_screen.dart';
@@ -23,46 +24,21 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    PushNotificationsManager().init();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-    //   appBar: AppBar(
-    //     title: Text(hello),
-    //     actions: [
-    //       DropdownButton(
-    //         icon: Icon(
-    //           Icons.more_vert,
-    //           color: Theme.of(context).primaryIconTheme.color,
-    //         ),
-    //         items: [
-    //           DropdownMenuItem(
-    //             child: Row(children: [
-    //               Icon(Icons.exit_to_app),
-    //               SizedBox(width: 8),
-    //               Text('Logout')
-    //             ]),
-    //             value: 'logout',
-    //           ),
-    //         ],
-    //         onChanged: (itemIdentifier) {
-    //           if (itemIdentifier == 'logout') {
-    //             FirebaseProvider.instance.logout();
-    //             Navigator.of(context).push(MaterialPageRoute(
-    //               builder: (context) => MyApp(),
-    //             ));
-    //           }
-    //         },
-    //       )
-    //     ],
-    //   ),
       body: _tabs[_navBarIndex],
       bottomNavigationBar: BottomNavigationBar(
         iconSize: 30,
         items: [
           buildBottomNavigationBarItem(Icons.home, "Home"),
-          // buildBottomNavigationBarItem(Icons.notifications, "Updates"),
           buildBottomNavigationBarItem(Icons.medical_services, "Medicine"),
           buildBottomNavigationBarItem(Icons.message_rounded, "Messages"),
-          // buildBottomNavigationBarItem(Icons.analytics, "Report"),
           buildBottomNavigationBarItem(Icons.more_horiz, "More"),
         ],
         currentIndex: _navBarIndex,

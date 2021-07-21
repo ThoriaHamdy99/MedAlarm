@@ -69,11 +69,15 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
               tag: 'ChatBot',
               child: Container(
                 height: 50,
-                child: Icon(
-                  Icons.android,
-                  size: 50,
-                  color: Colors.white,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: Image.asset('./assets/chatbot.png'),
                 ),
+                // Icon(
+                //   Icons.android,
+                //   size: 50,
+                //   color: Colors.white,
+                // ),
               ),
             ),
             SizedBox(

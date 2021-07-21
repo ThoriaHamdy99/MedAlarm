@@ -54,6 +54,7 @@ class SQLHelper {
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               name TEXT NOT NULL UNIQUE,
               type TEXT NOT NULL,
+              description TEXT NOT NULL,
               startDate INT NOT NULL,
               endDate INT NOT NULL,
               medAmount INT NOT NULL,
@@ -64,10 +65,11 @@ class SQLHelper {
               intervalTime INT);''');
 
       await db.execute('''CREATE TABLE Dose(
-              name TEXT NOT NULL REFERENCES Medicine(name),
-              dateTime INT NOT NULL,
+              id INTEGER NOT NULL REFERENCES Medicine(id),
+              doseTime INT NOT NULL,
               taken INT NOT NULL,
-              PRIMARY KEY (name, dateTime));''');
+              snoozed INT NOT NULL,
+              PRIMARY KEY (id, doseTime));''');
 
       print('DB Initialized successfully');
     } catch (e) {
@@ -160,7 +162,7 @@ class SQLHelper {
     try {
       result = await db.rawInsert('''INSERT INTO Medicine(
         name, type, startDate, endDate, medAmount, doseAmount,
-        nDoses, startTime, interval, intervalTime)
+        description, nDoses, startTime, interval, intervalTime)
         VALUES(
         '${med.medName}',
         '${med.medType}',
@@ -168,6 +170,7 @@ class SQLHelper {
         '${med.endDate.millisecondsSinceEpoch}',
         '${med.medAmount}',
         '${med.doseAmount}',
+        '${med.description}',
         '${med.numOfDoses}',
         '${med.startTime.millisecondsSinceEpoch}',
         '${med.interval}',
@@ -220,7 +223,7 @@ class SQLHelper {
 
     try {
       var result = await db.rawQuery(
-          'SELECT * FROM Medicine WHERE name = $medName;');
+          "SELECT * FROM Medicine WHERE name = '$medName';");
       if (result.isEmpty) return null;
       // print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
       // print(result[0]['name']);
@@ -254,12 +257,12 @@ class SQLHelper {
     }
   }
 
-  Future<bool> deleteMedicine(String medName) async {
+  Future<bool> deleteMedicine(int id) async {
     Database db = await database;
     try {
-      if(!await deleteMedicineDoses(medName)) throw 'Doses aren\'t deleted';
+      if(!await deleteMedicineDoses(id)) throw 'Doses aren\'t deleted';
       await db.rawDelete(
-          "DELETE FROM Medicine WHERE name = '$medName'");
+          "DELETE FROM Medicine WHERE id = '$id'");
       return true;
     } catch (e) {
       print(e);
@@ -267,15 +270,16 @@ class SQLHelper {
     }
   }
 
-  Future<bool> insertDose(String medName, Dose dose) async {
+  Future<bool> insertDose(int id, Dose dose) async {
     Database db = await this.database;
     var result;
     try {
-      result = await db.rawInsert('''insert into Dose
+      result = await db.rawInsert('''INSERT INTO Dose
         values(
-        '${medName}',
-        '${dose.dateTime.millisecondsSinceEpoch}',
-        '${dose.taken ? 1 : 0}')''');
+        '$id',
+        '${dose.doseTime.millisecondsSinceEpoch}',
+        '${dose.taken ? 1 : 0}',
+        '${dose.snoozed ? 1 : 0}')''');
       print('+++++++++++++++++++++ From InsertDose +++++++++++++++++++++');
       if(result != null) {
         print('Dose Added');
@@ -288,24 +292,65 @@ class SQLHelper {
     return false;
   }
 
-  Future<List<Dose>> getMedicineDoses(String medName) async {
+  Future<bool> replaceDose(map) async {
+    Database db = await this.database;
+    var result;
+    try {
+      print('Replaced Dose Info');
+      print(map['id']);
+      print(map['doseTime']);
+      print(map['taken']);
+      print(map['snoozed']);
+      result = await db.rawInsert('''REPLACE INTO Dose
+        (id, doseTime, taken, snoozed)
+        values(
+        '${map['id']}',
+        '${map['doseTime']}',
+        '${map['taken']}',
+        '${map['snoozed']}')''');
+      print('+++++++++++++++++++++ From ReplaceDose +++++++++++++++++++++');
+      if(result != null) {
+        print('Dose Replaced');
+        return true;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+    return false;
+  }
+
+  Future<Dose> getMedicineDose(int id, doseTime) async {
+    Database db = await database;
+    try {
+      var result = await db.rawQuery("SELECT * FROM Dose WHERE id = '$id' "
+          "AND doseTime = '$doseTime';");
+      if(result.isEmpty) return null;
+      return Dose.fromMap(result[0]);
+    } catch (e) {
+      throw 'Dose with id = $id and time = $doseTime is not found';
+    }
+  }
+
+  Future<List<Dose>> getMedicineDoses(int id) async {
     Database db = await database;
     List<Dose> doses = [];
     try {
-      var result = await db.rawQuery('SELECT * FROM Dose WHERE name = $medName;');
+      var result = await db.rawQuery("SELECT * FROM Dose WHERE id = '$id';");
       print(result.length);
       result.forEach((dose) => doses.add(Dose.fromMap(dose)));
       return doses;
     } catch (e) {
-      throw '$medName is not found to add its doses';
+      throw 'Medicine ID: $id is not found to add its doses';
     }
   }
 
-  Future<bool> deleteDose(String medName, DateTime time) async {
+  Future<bool> deleteDose(int id, DateTime time) async {
     Database db = await database;
     try {
       await db.rawDelete(
-          "DELETE FROM Dose WHERE name = $medName AND dateTime = $time");
+          "DELETE FROM Dose WHERE name = '$id' "
+          "AND doseTime = '${time.millisecondsSinceEpoch}'");
       return true;
     } catch (e) {
       print(e);
@@ -313,10 +358,10 @@ class SQLHelper {
     }
   }
 
-  Future<bool> deleteMedicineDoses(String medName) async {
+  Future<bool> deleteMedicineDoses(int id) async {
     Database db = await database;
     try {
-      await db.rawDelete("DELETE FROM Dose WHERE name = '$medName';");
+      await db.rawDelete("DELETE FROM Dose WHERE id = '$id';");
       return true;
     } catch (e) {
       return false;
@@ -335,7 +380,48 @@ class SQLHelper {
   deleteTables() async {
     Database db = await database;
     await db.execute('DELETE FROM User');
-    await db.execute('DELETE FROM Medicine');
     await db.execute('DELETE FROM Dose');
+    await db.execute('DELETE FROM Medicine');
+    await recreateDB();
+  }
+
+  recreateDB() async {
+    Database db = await database;
+    await db.execute('DROP TABLE User');
+    await db.execute('DROP TABLE Dose');
+    await db.execute('DROP TABLE Medicine');
+
+    await db.execute('''CREATE TABLE User(
+              uid TEXT PRIMARY KEY,
+              email TEXT NOT NULL,
+              type TEXT NOT NULL,
+              speciality TEXT,
+              firstname TEXT NOT NULL,
+              lastname TEXT NOT NULL,
+              profPicURL TEXT NOT NULL,
+              phoneNumber TEXT NOT NULL,
+              address TEXT NOT NULL,
+              dob INT NOT NULL);''');
+
+    await db.execute('''CREATE TABLE Medicine(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL UNIQUE,
+              type TEXT NOT NULL,
+              description TEXT NOT NULL,
+              startDate INT NOT NULL,
+              endDate INT NOT NULL,
+              medAmount INT NOT NULL,
+              doseAmount INT NOT NULL,
+              nDoses INT NOT NULL,
+              startTime INT NOT NULL,
+              interval TEXT NOT NULL,
+              intervalTime INT);''');
+
+    await db.execute('''CREATE TABLE Dose(
+              id INTEGER NOT NULL REFERENCES Medicine(id),
+              doseTime INT NOT NULL,
+              taken INT NOT NULL,
+              snoozed INT NOT NULL,
+              PRIMARY KEY (id, doseTime));''');
   }
 }

@@ -1,15 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/home_screen.dart';
+import 'package:med_alarm/service/alarm.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:validators/validators.dart';
 
-Medicine medInfo = new Medicine();
 final _formKey = new GlobalKey<FormState>();
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 class MedDetails extends StatefulWidget {
@@ -66,11 +67,12 @@ class _BottomContainer extends StatefulWidget {
 }
 
 class _BottomContainerState extends State<_BottomContainer> {
-  String dropDownValue = 'Pill';
+  Medicine medInfo = new Medicine();
+  String dropDownValue = 'Pills';
   String durationValue = 'once';
   int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
-  var items = ['Pill', 'Solution', 'Injection', 'Drops', 'Powder', 'other'];
+  var items = ['Pills', 'Solutions', 'Injections', 'Drops', 'Powder', 'other'];
   var durationItems = ['once', 'daily', 'weekly', 'monthly'];
   bool isDaily = false;
   var dropnDoses6H = [2, 3, 4];
@@ -83,6 +85,7 @@ class _BottomContainerState extends State<_BottomContainer> {
     medInfo.interval = durationValue;
     medInfo.intervalTime = dropDownValueDoses;
     medInfo.numOfDoses = dropnDosesValue;
+    medInfo.description = '';
     super.initState();
   }
 
@@ -95,7 +98,7 @@ class _BottomContainerState extends State<_BottomContainer> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MedReminderDetails(),
+            builder: (context) => MedReminderDetails(medInfo),
           ),
         );
       } else {
@@ -399,6 +402,10 @@ class PanelTitle extends StatelessWidget {
 }
 
 class MedReminderDetails extends StatefulWidget {
+  final Medicine medInfo;
+
+  MedReminderDetails(this.medInfo);
+
   @override
   _MedReminderDetailsState createState() => _MedReminderDetailsState();
 }
@@ -438,7 +445,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
         //     .of(context)
         //     .accentColor,
         child: Container(
-          child: _ReminderDetailsContainer(),
+          child: _ReminderDetailsContainer(widget.medInfo),
         ),
       ),
     );
@@ -446,6 +453,10 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
 }
 
 class _ReminderDetailsContainer extends StatefulWidget {
+  final Medicine medInfo;
+
+  _ReminderDetailsContainer(this.medInfo);
+
   @override
   _ReminderDetailsContainerState createState() =>
       _ReminderDetailsContainerState();
@@ -464,11 +475,11 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
     firstDate: medInfo.startDate.add(Duration(days: 1)),
     */
     setState(() {
-    medInfo.startDate = DateTime.parse(DateTime.now().toIso8601String().substring(0,10));
-    medInfo.endDate = medInfo.startDate.add(Duration(days: 1, hours: 1));
-    print(medInfo.startDate.add(Duration(days: 1)));
-    print(medInfo.endDate);
-    medInfo.startTime = DateTime.now();
+    widget.medInfo.startDate = DateTime.parse(DateTime.now().toIso8601String().substring(0,10));
+    widget.medInfo.endDate = widget.medInfo.startDate.add(Duration(days: 1, hours: 1));
+    // print(widget.medInfo.startDate.add(Duration(days: 1)));
+    // print(widget.medInfo.endDate);
+    widget.medInfo.startTime = DateTime.now();
 
     });
     super.initState();
@@ -478,10 +489,10 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
+        // localizationsDelegates: [
+        //   GlobalMaterialLocalizations.delegate,
+        //   GlobalWidgetsLocalizations.delegate,
+        // ],
         supportedLocales: [
           const Locale('en', 'US'),
         ],
@@ -511,7 +522,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         ),
                       ),
                       Text(
-                        DateFormat.yMMMd().format(medInfo.startDate),
+                        DateFormat.yMMMd().format(widget.medInfo.startDate),
                         style: TextStyle(
                           fontSize: 15,
                         ),
@@ -532,7 +543,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                           showRoundedDatePicker(
                             context: context,
                             theme: Theme.of(context),
-                            initialDate: medInfo.startDate,
+                            initialDate: widget.medInfo.startDate,
                             firstDate: DateTime.now().subtract(Duration(days: 1)),
                             lastDate: DateTime(DateTime.now().year + 10),
                             borderRadius: 16,
@@ -552,10 +563,10 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                                 );
                               }
                               setState(() {
-                                medInfo.startDate = dateTime;
-                                if (medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
-                                    medInfo.endDate.toIso8601String().substring(0 ,10)) >= 0)
-                                  medInfo.endDate = medInfo.startDate.add(Duration(days: 1));
+                                widget.medInfo.startDate = dateTime;
+                                if (widget.medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
+                                    widget.medInfo.endDate.toIso8601String().substring(0 ,10)) >= 0)
+                                  widget.medInfo.endDate = widget.medInfo.startDate.add(Duration(days: 1));
                               });
                               return available;
                             },
@@ -569,7 +580,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         ),
                       ),
                       Text(
-                        DateFormat.yMMMd().format(medInfo.endDate),
+                        DateFormat.yMMMd().format(widget.medInfo.endDate),
                         style: TextStyle(
                           fontSize: 15,
                         ),
@@ -587,8 +598,8 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                           showRoundedDatePicker(
                             context: context,
                             theme: Theme.of(context),
-                            initialDate: medInfo.endDate,
-                            firstDate: medInfo.startDate.add(Duration(days: 1)),
+                            initialDate: widget.medInfo.endDate,
+                            firstDate: widget.medInfo.startDate.add(Duration(days: 1)),
                             lastDate: DateTime(DateTime.now().year + 10),
                             borderRadius: 16,
                             onTapDay: (DateTime dateTime, bool available) {
@@ -607,7 +618,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                                 );
                               }
                               setState(() {
-                                medInfo.endDate = dateTime;
+                                widget.medInfo.endDate = dateTime;
                               });
                               return available;
                             },
@@ -636,7 +647,7 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         itemHeight: 40,
                         isForce2Digits: true,
                         onTimeChange: (time) {
-                            medInfo.startTime = time.subtract(Duration(minutes: 1));
+                            widget.medInfo.startTime = time.subtract(Duration(minutes: 1));
                         },
                       ),
                       SizedBox(
@@ -656,25 +667,26 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                             borderRadius: BorderRadius.circular(50.0)),
                         onPressed: () async {
                           try {
-                            if (medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
-                                medInfo.startTime.toIso8601String().substring(0 ,10)) == 0) {
-                              print(medInfo.startTime);
+                            if (isSameDay(widget.medInfo.startDate, widget.medInfo.startTime)) {
+                              print(widget.medInfo.startTime);
                               print(DateTime.now());
-                              if(medInfo.startTime.difference(
+                              if(widget.medInfo.startTime.difference(
                                   DateTime.now()
                               ).inSeconds < 0) {
                                 throw 'Choose time after now';
                               }
                             }
-                            if (!await _sqlHelper.insertMedicine(medInfo)) {
+                            if (!await _sqlHelper.insertMedicine(widget.medInfo)) {
                               print('Med Not Inserted');
                               return;
                             }
-                            Navigator.pop(context);
-                            Navigator.pop(context);
+                            await Alarm.setAlarm(await _sqlHelper.getMedicine(widget.medInfo.medName));
+                            while (Navigator.of(context).canPop())
+                              Navigator.pop(context);
                             Navigator.pushReplacementNamed(
                                 context, HomeScreen.id);
                           } catch (e) {
+                            print(e);
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(e.toString()),
                               duration: Duration(seconds: 3),

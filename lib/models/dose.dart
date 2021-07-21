@@ -2,40 +2,46 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class Dose {
-  DateTime dateTime;
+  DateTime doseTime;
   bool taken;
+  bool snoozed;
 
   Dose({
-    this.dateTime,
+    this.doseTime,
     this.taken,
+    this.snoozed,
   });
 
   factory Dose.fromMap(map) {
     return Dose(
-      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime']),
+      doseTime: DateTime.fromMillisecondsSinceEpoch(map['doseTime']),
       taken: map['taken'] == 1 ? true : false,
+      snoozed: map['snoozed'] == 1 ? true : false,
     );
   }
 
   Map toMap() {
     return {
-      'dateTime': dateTime.millisecondsSinceEpoch,
+      'doseTime': doseTime.millisecondsSinceEpoch,
       'taken': taken ? 1 : 0,
+      'snoozed': snoozed ? 1 : 0,
     };
   }
 
   factory Dose.fromDoc(doc) {
     return Dose(
-      dateTime: DateTime.fromMillisecondsSinceEpoch(doc.get('dateTime').millisecondsSinceEpoch),
+      doseTime: DateTime.fromMillisecondsSinceEpoch(doc.get('doseTime').millisecondsSinceEpoch),
       taken: doc.get('taken'),
+      snoozed: doc.get('snoozed'),
     );
   }
 
   Map toDoc() {
     return {
-      'dateTime': Timestamp.fromMillisecondsSinceEpoch(
-          dateTime.millisecondsSinceEpoch),
+      'doseTime': Timestamp.fromMillisecondsSinceEpoch(
+          doseTime.millisecondsSinceEpoch),
       'taken': taken,
+      'snoozed': snoozed,
     };
   }
 }

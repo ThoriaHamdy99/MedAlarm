@@ -74,7 +74,7 @@ class MoreScreen extends StatelessWidget {
         size: 50,
         color: Theme.of(context).accentColor,
       ),
-      title: Text('Synchronize Data'),
+      title: Text('Syncing Data'),
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(SyncMedsScreen.id);
@@ -104,7 +104,7 @@ class MoreScreen extends StatelessWidget {
         size: 50,
         color: Theme.of(context).accentColor,
       ),
-      title: Text('Report'),
+      title: Text('Reports'),
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(ReportScreen.id);
@@ -119,7 +119,7 @@ class MoreScreen extends StatelessWidget {
         size: 50,
         color: Theme.of(context).accentColor,
       ),
-      title: Text('Notification'),
+      title: Text('Notifications'),
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(LocalNotificationScreen.id);

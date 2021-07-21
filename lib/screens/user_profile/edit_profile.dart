@@ -61,7 +61,17 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
+        title: const Text('Edit Profile'),
+      ),
       body: Form(
         key: _globalKey,
         child: ListView(
