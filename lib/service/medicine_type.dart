@@ -1,7 +1,7 @@
 class MedicineType{
   static String pill = 'assets/medicine_icons/pill.jpg';
-  static String solution = 'assets/medicine_icons/solution.jpg';
-  static String injection = 'assets/medicine_icons/injection.png';
+  static String solution = 'assets/medicine_icons/solutions.jpg';
+  static String injection = 'assets/medicine_icons/injections.png';
   static String powder = 'assets/medicine_icons/powder.png';
   static String drops = 'assets/medicine_icons/drops.png';
   static String other = 'assets/medicine_icons/other.jpg';

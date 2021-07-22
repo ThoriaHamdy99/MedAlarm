@@ -93,7 +93,7 @@ class _ViewMedicineScreenState extends State<ViewMedicineScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(90),
                   image: DecorationImage(
-                    image: AssetImage('./assets/medicine_icons/other.jpg'),
+                    image: AssetImage('./assets/medicine_icons/${widget.med.medType}.jpg'),
                     fit: BoxFit.fill,
                   ),
                 ),

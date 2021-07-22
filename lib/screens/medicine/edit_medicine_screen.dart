@@ -4,10 +4,8 @@ import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/screens/home_screen.dart';
 import 'package:med_alarm/service/alarm.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:validators/validators.dart';
 
 final _formKey = new GlobalKey<FormState>();
@@ -29,7 +27,7 @@ class _EditMedicineState extends State<EditMedicine> {
   String durationValue = 'once';
   int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
-  var items = ['Pills', 'Solutions', 'Injections', 'Drops', 'Powder', 'other'];
+  var items = ['Pills', 'Solutions', 'Injections', 'Drops', 'Powder', 'Other'];
   var durationItems = ['once', 'daily', 'weekly', 'monthly'];
   bool isDaily = false;
   var dropnDoses6H = [2, 3, 4];

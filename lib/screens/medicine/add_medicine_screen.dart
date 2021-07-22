@@ -60,7 +60,7 @@ class _BottomContainerState extends State<_BottomContainer> {
   String durationValue = 'once';
   int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
-  var items = ['Pills', 'Solutions', 'Injections', 'Drops', 'Powder', 'other'];
+  var items = ['Pills', 'Solutions', 'Injections', 'Drops', 'Powder', 'Other'];
   var durationItems = ['once', 'daily', 'weekly', 'monthly'];
   bool isDaily = false;
   var dropnDoses6H = [2, 3, 4];

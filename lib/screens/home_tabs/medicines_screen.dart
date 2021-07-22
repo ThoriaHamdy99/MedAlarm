@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/screens/medicine/edit_medicine_screen.dart';
 import 'package:med_alarm/screens/medicine/view_medicine_screen.dart';
 import 'package:med_alarm/service/alarm.dart';
-// import 'package:med_alarm/screens/medicine/edit_medicine_screen.dart';
-import 'package:med_alarm/service/chatbot.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
 import '../medicine/add_medicine_screen.dart';
@@ -171,7 +167,12 @@ class _MedicineScreenState extends State<MedicineScreen> {
           ).whenComplete((){setState(() {});});
         },
         child: ListTile(
-          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+          contentPadding: EdgeInsets.symmetric(vertical: 15),
+          leading: CircleAvatar(
+            child: Image.asset('./assets/medicine_icons/${med.medType}.jpg'),
+            radius: 40,
+            backgroundColor: Colors.black,
+          ),
           title: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,7 +191,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                DateFormat.jm().format(med.startTime),
+                med.interval,
                 style: TextStyle(
                   fontSize: 20,
                 ),
