@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'edit_medicine_screen.dart';
 
 class ViewMedicineScreen extends StatefulWidget {
-  final Medicine med;
+  Medicine med;
 
   ViewMedicineScreen(this.med);
 
@@ -36,7 +36,16 @@ class _ViewMedicineScreenState extends State<ViewMedicineScreen> {
                 MaterialPageRoute(builder: (BuildContext context) {
                   return EditMedicine(widget.med);
                 })
-              ).whenComplete(() => setState(() {}));
+              ).then((newMed) {
+                if(newMed != null) {
+                  widget.med = newMed;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Medicine updated successfully'),
+                    duration: Duration(seconds: 3),
+                    backgroundColor: Theme.of(context).accentColor,
+                  ));
+                }
+              }).whenComplete(() => setState(() {}));
             },
             // color: Colors.black,
           ),
@@ -53,7 +62,7 @@ class _ViewMedicineScreenState extends State<ViewMedicineScreen> {
           otherDetails("Alarm starts at", parseTime(widget.med.startTime)),
           otherDetails("Alarm type", widget.med.interval),
           otherDetails("Daily interval (Hours)", '${widget.med.intervalTime}'),
-          otherDetails("Doses per day", '${widget.med.numOfDoses}'),
+          otherDetails("Doses per day", '${widget.med.nDoses}'),
           otherDetails("Start date", parseDate(widget.med.startDate)),
           otherDetails("End date", parseDate(widget.med.endDate)),
           SizedBox(height: 5),

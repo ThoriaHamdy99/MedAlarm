@@ -96,8 +96,9 @@ class _BottomContainerState extends State<_BottomContainer> {
     medInfo.medType = dropDownValue;
     medInfo.interval = durationValue;
     medInfo.intervalTime = dropDownValueDoses;
-    medInfo.numOfDoses = dropnDosesValue;
+    medInfo.nDoses = dropnDosesValue;
     medInfo.description = '';
+    medInfo.isOn = true;
     super.initState();
   }
 
@@ -190,7 +191,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                   dropnDosesValue = newValue;
                 });
                 // }
-                medInfo.numOfDoses = dropnDosesValue;
+                medInfo.nDoses = dropnDosesValue;
               },
               style: TextStyle(
                 fontSize: 18,
@@ -212,7 +213,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                   dropnDosesValue = newValue;
                 });
                 // }
-                medInfo.numOfDoses = dropnDosesValue;
+                medInfo.nDoses = dropnDosesValue;
               },
               style: TextStyle(
                 fontSize: 18,
@@ -418,7 +419,7 @@ class _BottomContainerState extends State<_BottomContainer> {
         decoration: InputDecoration(
           border: tfBorder,
           focusedBorder: tfFBorder,
-          labelText: "Notes",
+          labelText: "Notes (Optional)",
           hintText: "Notes (Optional)",
         ),
       ),
@@ -467,6 +468,20 @@ class MedReminderDetails extends StatefulWidget {
 }
 
 class _MedReminderDetailsState extends State<MedReminderDetails> {
+  SQLHelper _sqlHelper = SQLHelper();
+  bool beforeNow = true;
+
+  @override
+  void initState() {
+    setState(() {
+      widget.medInfo.startDate =
+          DateTime.parse(DateTime.now().toIso8601String().substring(0,10));
+      widget.medInfo.endDate =
+          widget.medInfo.startDate.add(Duration(days: 1, hours: 1));
+      widget.medInfo.startTime = DateTime.now();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -482,41 +497,6 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
         centerTitle: true,
         title: Text("Medicine Details",),
       ),
-      body: Container(
-        child: _ReminderDetailsContainer(widget.medInfo),
-      ),
-    );
-  }
-}
-
-class _ReminderDetailsContainer extends StatefulWidget {
-  final Medicine medInfo;
-
-  _ReminderDetailsContainer(this.medInfo);
-
-  @override
-  _ReminderDetailsContainerState createState() =>
-      _ReminderDetailsContainerState();
-}
-
-class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
-  SQLHelper _sqlHelper = SQLHelper();
-  bool beforeNow = true;
-
-  @override
-  void initState() {
-    setState(() {
-    widget.medInfo.startDate = DateTime.parse(DateTime.now().toIso8601String().substring(0,10));
-    widget.medInfo.endDate = widget.medInfo.startDate.add(Duration(days: 1, hours: 1));
-    widget.medInfo.startTime = DateTime.now();
-
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
       body: Center(
         child: Container(
           child: SingleChildScrollView(
@@ -692,7 +672,13 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                           print('Med Not Inserted');
                           return;
                         }
-                        await Alarm.setAlarm(await _sqlHelper.getMedicine(widget.medInfo.medName));
+                        await Alarm.setAlarm(await _sqlHelper
+                            .getMedicine(widget.medInfo.medName));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Medicine added successfully'),
+                          duration: Duration(seconds: 3),
+                          backgroundColor: Theme.of(context).accentColor,
+                        ));
                         while (Navigator.of(context).canPop())
                           Navigator.pop(context);
                         Navigator.pushReplacementNamed(

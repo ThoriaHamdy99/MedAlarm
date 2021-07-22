@@ -49,7 +49,6 @@ class _UserProfileState extends State {
               Navigator.of(context).pushNamed(EditProfile.id)
                 .whenComplete(() => setState(() {}));
             },
-            color: Colors.black,
           ),
         ],
       ),

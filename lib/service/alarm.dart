@@ -6,6 +6,7 @@ import 'package:med_alarm/utilities/sql_helper.dart';
 class Alarm {
   static setAlarm(Medicine med) async {
     try {
+      print(med.startDate);
       await notification.showNotificationAtScheduleTime(med);
     } catch (e) {
       print(e);
@@ -23,8 +24,8 @@ class Alarm {
     }
   }
 
-  static pauseAlarm(Medicine med) {
-
+  static pauseAlarm(Medicine med) async {
+    await notification.cancelNotification(med.id);
   }
 
   static deleteAlarm(Medicine med) {
@@ -39,7 +40,7 @@ class Alarm {
     await SQLHelper.getInstant().replaceDose(map);
     Medicine med = Medicine.fromMapString(map);
     if(med.medAmount > 0) {
-      med.medAmount--;
+      med.medAmount -= med.doseAmount;
       print('Remaining amount: ${med.medAmount} ${med.medType}');
       await SQLHelper.getInstant().updateMedicine(med);
       switch(med.interval) {

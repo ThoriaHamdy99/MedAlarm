@@ -178,8 +178,10 @@ class Notification {
   }
 
   Future<void> showNotificationAtScheduleTime(Medicine med) async {
+    print('here');
     DateTime scheduleTime = DateTime(med.startDate.year, med.startDate.month,
         med.startDate.day, med.startTime.hour, med.startTime.minute);
+    print('here 2');
     DateTime breakAlarmTime = DateTime(med.endDate.year, med.endDate.month, med.endDate.day + 1);
     switch (med.interval) {
       case 'once':
@@ -191,7 +193,7 @@ class Notification {
         scheduleTime = DateTime(DateTime.now().year, DateTime.now().month,
             DateTime.now().day, med.startTime.hour, med.startTime.minute);
         while(scheduleTime.isBefore(DateTime.now())) {
-          scheduleTime = scheduleTime.add(Duration(minutes: med.intervalTime));
+          scheduleTime = scheduleTime.add(Duration(hours: med.intervalTime));
           // scheduleTime = scheduleTime.add(Duration(hours: med.intervalTime));
         }
         if(breakAlarmTime.isBefore(DateTime.now())) {

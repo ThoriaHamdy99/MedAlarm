@@ -154,47 +154,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: TableCalendar(
-                  firstDay: firstDay,
-                  lastDay: lastDay,
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  calendarFormat: _calendarFormat,
-                  eventLoader: _getEventsForDay,
-                  startingDayOfWeek: StartingDayOfWeek.saturday,
-                  onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
-                  },
-                  calendarStyle: CalendarStyle(
-                    outsideDaysVisible: false,
-                    todayDecoration: BoxDecoration(
-                      color: Colors.grey,
-                      shape: BoxShape.circle,
-                    ),
-                    todayTextStyle: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                    selectedDecoration: BoxDecoration(
-                      color: Theme.of(context).accentColor,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  onDaySelected: _onDaySelected,
-                  onFormatChanged: (format) {
-                    if (_calendarFormat != format) {
-                      setState(() {
-                        _calendarFormat = format;
-                      });
-                    }
-                  },
-                  headerStyle: HeaderStyle(
-                    titleCentered: false,
-                    formatButtonShowsNext: false,
-                    formatButtonVisible: true,
-                    titleTextStyle: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
+                child: buildTableCalendar(context),
               ),
               const SizedBox(height: 1),
               FutureBuilder<List<Medicine>>(
@@ -247,9 +207,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     borderRadius: BorderRadius.circular(20)),
                                 onPressed: () {
                                   Navigator.of(context)
-                                      .pushNamed(AddMedicineScreen.id).whenComplete(() {
-                                        setState(() {});
-                                        _selectedMeds.value = _getEventsForDay(_selectedDay);
+                                      .pushNamed(AddMedicineScreen.id).whenComplete(() async {
+                                        await updateList();
+                                        // setState(() {});
+                                        // _selectedMeds.value = _getEventsForDay(_selectedDay);
                                   });
                                 },
                                 child: Text(
@@ -329,11 +290,56 @@ class _CalendarScreenState extends State<CalendarScreen> {
           // backgroundColor: Theme.of(context).accentColor,
           child: Icon(Icons.add, color: Colors.white,),
           onPressed: () {
-            Navigator.of(context).pushNamed(AddMedicineScreen.id).whenComplete(() {
-              setState(() {});
-              _selectedMeds.value = _getEventsForDay(_selectedDay);
+            Navigator.of(context).pushNamed(AddMedicineScreen.id).whenComplete(() async {
+              // setState(() {});
+              // _selectedMeds.value = _getEventsForDay(_selectedDay);
+              await updateList();
             });
           },
+        ),
+      ),
+    );
+  }
+
+  TableCalendar<Medicine> buildTableCalendar(BuildContext context) {
+    return TableCalendar(
+      firstDay: firstDay,
+      lastDay: lastDay,
+      focusedDay: _focusedDay,
+      selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+      calendarFormat: _calendarFormat,
+      eventLoader: _getEventsForDay,
+      startingDayOfWeek: StartingDayOfWeek.saturday,
+      onPageChanged: (focusedDay) {
+        _focusedDay = focusedDay;
+      },
+      calendarStyle: CalendarStyle(
+        outsideDaysVisible: false,
+        todayDecoration: BoxDecoration(
+          color: Colors.grey,
+          shape: BoxShape.circle,
+        ),
+        todayTextStyle: TextStyle(
+            color: Colors.white, fontWeight: FontWeight.bold),
+        selectedDecoration: BoxDecoration(
+          color: Theme.of(context).accentColor,
+          shape: BoxShape.circle,
+        ),
+      ),
+      onDaySelected: _onDaySelected,
+      onFormatChanged: (format) {
+        if (_calendarFormat != format) {
+          setState(() {
+            _calendarFormat = format;
+          });
+        }
+      },
+      headerStyle: HeaderStyle(
+        titleCentered: false,
+        formatButtonShowsNext: false,
+        formatButtonVisible: true,
+        titleTextStyle: TextStyle(
+          fontSize: 18,
         ),
       ),
     );
@@ -350,7 +356,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             MaterialPageRoute(
                 builder: (_) => ViewMedicineScreen(med)
             ),
-          ).whenComplete((){setState(() {});});
+          ).whenComplete(() async {await updateList();});
         },
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -387,30 +393,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
             ],
           ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                DateFormat.jm().format(med.startTime),
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-              Switch(
-                value: isSwitched,
-                onChanged: (value){
-                  setState(() {
-                    isSwitched = value;
-                  });
-                },
-                activeColor: Theme.of(context).accentColor,
-                inactiveThumbColor: Colors.white12,
 
+          trailing: Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: Text(
+              DateFormat.jm().format(med.startTime),
+              style: TextStyle(
+                fontSize: 20,
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  updateList() async {
+    setState(() {});
+    allMeds = await _sqlHelper.getAllMedicines();
+    _selectedMeds.value = _getEventsForDay(_selectedDay);
   }
 }

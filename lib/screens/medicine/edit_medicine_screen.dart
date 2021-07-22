@@ -62,12 +62,12 @@ class _EditMedicineState extends State<EditMedicine> {
 
   @override
   void initState() {
-    medInfo = widget.med;
+    medInfo = Medicine.fromMapString(widget.med.toMapString());
     dropDownValue = medInfo.medType;
     durationValue = medInfo.interval;
     dropDownValueDoses = medInfo.intervalTime;
     isDaily = medInfo.interval == 'daily';
-    dropnDosesValue = medInfo.numOfDoses;
+    dropnDosesValue = medInfo.nDoses;
     super.initState();
   }
 
@@ -129,7 +129,6 @@ class _EditMedicineState extends State<EditMedicine> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50.0)),
         onPressed: () {
-
           _submit();
         },
         child: Row(
@@ -177,7 +176,7 @@ class _EditMedicineState extends State<EditMedicine> {
                     dropnDosesValue = newValue;
                   });
                   // }
-                  medInfo.numOfDoses = dropnDosesValue;
+                  medInfo.nDoses = dropnDosesValue;
                 },
                 style: TextStyle(
                   fontSize: 18,
@@ -199,7 +198,7 @@ class _EditMedicineState extends State<EditMedicine> {
                     dropnDosesValue = newValue;
                   });
                   // }
-                  medInfo.numOfDoses = dropnDosesValue;
+                  medInfo.nDoses = dropnDosesValue;
                 },
                 style: TextStyle(
                   fontSize: 18,
@@ -408,7 +407,7 @@ class _EditMedicineState extends State<EditMedicine> {
         decoration: InputDecoration(
           border: tfBorder,
           focusedBorder: tfFBorder,
-          labelText: "Notes",
+          labelText: "Notes (Optional)",
           hintText: "Notes (Optional)",
         ),
       ),
@@ -457,7 +456,7 @@ class MedReminderDetails extends StatefulWidget {
 }
 
 class _MedReminderDetailsState extends State<MedReminderDetails> {
-
+  SQLHelper _sqlHelper = SQLHelper();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -472,30 +471,6 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
         centerTitle: true,
         title: Text("Edit Medicine",),
       ),
-      body: Container(
-        child: _ReminderDetailsContainer(widget.medInfo),
-      ),
-    );
-  }
-}
-
-class _ReminderDetailsContainer extends StatefulWidget {
-  final Medicine medInfo;
-
-  _ReminderDetailsContainer(this.medInfo);
-
-  @override
-  _ReminderDetailsContainerState createState() =>
-      _ReminderDetailsContainerState();
-}
-
-class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
-  SQLHelper _sqlHelper = SQLHelper();
-  bool beforeNow = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
       body: Center(
         child: Container(
           child: SingleChildScrollView(
@@ -659,22 +634,14 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         borderRadius: BorderRadius.circular(50.0)),
                     onPressed: () async {
                       try {
-                        // if (isSameDay(widget.medInfo.startDate, widget.medInfo.startTime)) {
-                        //   print(widget.medInfo.startTime);
-                        //   print(DateTime.now());
-                        //   if(widget.medInfo.startTime.difference(
-                        //       DateTime.now()
-                        //   ).inSeconds < 0) {
-                        //     throw 'Choose time after now';
-                        //   }
-                        // }
                         if (!await _sqlHelper.updateMedicine(widget.medInfo)) {
                           print('Med Not Updated');
                           return;
                         }
-                        await Alarm.updateAlarm(widget.medInfo);
+                        if(widget.medInfo.isOn)
+                          await Alarm.updateAlarm(widget.medInfo);
                         Navigator.pop(context);
-                        Navigator.pop(context);
+                        Navigator.pop(context, widget.medInfo);
                       } catch (e) {
                         print(e);
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

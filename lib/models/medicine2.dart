@@ -11,10 +11,11 @@ class Medicine {
   DateTime endDate;
   int medAmount;
   int doseAmount;
-  int numOfDoses;
+  int nDoses;
   DateTime startTime;
   String interval;
   int intervalTime;
+  bool isOn;
   List<Dose> dosesTaken;
   List<Dose> dosesSnoozed;
   List<Dose> dosesSkipped;
@@ -28,10 +29,11 @@ class Medicine {
     this.endDate,
     this.medAmount,
     this.doseAmount,
-    this.numOfDoses,
+    this.nDoses,
     this.startTime,
     this.interval,
     this.intervalTime,
+    this.isOn,
     this.dosesTaken,
     this.dosesSnoozed,
     this.dosesSkipped
@@ -49,15 +51,16 @@ class Medicine {
       "id": id,
       "name": medName,
       "type": medType,
-      "start": startDate,
-      "end": endDate,
+      "startDate": startDate,
+      "endDate": endDate,
       "medAmount": medAmount,
       "doseAmount": doseAmount,
-      "nDoses": numOfDoses,
+      "nDoses": nDoses,
       "startTime": startTime,
       "interval": interval,
       "intervalTime": intervalTime,
       "description": description,
+      "isOn": isOn,
       //"doses": this.doses
     };
   }
@@ -69,13 +72,14 @@ class Medicine {
       medType: map['type'],
       medAmount: map['medAmount'],
       doseAmount: map['doseAmount'],
-      numOfDoses: map['nDoses'],
+      nDoses: map['nDoses'],
       interval: map['interval'],
       intervalTime: map['intervalTime'],
       startDate: DateTime.fromMillisecondsSinceEpoch(map['startDate']),
       endDate: DateTime.fromMillisecondsSinceEpoch(map['endDate']),
       startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
       description: map['description'],
+      isOn: map['isOn'] == 1,
       // doses: parsedJson['doses'],
     );
     return med;
@@ -86,15 +90,16 @@ class Medicine {
       "id": '$id',
       "name": medName,
       "type": medType,
-      "start": '${startDate.millisecondsSinceEpoch}',
-      "end": '${endDate.millisecondsSinceEpoch}',
+      "startDate": '${startDate.millisecondsSinceEpoch}',
+      "endDate": '${endDate.millisecondsSinceEpoch}',
       "medAmount": '$medAmount',
       "doseAmount": '$doseAmount',
-      "nDoses": '$numOfDoses',
+      "nDoses": '$nDoses',
       "startTime": '${startTime.millisecondsSinceEpoch}',
       "interval": interval,
       "intervalTime": '$intervalTime',
       "description": description,
+      "isOn": isOn ? '1' : '0',
       //"doses": this.doses
     };
   }
@@ -106,13 +111,14 @@ class Medicine {
       medType: map['type'],
       medAmount: int.parse(map['medAmount']),
       doseAmount: int.parse(map['doseAmount']),
-      numOfDoses: int.parse(map['nDoses']),
+      nDoses: int.parse(map['nDoses']),
       interval: map['interval'],
       intervalTime: int.parse(map['intervalTime']),
-      startDate: DateTime.fromMillisecondsSinceEpoch(int.parse(map['start'])),
-      endDate: DateTime.fromMillisecondsSinceEpoch(int.parse(map['end'])),
+      startDate: DateTime.fromMillisecondsSinceEpoch(int.parse(map['startDate'])),
+      endDate: DateTime.fromMillisecondsSinceEpoch(int.parse(map['endDate'])),
       startTime: DateTime.fromMillisecondsSinceEpoch(int.parse(map['startTime'])),
       description: map['description'],
+      isOn: map['isOn'] == '1',
       // doses: parsedJson['doses'],
     );
     return med;
@@ -123,15 +129,16 @@ class Medicine {
       "id": id,
       "name": medName,
       "type": medType,
-      "start": Timestamp.fromMillisecondsSinceEpoch(startDate.millisecondsSinceEpoch),
-      "end": Timestamp.fromMillisecondsSinceEpoch(endDate.millisecondsSinceEpoch),
+      "startDate": Timestamp.fromMillisecondsSinceEpoch(startDate.millisecondsSinceEpoch),
+      "endDate": Timestamp.fromMillisecondsSinceEpoch(endDate.millisecondsSinceEpoch),
       "medAmount": medAmount,
       "doseAmount": doseAmount,
-      "nDoses": numOfDoses,
+      "nDoses": nDoses,
       "startTime": Timestamp.fromMillisecondsSinceEpoch(startTime.millisecondsSinceEpoch),
       "interval": interval,
       "intervalTime": intervalTime,
       "description": description,
+      "isOn": isOn,
       //"doses": this.doses
     };
   }
@@ -143,13 +150,14 @@ class Medicine {
       medType: doc.get('type'),
       medAmount: doc.get('medAmount'),
       doseAmount: doc.get('doseAmount'),
-      numOfDoses: doc.get('nDoses'),
+      nDoses: doc.get('nDoses'),
       interval: doc.get('interval'),
       intervalTime: doc.get('intervalTime'),
       startDate: DateTime.fromMillisecondsSinceEpoch(doc.get('startDate').millisecondsSinceEpoch),
       endDate: DateTime.fromMillisecondsSinceEpoch(doc.get('endDate').millisecondsSinceEpoch),
       startTime: DateTime.fromMillisecondsSinceEpoch(doc.get('startTime').millisecondsSinceEpoch),
       description: doc.get('description'),
+      isOn: doc.get('isOn'),
     );
     return med;
   }

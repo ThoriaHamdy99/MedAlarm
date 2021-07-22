@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/edit_medicine_screen.dart';
 import 'package:med_alarm/screens/medicine/view_medicine_screen.dart';
+import 'package:med_alarm/service/alarm.dart';
 // import 'package:med_alarm/screens/medicine/edit_medicine_screen.dart';
 import 'package:med_alarm/service/chatbot.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
@@ -95,53 +97,54 @@ class _MedicineScreenState extends State<MedicineScreen> {
                       child: ListView.builder(
                         itemCount: value.length,
                         itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              InkWell(
-                                onTap: (){
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => ViewMedicineScreen(value[index])
-                                    ),
-                                  ).whenComplete((){setState(() {});});
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: 8.0, left: 5.0, right: 5.0),
-                                  child: Card(
-                                    margin: EdgeInsets.symmetric(
-                                        vertical: 5,
-                                        horizontal: 12.0),
-                                    elevation: 5,
-                                    shadowColor: Colors.green,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: ListTile(
-                                      title: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 10.0, top: 10.0),
-                                            child: Text(
-                                              '${value[index].medName}',
-                                              style: TextStyle(
-                                                fontSize: 22,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0),
-                                            child: Text('take ${value[index].doseAmount} ${value[index].medType}',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                              ),),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
+                          return medCard(medicines.value[index], context);
+                          // return Column(
+                          //   children: [
+                          //     InkWell(
+                          //       onTap: (){
+                          //         Navigator.of(context).push(
+                          //           MaterialPageRoute(
+                          //             builder: (_) => ViewMedicineScreen(value[index])
+                          //           ),
+                          //         ).whenComplete((){setState(() {});});
+                          //       },
+                          //       child: Padding(
+                          //         padding: EdgeInsets.only(top: 8.0, left: 5.0, right: 5.0),
+                          //         child: Card(
+                          //           margin: EdgeInsets.symmetric(
+                          //               vertical: 5,
+                          //               horizontal: 12.0),
+                          //           elevation: 5,
+                          //           shadowColor: Colors.green,
+                          //           clipBehavior: Clip.antiAlias,
+                          //           child: ListTile(
+                          //             title: Column(
+                          //               crossAxisAlignment: CrossAxisAlignment.start,
+                          //               children: [
+                          //                 Padding(
+                          //                   padding: EdgeInsets.only(left: 10.0, top: 10.0),
+                          //                   child: Text(
+                          //                     '${value[index].medName}',
+                          //                     style: TextStyle(
+                          //                       fontSize: 22,
+                          //                     ),
+                          //                   ),
+                          //                 ),
+                          //                 Padding(
+                          //                   padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0),
+                          //                   child: Text('take ${value[index].doseAmount} ${value[index].medType}',
+                          //                     style: TextStyle(
+                          //                       fontSize: 16,
+                          //                     ),),
+                          //                 ),
+                          //               ],
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // );
                         },
                       ),
                     );
@@ -151,6 +154,71 @@ class _MedicineScreenState extends State<MedicineScreen> {
             }
             return Center(child: CircularProgressIndicator());
           }),
+    );
+  }
+
+  Widget medCard(Medicine med, BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+      elevation: 5,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (_) => ViewMedicineScreen(med)
+            ),
+          ).whenComplete((){setState(() {});});
+        },
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${med.medName}',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                DateFormat.jm().format(med.startTime),
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              Switch(
+                value: med.isOn,
+                activeColor: Theme.of(context).accentColor,
+                inactiveThumbColor: Colors.white12,
+                onChanged: (value) async {
+                  setState(() {
+                    med.isOn = value;
+                    print(value.toString());
+                    print('Switch');
+                  });
+                  await _sqlHelper.updateMedicine(med);
+                  value ? await Alarm.setAlarm(med) : await Alarm.pauseAlarm(med);
+
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Alarm is now ' + (value ? 'ON' : 'OFF')),
+                    duration: Duration(seconds: 1),
+                    backgroundColor: Theme.of(context).accentColor,
+                  ));
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

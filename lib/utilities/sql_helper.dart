@@ -62,7 +62,8 @@ class SQLHelper {
               nDoses INT NOT NULL,
               startTime INT NOT NULL,
               interval TEXT NOT NULL,
-              intervalTime INT);''');
+              intervalTime INT NOT NULL,
+              isOn INT NOT NULL);''');
 
       await db.execute('''CREATE TABLE Dose(
               id INTEGER NOT NULL REFERENCES Medicine(id),
@@ -162,7 +163,7 @@ class SQLHelper {
     try {
       result = await db.rawInsert('''INSERT INTO Medicine(
         name, type, startDate, endDate, medAmount, doseAmount,
-        description, nDoses, startTime, interval, intervalTime)
+        description, nDoses, startTime, interval, intervalTime, isOn)
         VALUES(
         '${med.medName}',
         '${med.medType}',
@@ -171,10 +172,11 @@ class SQLHelper {
         '${med.medAmount}',
         '${med.doseAmount}',
         '${med.description}',
-        '${med.numOfDoses}',
+        '${med.nDoses}',
         '${med.startTime.millisecondsSinceEpoch}',
         '${med.interval}',
-        '${med.intervalTime}')''');
+        '${med.intervalTime}',
+        '${med.isOn ? 1 : 0}')''');
       print('+++++++++++++++++++++ From InsertMedicine +++++++++++++++++++++');
       if(result != null) {
         print('Medicine Added');
@@ -200,10 +202,11 @@ class SQLHelper {
         endDate = '${med.endDate.millisecondsSinceEpoch}',
         medAmount = '${med.medAmount}',
         doseAmount = '${med.doseAmount}',
-        nDoses = '${med.numOfDoses}',
+        nDoses = '${med.nDoses}',
         startTime = '${med.startTime.millisecondsSinceEpoch}',
         interval = '${med.interval}',
-        intervalTime = '${med.intervalTime}'
+        intervalTime = '${med.intervalTime}',
+        isOn = '${med.isOn ? 1 : 0}'
         WHERE id = '${med.id}';''');
       print('+++++++++++++++++++++ From UpdateMedicine +++++++++++++++++++++');
       if(result != null) {
@@ -218,6 +221,27 @@ class SQLHelper {
     return false;
   }
 
+  Future<bool> updateMedicineAlarm(Medicine med) async {
+    Database db = await this.database;
+    var result;
+    try {
+      result = await db.rawUpdate('''UPDATE Medicine
+        SET isOn = '${med.isOn ? 1 : 0}'
+        WHERE id = '${med.id}';'''
+      );
+      print('+++++++++++++++++++++ From UpdateMedicine +++++++++++++++++++++');
+      if(result != null) {
+        print('Medicine alarm Updated');
+        return true;
+      }
+    } catch (e) {
+      print(e);
+      throw 'Medicine alarm hasn\'t updated';
+      // return false;
+    }
+    return false;
+  }
+
   Future<Medicine> getMedicine(String medName) async {
     Database db = await database;
 
@@ -225,17 +249,19 @@ class SQLHelper {
       var result = await db.rawQuery(
           "SELECT * FROM Medicine WHERE name = '$medName';");
       if (result.isEmpty) return null;
-      // print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
+      print('+++++++++++++++++++++ From GetMedicine +++++++++++++++++++++');
       // print(result[0]['name']);
       // print(result[0]['type']);
       // print(DateTime.fromMillisecondsSinceEpoch(result[0]['startDate']));
       // print(DateTime.fromMillisecondsSinceEpoch(result[0]['endDate']));
       // print(result[0]['medAmount']);
+      // print(result[0]['description']);
       // print(result[0]['doseAmount']);
       // print(result[0]['nDoses']);
       // print(DateTime.fromMillisecondsSinceEpoch(result[0]['startTime']));
       // print(result[0]['interval']);
       // print(result[0]['intervalTime']);
+      // print(result[0]['isOn'] ? 'ON' : 'OFF');
       // print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
       return Medicine.fromMap(result[0]);
     } catch (e) {
@@ -414,7 +440,8 @@ class SQLHelper {
               nDoses INT NOT NULL,
               startTime INT NOT NULL,
               interval TEXT NOT NULL,
-              intervalTime INT);''');
+              intervalTime INT NOT NULL,
+              isOn INT NOT NULL);''');
 
     await db.execute('''CREATE TABLE Dose(
               id INTEGER NOT NULL REFERENCES Medicine(id),

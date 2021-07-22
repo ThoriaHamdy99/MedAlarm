@@ -102,18 +102,19 @@ class _LocalNotificationScreenState extends State<LocalNotificationScreen> {
 
 
             await notification.showNotificationAtScheduleTime(Medicine(
-              id: 1,
+              id: 1001,
               medName: 'Med',
               doseAmount: 1,
               medType: 'Pills',
               interval: 'daily',
-              numOfDoses: 3,
+              nDoses: 3,
               intervalTime: 2,
               description: '',
               medAmount: 3,
               startDate: DateTime.now(),
               endDate: DateTime(2021, 8, 21, 14, 30),
               startTime: DateTime.now().add(Duration(minutes: 1)),
+              isOn: true
               // startTime: DateTime(2021, 7, 21, 14, 30),
             ));
 
