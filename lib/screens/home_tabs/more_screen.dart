@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/notification/localNotification.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/screens/login_fresh/login_fresh_screen.dart';
 import 'package:med_alarm/screens/report/report_screen.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 
@@ -136,11 +137,11 @@ class MoreScreen extends StatelessWidget {
       ),
       title: Text('Logout'),
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      onTap: () {
-        FirebaseProvider.instance.logout();
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => MyApp(),
-        ));
+      onTap: () async {
+        try {
+          FirebaseProvider.instance.logout();
+        } catch (e) {}
+        Navigator.of(context).pushReplacementNamed(BuildLoginFresh.id);
       },
     );
   }

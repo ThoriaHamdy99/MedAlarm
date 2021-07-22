@@ -9,7 +9,7 @@ import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/providers/user_provider.dart';
-import 'package:med_alarm/screens/medicine/med_details_screen.dart';
+import 'package:med_alarm/screens/medicine/add_medicine_screen.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 import '/models/user.dart';
@@ -137,7 +137,7 @@ class _EditProfileState extends State<EditProfile> {
                           return;
                         }
                         UserProvider.instance.currentUser = user;
-                        SQLHelper.getInstant().insertUser();
+                        await SQLHelper.getInstant().insertUser();
                         setState(() {
                           circular = false;
                         });
@@ -153,7 +153,7 @@ class _EditProfileState extends State<EditProfile> {
                         child: circular
                             ? CircularProgressIndicator(color: Colors.white,)
                             : Text(
-                                "Submit",
+                                "Save",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
@@ -13,18 +14,48 @@ import 'package:validators/validators.dart';
 final _formKey = new GlobalKey<FormState>();
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class EditMedicine extends StatefulWidget {
+class AddMedicineScreen extends StatefulWidget {
   static const id = 'MED_DETAILS_SCREEN';
-  final Medicine med;
-
-  EditMedicine(this.med);
 
   @override
-  _EditMedicineState createState() => _EditMedicineState();
+  _AddMedicineScreenState createState() => _AddMedicineScreenState();
 }
 
-class _EditMedicineState extends State<EditMedicine> {
-  Medicine medInfo;
+class _AddMedicineScreenState extends State<AddMedicineScreen> {
+
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+        centerTitle: true,
+        elevation: 5,
+        title: Text(
+          "Medicine Details",
+          style: TextStyle(),
+        ),
+      ),
+      body: Container(
+        child: _BottomContainer(),
+      ),
+    );
+  }
+}
+
+class _BottomContainer extends StatefulWidget {
+  @override
+  _BottomContainerState createState() => _BottomContainerState();
+}
+
+class _BottomContainerState extends State<_BottomContainer> {
+  Medicine medInfo = new Medicine();
   String dropDownValue = 'Pills';
   String durationValue = 'once';
   int dropDownValueDoses = 6;
@@ -62,55 +93,37 @@ class _EditMedicineState extends State<EditMedicine> {
 
   @override
   void initState() {
-    medInfo = widget.med;
-    dropDownValue = medInfo.medType;
-    durationValue = medInfo.interval;
-    dropDownValueDoses = medInfo.intervalTime;
-    isDaily = medInfo.interval == 'daily';
-    dropnDosesValue = medInfo.numOfDoses;
+    medInfo.medType = dropDownValue;
+    medInfo.interval = durationValue;
+    medInfo.intervalTime = dropDownValueDoses;
+    medInfo.numOfDoses = dropnDosesValue;
+    medInfo.description = '';
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-        ),
-        centerTitle: true,
-        elevation: 5,
-        title: Text(
-          "Edit Details",
-          style: TextStyle(),
-        ),
-      ),
-      body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  medNameTextField(),
-                  medTypeDDL(),
-                  medAmountTextField(),
-                  doseAmountTextField(),
-                  intervalDDL(),
-                  dailyIntervalDDL(),
-                  dailyDosesCountDDL(),
-                  descriptionTextField(),
-                  nextButton(context, _submit),
-                ],
-              ),
+    return Container(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                medNameTextField(),
+                medTypeDDL(),
+                medAmountTextField(),
+                doseAmountTextField(),
+                intervalDDL(),
+                dailyIntervalDDL(),
+                dailyDosesCountDDL(),
+                descriptionTextField(),
+                nextButton(context, _submit),
+              ],
             ),
-          )),
-    );
+          ),
+        ));
   }
 
   Widget nextButton(BuildContext context, void _submit()) {
@@ -159,54 +172,54 @@ class _EditMedicineState extends State<EditMedicine> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if(medInfo.intervalTime == 6 || medInfo.intervalTime == 8)
-              PanelTitle(
-                title: "Doses per day:",
-                isRequired: false,
-              ),
+            PanelTitle(
+              title: "Doses per day:",
+              isRequired: false,
+            ),
             if(medInfo.intervalTime == 6)
-              DropdownButton(
-                value: dropnDosesValue,
-                icon: Icon(Icons.keyboard_arrow_down),
-                items: dropnDoses6H.map((int item) {
-                  return DropdownMenuItem(
-                      value: item, child: Text(item.toString()));
-                }).toList(),
-                onChanged: (newValue) {
-                  // if (newValue != null) {
-                  setState(() {
-                    dropnDosesValue = newValue;
-                  });
-                  // }
-                  medInfo.numOfDoses = dropnDosesValue;
-                },
-                style: TextStyle(
-                  fontSize: 18,
-                  // fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+            DropdownButton(
+              value: dropnDosesValue,
+              icon: Icon(Icons.keyboard_arrow_down),
+              items: dropnDoses6H.map((int item) {
+                return DropdownMenuItem(
+                    value: item, child: Text(item.toString()));
+              }).toList(),
+              onChanged: (newValue) {
+                // if (newValue != null) {
+                setState(() {
+                  dropnDosesValue = newValue;
+                });
+                // }
+                medInfo.numOfDoses = dropnDosesValue;
+              },
+              style: TextStyle(
+                fontSize: 18,
+                // fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
+            ),
             if(medInfo.intervalTime == 8)
-              DropdownButton(
-                value: dropnDosesValue,
-                icon: Icon(Icons.keyboard_arrow_down),
-                items: dropnDoses8H.map((int item) {
-                  return DropdownMenuItem(
-                      value: item, child: Text(item.toString()));
-                }).toList(),
-                onChanged: (newValue) {
-                  // if (newValue != null) {
-                  setState(() {
-                    dropnDosesValue = newValue;
-                  });
-                  // }
-                  medInfo.numOfDoses = dropnDosesValue;
-                },
-                style: TextStyle(
-                  fontSize: 18,
-                  // fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+            DropdownButton(
+              value: dropnDosesValue,
+              icon: Icon(Icons.keyboard_arrow_down),
+              items: dropnDoses8H.map((int item) {
+                return DropdownMenuItem(
+                    value: item, child: Text(item.toString()));
+              }).toList(),
+              onChanged: (newValue) {
+                // if (newValue != null) {
+                setState(() {
+                  dropnDosesValue = newValue;
+                });
+                // }
+                medInfo.numOfDoses = dropnDosesValue;
+              },
+              style: TextStyle(
+                fontSize: 18,
+                // fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
+            ),
           ],
         ),
       ),
@@ -332,7 +345,6 @@ class _EditMedicineState extends State<EditMedicine> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
-        initialValue: medInfo.medName,
         validator: (value) {
           if (value.isEmpty) return "Medicine name can't be empty";
           return null;
@@ -354,7 +366,6 @@ class _EditMedicineState extends State<EditMedicine> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
-        initialValue: '${medInfo.medAmount}',
         validator: (value) {
           if (!isNumeric(value)) return "Enter numbers only";
           if (value.isEmpty) return "Available Medicine amount can't be empty";
@@ -378,7 +389,6 @@ class _EditMedicineState extends State<EditMedicine> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
-        initialValue: '${medInfo.doseAmount}',
         validator: (value) {
           if (!isNumeric(value)) return "Enter numbers only";
           if (value.isEmpty) return "Dose amount can't be empty";
@@ -470,7 +480,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
         ),
         elevation: 5,
         centerTitle: true,
-        title: Text("Edit Medicine",),
+        title: Text("Medicine Details",),
       ),
       body: Container(
         child: _ReminderDetailsContainer(widget.medInfo),
@@ -492,6 +502,17 @@ class _ReminderDetailsContainer extends StatefulWidget {
 class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
   SQLHelper _sqlHelper = SQLHelper();
   bool beforeNow = true;
+
+  @override
+  void initState() {
+    setState(() {
+    widget.medInfo.startDate = DateTime.parse(DateTime.now().toIso8601String().substring(0,10));
+    widget.medInfo.endDate = widget.medInfo.startDate.add(Duration(days: 1, hours: 1));
+    widget.medInfo.startTime = DateTime.now();
+
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -528,120 +549,119 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                   ),
                   child: new Icon(Icons.date_range),
                   onPressed: () =>
-                      showRoundedDatePicker(
-                        context: context,
-                        theme: Theme.of(context),
-                        initialDate: widget.medInfo.startDate,
-                        firstDate: DateTime.now().subtract(Duration(days: 1)),
-                        lastDate: DateTime(DateTime.now().year + 10),
-                        borderRadius: 16,
-                        onTapDay: (DateTime dateTime, bool available) {
-                          if (!available) {
-                            showDialog(
-                              context: context,
-                              builder: (c) => AlertDialog(
-                                title: Text("This date cannot be selected."),
-                                actions: <Widget>[
-                                  CupertinoDialogAction(
-                                    child: Text("OK"),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          setState(() {
-                            widget.medInfo.startDate = dateTime;
-                            if (widget.medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
-                                widget.medInfo.endDate.toIso8601String().substring(0 ,10)) >= 0)
-                              widget.medInfo.endDate = widget.medInfo.startDate.add(Duration(days: 1));
-                          });
-                          return available;
-                        },
-                      ),
+                    showRoundedDatePicker(
+                      context: context,
+                      theme: Theme.of(context),
+                      initialDate: widget.medInfo.startDate,
+                      firstDate: DateTime.now().subtract(Duration(days: 1)),
+                      lastDate: DateTime(DateTime.now().year + 10),
+                      borderRadius: 16,
+                      onTapDay: (DateTime dateTime, bool available) {
+                        if (!available) {
+                          showDialog(
+                            context: context,
+                            builder: (c) => AlertDialog(
+                              title: Text("This date cannot be selected."),
+                              actions: <Widget>[
+                                CupertinoDialogAction(
+                                  child: Text("OK"),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        setState(() {
+                          widget.medInfo.startDate = dateTime;
+                          if (widget.medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
+                              widget.medInfo.endDate.toIso8601String().substring(0 ,10)) >= 0)
+                            widget.medInfo.endDate = widget.medInfo.startDate.add(Duration(days: 1));
+                        });
+                        return available;
+                      },
+                    ),
                 ),
                 if(widget.medInfo.interval != 'once')
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: PanelTitle(
-                      title: "Pick up end date",
-                      isRequired: false,
-                    ),
-                  ),
-                if(widget.medInfo.interval != 'once')
-                  Text(
-                    DateFormat.yMMMd().format(widget.medInfo.endDate),
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                if(widget.medInfo.interval != 'once')
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(50.0),
-                      ),
-                      primary: Theme.of(context).accentColor,
-                      onPrimary: Colors.white,
-                    ),
-                    child: new Icon(Icons.date_range),
-                    onPressed: () =>
-                        showRoundedDatePicker(
-                          context: context,
-                          theme: Theme.of(context),
-                          initialDate: widget.medInfo.endDate,
-                          firstDate: widget.medInfo.startDate.add(Duration(days: 1)),
-                          lastDate: DateTime(DateTime.now().year + 10),
-                          borderRadius: 16,
-                          onTapDay: (DateTime dateTime, bool available) {
-                            if (!available) {
-                              showDialog(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: Text("This date cannot be selected."),
-                                  actions: <Widget>[
-                                    CupertinoDialogAction(
-                                      child: Text("OK"),
-                                      onPressed: () => Navigator.pop(context),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                            setState(() {
-                              widget.medInfo.endDate = dateTime;
-                            });
-                            return available;
-                          },
-                        ),
-                  ),
                 Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    child: PanelTitle(
-                      title: "Pick up time for first reminder",
-                      isRequired: false,
-                    )),
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: PanelTitle(
+                    title: "Pick up end date",
+                    isRequired: false,
+                  ),
+                ),
+                if(widget.medInfo.interval != 'once')
+                Text(
+                  DateFormat.yMMMd().format(widget.medInfo.endDate),
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+                if(widget.medInfo.interval != 'once')
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(50.0),
+                    ),
+                    primary: Theme.of(context).accentColor,
+                    onPrimary: Colors.white,
+                  ),
+                  child: new Icon(Icons.date_range),
+                  onPressed: () =>
+                    showRoundedDatePicker(
+                      context: context,
+                      theme: Theme.of(context),
+                      initialDate: widget.medInfo.endDate,
+                      firstDate: widget.medInfo.startDate.add(Duration(days: 1)),
+                      lastDate: DateTime(DateTime.now().year + 10),
+                      borderRadius: 16,
+                      onTapDay: (DateTime dateTime, bool available) {
+                        if (!available) {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: Text("This date cannot be selected."),
+                              actions: <Widget>[
+                                CupertinoDialogAction(
+                                  child: Text("OK"),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        setState(() {
+                          widget.medInfo.endDate = dateTime;
+                        });
+                        return available;
+                      },
+                    ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 10),
+                  child: PanelTitle(
+                    title: "Pick up time for first reminder",
+                    isRequired: false,
+                  )),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TimePickerSpinner(
-                    time: widget.medInfo.startTime,
                     is24HourMode: false,
                     normalTextStyle: TextStyle(
-                      fontSize: 22,
-                      color: Colors.grey,
+                        fontSize: 22,
+                        color: Colors.grey,
                     ),
                     highlightedTextStyle:
                     TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).accentColor,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).accentColor,
                     ),
                     spacing: 45,
                     itemHeight: 40,
                     isForce2Digits: true,
                     onTimeChange: (time) {
-                      widget.medInfo.startTime = time;
+                        widget.medInfo.startTime = time;
                     },
                   ),
                 ),
@@ -659,24 +679,27 @@ class _ReminderDetailsContainerState extends State<_ReminderDetailsContainer> {
                         borderRadius: BorderRadius.circular(50.0)),
                     onPressed: () async {
                       try {
-                        // if (isSameDay(widget.medInfo.startDate, widget.medInfo.startTime)) {
-                        //   print(widget.medInfo.startTime);
-                        //   print(DateTime.now());
-                        //   if(widget.medInfo.startTime.difference(
-                        //       DateTime.now()
-                        //   ).inSeconds < 0) {
-                        //     throw 'Choose time after now';
-                        //   }
-                        // }
-                        if (!await _sqlHelper.updateMedicine(widget.medInfo)) {
-                          print('Med Not Updated');
+                        if (isSameDay(widget.medInfo.startDate, widget.medInfo.startTime)) {
+                          print(widget.medInfo.startTime);
+                          print(DateTime.now());
+                          if(widget.medInfo.startTime.difference(
+                              DateTime.now()
+                          ).inSeconds < 0) {
+                            throw 'Choose time after now';
+                          }
+                        }
+                        if (!await _sqlHelper.insertMedicine(widget.medInfo)) {
+                          print('Med Not Inserted');
                           return;
                         }
-                        await Alarm.updateAlarm(widget.medInfo);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
+                        await Alarm.setAlarm(await _sqlHelper.getMedicine(widget.medInfo.medName));
+                        while (Navigator.of(context).canPop())
+                          Navigator.pop(context);
+                        Navigator.pushReplacementNamed(
+                            context, HomeScreen.id);
                       } catch (e) {
                         print(e);
+                        Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(e.toString()),
                           duration: Duration(seconds: 3),

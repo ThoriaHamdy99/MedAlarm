@@ -2,14 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:med_alarm/notification/notification.dart';
-import 'package:med_alarm/screens/alarm/alarm_screen.dart';
 import 'package:med_alarm/screens/chat/chatbot_screen.dart';
 import 'package:med_alarm/screens/sync_meds_screen.dart';
 import 'package:med_alarm/screens/user_profile/edit_profile.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'notification/localNotification.dart';
 import 'providers/firebase_provider.dart';
-import 'screens/medicine/med_details_screen.dart';
+import 'screens/medicine/add_medicine_screen.dart';
 import 'screens/home_tabs/calender_screen.dart';
 import 'screens/login_fresh/login_fresh_screen.dart';
 import 'screens/report/report_screen.dart';
@@ -22,13 +21,13 @@ import 'screens/search_contact_screen.dart';
 import 'utilities/sql_helper.dart';
 import 'models/user.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
-    notification.initialize();
+    await notification.initialize();
     WidgetsFlutterBinding.ensureInitialized();
   } catch (e) {
     print(e);
@@ -38,10 +37,6 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  final Map map;
-
-  MyApp({this.map});
-
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -76,7 +71,7 @@ class _MyAppState extends State<MyApp> {
         ChatRoom.id: (context) => ChatRoom(),
         ChatsScreen.id: (context) => ChatsScreen(),
         ReportScreen.id: (context) => ReportScreen(),
-        MedDetails.id: (context) => MedDetails(),
+        AddMedicineScreen.id: (context) => AddMedicineScreen(),
         ChatBotScreen.id: (context) => ChatBotScreen(),
         UserProfile.id: (context) => UserProfile(),
         EditProfile.id: (context) => EditProfile(),

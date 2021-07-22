@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:med_alarm/screens/medicine/med_details_screen.dart';
+import 'package:med_alarm/screens/medicine/add_medicine_screen.dart';
 
 class SyncMedsScreen extends StatelessWidget {
   static const id = 'SYNC_MEDS_SCREEN';

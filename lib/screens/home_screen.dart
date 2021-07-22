@@ -3,7 +3,7 @@ import 'package:med_alarm/screens/home_tabs/calender_screen.dart';
 import 'package:med_alarm/utilities/push_notifications.dart';
 
 import 'chat/chats_screen.dart';
-import 'home_tabs/medicine_screen.dart';
+import 'home_tabs/medicines_screen.dart';
 import 'home_tabs/more_screen.dart';
 
 class HomeScreen extends StatefulWidget {

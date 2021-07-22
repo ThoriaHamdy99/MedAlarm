@@ -248,7 +248,6 @@ class SQLHelper {
     List<Medicine> medicines = [];
     try {
       var result = await db.rawQuery('SELECT * FROM Medicine;');
-      print(result.length);
       result.forEach((medicine) => medicines.add(Medicine.fromMap(medicine)));
       return medicines;
     } catch (e) {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/edit_medicine_screen.dart';
+import 'package:med_alarm/screens/medicine/view_medicine_screen.dart';
+// import 'package:med_alarm/screens/medicine/edit_medicine_screen.dart';
 import 'package:med_alarm/service/chatbot.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
-import '../medicine/med_details_screen.dart';
+import '../medicine/add_medicine_screen.dart';
 
 class MedicineScreen extends StatefulWidget {
   static const id = 'EMPTY_SCREEN';
@@ -65,7 +67,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
                               borderRadius: BorderRadius.circular(20)),
                           onPressed: () {
                             Navigator.of(context)
-                                .pushNamed(MedDetails.id).whenComplete((){
+                                .pushNamed(AddMedicineScreen.id).whenComplete((){
                                   setState(() {});
                             });
                           },
@@ -99,7 +101,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
                                 onTap: (){
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => EditMedicine(value[index])
+                                      builder: (_) => ViewMedicineScreen(value[index])
                                     ),
                                   ).whenComplete((){setState(() {});});
                                 },

@@ -83,17 +83,35 @@ class _LocalNotificationScreenState extends State<LocalNotificationScreen> {
             //     return AlarmScreen({'medName': 'Med Name'});
             //   })
             // );
+
+            // await notification.showNotificationRefill(Medicine(
+            //   id: 1,
+            //   medName: 'Med',
+            //   doseAmount: 1,
+            //   medType: 'Pills',
+            //   interval: 'daily',
+            //   numOfDoses: 3,
+            //   intervalTime: 2,
+            //   description: '',
+            //   medAmount: 3,
+            //   startDate: DateTime.now(),
+            //   endDate: DateTime(2021, 8, 21, 14, 30),
+            //   startTime: DateTime.now().add(Duration(minutes: 1)),
+            //   ), '');
+
+
+
             await notification.showNotificationAtScheduleTime(Medicine(
               id: 1,
               medName: 'Med',
               doseAmount: 1,
               medType: 'Pills',
-              interval: 'once',
-              numOfDoses: 1,
-              intervalTime: 1,
+              interval: 'daily',
+              numOfDoses: 3,
+              intervalTime: 2,
               description: '',
-              medAmount: 8,
-              startDate: DateTime(2021, 7, 21, 14, 30),
+              medAmount: 3,
+              startDate: DateTime.now(),
               endDate: DateTime(2021, 8, 21, 14, 30),
               startTime: DateTime.now().add(Duration(minutes: 1)),
               // startTime: DateTime(2021, 7, 21, 14, 30),

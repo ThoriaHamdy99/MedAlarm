@@ -1,26 +1,18 @@
-import 'dart:ffi';
-import 'dart:io' show Platform;
-import 'dart:typed_data';
-import 'package:awesome_notifications/awesome_notifications.dart' as Utils
-    show DateUtils;
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/main.dart';
-import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/alarm/alarm_screen.dart';
+import 'package:med_alarm/service/alarm.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:rxdart/subjects.dart';
-import 'package:table_calendar/table_calendar.dart';
+
+Notification notification = Notification();
 
 class Notification {
 
-  Notification._() {
-    // init();
-  }
+  Notification();
 
   Notification.builder(Notification notification);
 
@@ -34,15 +26,27 @@ class Notification {
           '',
           [
             NotificationChannel(
-              channelKey: 'scheduled',
-              channelName: 'Basic notifications',
-              channelDescription: 'Notification channel for alarm',
+              channelKey: 'Medicine Alarm',
+              channelName: 'Medicine Alarm',
+              channelDescription: 'Notification channel for medicine alarm',
               defaultColor: Colors.cyan,
               ledColor: Colors.white,
               importance: NotificationImportance.Max,
               defaultRingtoneType: DefaultRingtoneType.Alarm,
+              // playSound: true,
               locked: true,
-            )
+            ),
+            NotificationChannel(
+              channelKey: 'Refill Alarm',
+              channelName: 'Refill Alarm',
+              channelDescription: 'Notification channel for refill alarm',
+              defaultColor: Colors.cyan,
+              ledColor: Colors.white,
+              importance: NotificationImportance.Max,
+              defaultRingtoneType: DefaultRingtoneType.Alarm,
+              // playSound: true,
+              locked: true,
+            ),
           ]
       );
       AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
@@ -50,6 +54,7 @@ class Notification {
           AwesomeNotifications().requestPermissionToSendNotifications();
         }
       });
+      // AwesomeNotifications().removeChannel('scheduled');
     } catch (e) {
       print(e);
     }
@@ -59,43 +64,59 @@ class Notification {
         FlutterRingtonePlayer.playAlarm(looping: true, asAlarm: true);
       });
       AwesomeNotifications().actionStream.listen((event) async {
-        var sqlHelper = SQLHelper.getInstant();
         var map = event.payload;
-        if (event.buttonKeyPressed == 'Take') {
-          FlutterRingtonePlayer.stop();
-          print('Taken');
-          print(map['taken']);
-          map['taken'] = '1';
-          await sqlHelper.replaceDose(map);
-        }
-        else if (event.buttonKeyPressed == 'Snooze') {
-          print('Snoozed');
-          FlutterRingtonePlayer.stop();
-          print(map['snoozed']);
-          // print('Map Content=================================');
-          // for(var key in map.keys) {
-          //   print(map[key]);
-          // }
-          // print('============================================');
-          map['snoozed'] = '1';
-          await sqlHelper.replaceDose(map);
-          await delayNotification(map);
-        }
-        else if (event.buttonKeyPressed == 'Cancel') {
-          print('Cancelled');
-          FlutterRingtonePlayer.stop();
-          print(map['taken']);
-          map['taken'] = '0';
-          await sqlHelper.replaceDose(map);
-        }
-        else{
-          print('Else');
-          // FlutterRingtonePlayer.stop();
-          navigatorKey.currentState.push(
-              MaterialPageRoute(builder: (BuildContext context) {
-                return AlarmScreen(map);
-              })
-          );
+        print(event.channelKey);
+        print(event.buttonKeyPressed);
+        switch (event.channelKey) {
+          case 'Medicine Alarm':
+            switch (event.buttonKeyPressed) {
+              case 'Take':
+                print('Taken');
+                print(map['taken']);
+                Alarm.confirmAlarm(map);
+                break;
+
+              case 'Snooze':
+                print('Snoozed');
+                print(map['snoozed']);
+                Alarm.snoozeAlarm(map);
+                break;
+
+              case 'Cancel':
+                print('Cancelled');
+                print(map['taken']);
+                Alarm.skipAlarm(map);
+                break;
+
+              default:
+                print('Else');
+                if (navigatorKey == null) main();
+                navigatorKey.currentState.push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return AlarmScreen(map);
+                    })
+                );
+            } break;
+          case 'Refill Alarm':
+            FlutterRingtonePlayer.stop();
+            switch (event.buttonKeyPressed) {
+              case 'Confirm':
+                print('Confirmed');
+                break;
+
+              case 'Snooze':
+                print('Snoozed');
+                break;
+
+              default:
+                print('Else');
+                // if (navigatorKey == null) main();
+                // navigatorKey.currentState.push(
+                //     MaterialPageRoute(builder: (BuildContext context) {
+                //       return AlarmScreen(map);
+                //     })
+                // );
+            } break;
         }
       });
     } catch(e) {
@@ -138,11 +159,12 @@ class Notification {
     await AwesomeNotifications().createNotification(
         content: NotificationContent(
             id: int.parse(map['id']),
-            channelKey: 'scheduled',
+            channelKey: 'Medicine Alarm',
             title:'Time to take your delayed medicine.',
             body:'${map['name']}: ${map['doseAmount']} ${map['type']}',
             payload: map,
           displayOnBackground: true,
+
         ),
         schedule: NotificationInterval(interval:10, timeZone: await AwesomeNotifications().getLocalTimeZoneIdentifier()),
         actionButtons: [
@@ -156,7 +178,6 @@ class Notification {
   }
 
   Future<void> showNotificationAtScheduleTime(Medicine med) async {
-    // String timeZoneIdentifier = AwesomeNotifications.localTimeZoneIdentifier;
     DateTime scheduleTime = DateTime(med.startDate.year, med.startDate.month,
         med.startDate.day, med.startTime.hour, med.startTime.minute);
     DateTime breakAlarmTime = DateTime(med.endDate.year, med.endDate.month, med.endDate.day + 1);
@@ -170,7 +191,8 @@ class Notification {
         scheduleTime = DateTime(DateTime.now().year, DateTime.now().month,
             DateTime.now().day, med.startTime.hour, med.startTime.minute);
         while(scheduleTime.isBefore(DateTime.now())) {
-          scheduleTime = scheduleTime.add(Duration(hours: med.intervalTime));
+          scheduleTime = scheduleTime.add(Duration(minutes: med.intervalTime));
+          // scheduleTime = scheduleTime.add(Duration(hours: med.intervalTime));
         }
         if(breakAlarmTime.isBefore(DateTime.now())) {
           return;
@@ -202,54 +224,64 @@ class Notification {
     //   print(payload[key]);
     // }
     // print('============================================');
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: med.id,
-        channelKey: 'scheduled',
-        title: 'Time to take your medicine.',
-        body:'${med.medName}: ${med.doseAmount} ${med.medType}',
-        payload: payload,
-        // displayedDate: '${scheduleTime.millisecondsSinceEpoch}',
-        // ticker: 'ticker',
-      ),
-      schedule: NotificationCalendar.fromDate(date: scheduleTime, allowWhileIdle: true),
-      actionButtons: [
-        NotificationActionButton(
-            key: 'Take', label: 'Take', autoCancel: true,
-            buttonType:  ActionButtonType.KeepOnTop),
-        NotificationActionButton(
-            key: 'Snooze', label: 'Snooze', autoCancel: true,
-            buttonType:  ActionButtonType.KeepOnTop),
-        NotificationActionButton(
-            key: 'Cancel', label: 'Cancel', autoCancel: true,
-            buttonType:  ActionButtonType.KeepOnTop)
-      ],
-    );
-
-    print('Alarm for ${med.medName} is set '
-        'at ${DateFormat().add_Hms().format(scheduleTime)} '
-        'on ${DateFormat().add_yMMMd().format(scheduleTime)}');
-  }
-  Future<void> showNotificationRefill(int id ,String medImageURl ,String medName) async {
-    await AwesomeNotifications().createNotification(
+    try {
+      await AwesomeNotifications().createNotification(
         content: NotificationContent(
-            id: id,
-            channelKey: "scheduled",
-            title: 'Renew your Medicine.',
-            body: '$medName needs to be refilled',
-            // largeIcon:
-            // 'https://image.freepik.com/vetores-gratis/modelo-de-logotipo-de-restaurante-retro_23-2148451519.jpg',
-            // bigPicture: medImageURl,
-            // notificationLayout: NotificationLayout.BigPicture,
-            color: Colors.cyan,
-            payload: {'uuid': 'uuid-test'}),
+          id: med.id,
+          channelKey: 'Medicine Alarm',
+          title: 'Time to take your medicine.',
+          body: '${med.medName}: ${med.doseAmount} ${med.medType}',
+          payload: payload,
+          // autoCancel: false,
+          // displayedDate: '${scheduleTime.millisecondsSinceEpoch}',
+          // ticker: 'ticker',
+        ),
+        schedule: NotificationCalendar.fromDate(
+            date: scheduleTime, allowWhileIdle: true),
         actionButtons: [
           NotificationActionButton(
-              key: 'read', label: 'Renew', autoCancel: true,buttonType:  ActionButtonType.KeepOnTop),
+              key: 'Take', label: 'Take', autoCancel: true,
+              buttonType: ActionButtonType.KeepOnTop),
           NotificationActionButton(
-              key: 'delay', label: 'Remember-me later', autoCancel: true,buttonType:  ActionButtonType.KeepOnTop)
-        ]);
+              key: 'Snooze', label: 'Snooze', autoCancel: true,
+              buttonType: ActionButtonType.KeepOnTop),
+          NotificationActionButton(
+              key: 'Cancel', label: 'Cancel', autoCancel: true,
+              buttonType: ActionButtonType.KeepOnTop)
+        ],
+      );
 
+      print('Alarm for ${med.medName} is set '
+          'at ${DateFormat().add_Hms().format(scheduleTime)} '
+          'on ${DateFormat().add_yMMMd().format(scheduleTime)}');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> showNotificationRefill(Medicine med, String msg) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        channelKey: "Refill Alarm",
+        id: med.id,
+        title: '${med.medName} needs to be refilled',
+        body: 'Only ${med.medAmount} ${med.medType} left',
+        notificationLayout: NotificationLayout.Default,
+        // largeIcon: '',
+        // bigPicture: medImageURl,
+        // notificationLayout: NotificationLayout.BigPicture,
+        color: Colors.cyan,
+        payload: {'uuid': 'uuid-test'},
+      ),
+      actionButtons: [
+        NotificationActionButton(
+            key: 'Confirm', label: 'Confirm', autoCancel: true,
+            buttonType:  ActionButtonType.KeepOnTop),
+        NotificationActionButton(
+            key: 'Snooze', label: 'Snooze to next dose', autoCancel: true,
+            buttonType:  ActionButtonType.KeepOnTop)
+      ]
+    );
   }
 
   Future<void> cancelNotification(int id) async {
@@ -257,5 +289,3 @@ class Notification {
   }
 
 }
-
-Notification notification = Notification._();

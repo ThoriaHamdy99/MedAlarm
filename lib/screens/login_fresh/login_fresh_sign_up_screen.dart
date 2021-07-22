@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/providers/user_provider.dart';
-import 'package:med_alarm/screens/medicine/med_details_screen.dart';
+import 'package:med_alarm/screens/medicine/add_medicine_screen.dart';
 import 'package:med_alarm/providers/firebase_provider.dart';
 import 'package:med_alarm/screens/home_screen.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';

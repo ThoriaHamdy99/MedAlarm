@@ -6,75 +6,21 @@ import 'package:med_alarm/utilities/sql_helper.dart';
 class Alarm {
   static setAlarm(Medicine med) async {
     try {
-      // await notification.initialize();
-      // await notification.showNotificationAtScheduleTime(
-      //     Medicine(id: 1,
-      //       medName: 'med',
-      //       doseAmount: 2,
-      //       medType: 'Pills',
-      //       interval: 'once',
-      //       startDate: DateTime(2021, 7, 21, 14, 30),
-      //       endDate: DateTime(2021, 8, 21, 14, 30),
-      //       startTime: DateTime.now().add(Duration(seconds: 5)),
-      //       // startTime: DateTime(2021, 7, 21, 14, 30),
-      //     )
-      // );
-
-      // AwesomeNotifications().displayedStream.listen((receivedNotification) {
-      //   FlutterRingtonePlayer.playAlarm(
-      //       looping: true, asAlarm: true);
-      // });
-      // AwesomeNotifications().actionStream.listen((event) {
-      //   if (event.buttonKeyPressed == 'take')
-      //     FlutterRingtonePlayer.stop();
-      //   if (event.buttonKeyPressed == 'cancel')
-      //     FlutterRingtonePlayer.stop();
-      //   if (event.buttonKeyPressed == 'snooze') {
-      //     FlutterRingtonePlayer.stop();
-      //     // notification.delayNotification(0, 'medName');
-      //   }
-      // });
-    } catch (e) {
-      print(e);
-    }
-
-    try {
-      // print(med.id);
-      // print(med.medName);
-      // print(med.medType);
-      // print(med.description);
-      // print(med.startDate);
-      // print(med.endDate);
-      // print(med.medAmount);
-      // print(med.doseAmount);
-      // print(med.numOfDoses);
-      // print(med.startTime);
-      // print(med.interval);
-      // print(med.intervalTime);
       await notification.showNotificationAtScheduleTime(med);
-
-      // AwesomeNotifications().displayedStream.listen((receivedNotification) {
-      //   FlutterRingtonePlayer.playAlarm(
-      //       looping: true, asAlarm: true);
-      // });
-      // AwesomeNotifications().actionStream.listen((event) {
-      //   if (event.buttonKeyPressed == 'Take')
-      //     FlutterRingtonePlayer.stop();
-      //   if (event.buttonKeyPressed == 'Snooze') {
-      //     FlutterRingtonePlayer.stop();
-      //     notification.delayNotification(med);
-      //   }
-      //   if (event.buttonKeyPressed == 'Cancel')
-      //     FlutterRingtonePlayer.stop();
-      // });
     } catch (e) {
       print(e);
       throw e;
     }
   }
 
-  static updateAlarm(Medicine med) {
-
+  static updateAlarm(Medicine med) async {
+    try {
+      await notification.cancelNotification(med.id);
+      await notification.showNotificationAtScheduleTime(med);
+    } catch (e) {
+      print(e);
+      throw e;
+    }
   }
 
   static pauseAlarm(Medicine med) {
@@ -91,6 +37,37 @@ class Alarm {
     } catch (e) {}
     map['taken'] = '1';
     await SQLHelper.getInstant().replaceDose(map);
+    Medicine med = Medicine.fromMapString(map);
+    if(med.medAmount > 0) {
+      med.medAmount--;
+      print('Remaining amount: ${med.medAmount} ${med.medType}');
+      await SQLHelper.getInstant().updateMedicine(med);
+      switch(med.interval) {
+        case 'daily':
+          if(med.medAmount <= med.doseAmount * med.intervalTime) {
+            print('Remaining medicine will end within a day');
+            print('Medicine needs to be refilled');
+            await notification.showNotificationRefill(med, '');
+          }
+          break;
+        case 'weekly':
+          if(med.medAmount <= med.doseAmount) {
+            print('Remaining medicine will end next week');
+            print('Medicine needs to be refilled');
+          }
+          break;
+        case 'monthly':
+          if(med.medAmount <= med.doseAmount) {
+            print('Remaining medicine will end within a monthly');
+            print('Medicine needs to be refilled');
+          }
+          break;
+      }
+    }
+    if(med.interval != 'once') {
+      // updateAlarm(med);
+      await notification.showNotificationAtScheduleTime(med);
+    }
   }
 
   static snoozeAlarm(map) async {

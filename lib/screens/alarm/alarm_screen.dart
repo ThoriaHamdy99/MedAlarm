@@ -4,18 +4,30 @@ import 'package:med_alarm/service/alarm.dart';
 import '../../main.dart';
 import '../home_screen.dart';
 
-class AlarmScreen extends StatelessWidget {
+class AlarmScreen extends StatefulWidget {
   final Map map;
 
   AlarmScreen(this.map);
 
   @override
+  _AlarmScreenState createState() => _AlarmScreenState();
+}
+
+class _AlarmScreenState extends State<AlarmScreen> {
+
+  @override
+  void dispose() {
+    Alarm.snoozeAlarm(widget.map);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print('Map Content=================================');
-    for(var key in map.keys) {
-      print(map[key]);
-    }
-    print('============================================');
+    // print('Map Content=================================');
+    // for(var key in widget.map.keys) {
+    //   print(widget.map[key]);
+    // }
+    // print('============================================');
     return Scaffold(
       appBar: AppBar(
         shape: RoundedRectangleBorder(
@@ -50,7 +62,7 @@ class AlarmScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                map['name'] == null ? 'no name' : map['name'],
+                widget.map['name'],
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -72,7 +84,7 @@ class AlarmScreen extends StatelessWidget {
                     ),
                     Text(
                       // '',
-                      map['doseAmount'],
+                      widget.map['doseAmount'],
                       style: TextStyle(
                         fontSize: 20,
                         // fontWeight: FontWeight.bold,
@@ -96,7 +108,7 @@ class AlarmScreen extends StatelessWidget {
                     ),
                     Text(
                       // '',
-                      map['description'],
+                      widget.map['description'],
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -108,9 +120,9 @@ class AlarmScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  buildButton(context, 'Take', () async {await Alarm.confirmAlarm(map);}),
-                  buildButton(context, 'Snooze', () async {await Alarm.snoozeAlarm(map);}),
-                  buildButton(context, 'Cancel', () async {await Alarm.skipAlarm(map);}),
+                  buildButton(context, 'Take', () async {await Alarm.confirmAlarm(widget.map);}),
+                  buildButton(context, 'Snooze', () async {await Alarm.snoozeAlarm(widget.map);}),
+                  buildButton(context, 'Cancel', () async {await Alarm.skipAlarm(widget.map);}),
                 ],
               ),
               // SizedBox(height: 10),
