@@ -240,15 +240,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
               }),
         ],
       ),
-      floatingActionButton: new Visibility(
+      floatingActionButton: Visibility(
         visible: allMeds.isEmpty ? false : true,
         child: FloatingActionButton(
-          // backgroundColor: Theme.of(context).accentColor,
           child: Icon(Icons.add, color: Colors.white,),
           onPressed: () {
             Navigator.of(context).pushNamed(AddMedicineScreen.id).whenComplete(() async {
-              // setState(() {});
-              // _selectedMeds.value = _getEventsForDay(_selectedDay);
               await updateList();
             });
           },
@@ -506,15 +503,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 fontSize: 20,
               ),
             ),
-            subtitle: Padding(
+            subtitle: med.description.isNotEmpty ? Padding(
               padding: const EdgeInsets.only(top: 10.0),
-              child: Text('test test test test test test test ',
-                // child: Text(med.description,
+                child: Text(med.description,
                 style: TextStyle(
                   fontSize: 18,
                 ),
               ),
-            ),
+            ) : null,
                 // if(med.description.isNotEmpty)
           ),
         ],

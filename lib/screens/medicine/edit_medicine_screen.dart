@@ -29,9 +29,10 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
   var items = ['Pills', 'Syrup', 'Solutions', 'Injections', 'Drops', 'Powder', 'Other'];
   var durationItems = ['once', 'daily', 'weekly', 'monthly'];
   bool isDaily = false;
-  var dropnDoses6H = [2, 3, 4];
-  var dropnDoses8H = [2, 3];
-  var dropnDosesValue = 2;
+
+  DateTime _startTime;
+
+  SQLHelper _sqlHelper = SQLHelper();
 
   get tfBorder =>
       OutlineInputBorder(
@@ -46,21 +47,6 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
             .accentColor, width: 2),
       );
 
-  void _submit() {
-    final isValid = _formKey.currentState.validate();
-    FocusScope.of(context).unfocus();
-    if (isValid) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MedReminderDetails(medInfo),
-        ),
-      );
-    } else {
-      print('form is invalid');
-    }
-  }
-
   @override
   void initState() {
     medInfo = Medicine.fromMapString(widget.med.toMapString());
@@ -68,7 +54,8 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
     durationValue = medInfo.interval;
     dropDownValueDoses = medInfo.intervalTime;
     isDaily = medInfo.interval == 'daily';
-    dropnDosesValue = medInfo.nDoses;
+    _startTime = medInfo.startTime;
+
     super.initState();
   }
 
@@ -90,73 +77,7 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
           style: TextStyle(),
         ),
         actions: [
-          FlatButton(
-            child: Text(
-              'Delete',
-              style: TextStyle(fontSize: 16, color: Theme
-                  .of(context)
-                  .errorColor),
-            ),
-            onPressed: () async {
-              await showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  elevation: 10,
-                  title: Text(
-                    "Delete ${medInfo.medName}",
-                    style: TextStyle(
-                      // color: Theme.of(context).errorColor,
-                      fontSize: 22,
-                    ),
-                  ),
-                  content: Text(
-                    "Are you sure?",
-                    style: TextStyle(color: Colors.black54, fontSize: 20),
-                  ),
-                  actions: [
-                    FlatButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          "Cancel",
-                          style: TextStyle(
-                            color: Theme.of(context).accentColor,
-                          ),
-                        )),
-                    FlatButton(
-                      child: Text(
-                        "Ok",
-                        style: TextStyle(
-                          color: Theme.of(context).errorColor,
-                        ),
-                      ),
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        String msg = 'Medicine deleted successfully';
-                        try {
-                          await SQLHelper.getInstant().deleteMedicine(medInfo.id);
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        } catch (e) {
-                          msg = 'Medicine hasn\'t deleted';
-                        }
-                        try {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(msg),
-                            duration: Duration(seconds: 3),
-                            backgroundColor: Theme
-                                .of(context)
-                                .accentColor,
-                          ));
-                        } catch (e) {}
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+          deleteMed(context),
         ],
       ),
       body: Container(
@@ -173,8 +94,26 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                   doseAmountTextField(),
                   intervalDDL(),
                   dailyIntervalDDL(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if(medInfo.startDate.compareTo(DateTime.now()) > 0)
+                      startDatePicker(),
+                      if(medInfo.interval != 'once' && medInfo.startDate.compareTo(DateTime.now()) > 0)
+                      Container(
+                        height: 70,
+                        width: 0.7,
+                        color: Colors.grey,
+                      ),
+                      if(medInfo.interval != 'once')
+                      endDatePicker(),
+                    ],
+                  ),
+                  startTimePicker(context),
                   descriptionTextField(),
-                  nextButton(context, _submit),
+                  submitButton(),
+                  // nextButton(context, _submit),
                 ],
               ),
             ),
@@ -182,38 +121,74 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
     );
   }
 
-  Widget nextButton(BuildContext context, void _submit()) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 15),
-      child: RaisedButton(
-        elevation: 10,
-        padding: EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: 25,
-        ),
-        textColor: Colors.white,
-        color: Theme
-            .of(context)
-            .accentColor,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50.0)),
-        onPressed: () {
-          _submit();
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Next",
-              style: TextStyle(
-                fontSize: 28,
-                color: Colors.white,
-              ),
-            ),
-            Icon(Icons.arrow_forward)
-          ],
+  FlatButton deleteMed(BuildContext context) {
+    return FlatButton(
+      child: Text(
+        'Delete',
+        style: TextStyle(
+          fontSize: 16,
+          color: Theme.of(context).errorColor,
         ),
       ),
+      onPressed: () async {
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            elevation: 10,
+            title: Text(
+              "Delete ${medInfo.medName}",
+              style: TextStyle(
+                // color: Theme.of(context).errorColor,
+                fontSize: 22,
+              ),
+            ),
+            content: Text(
+              "Are you sure?",
+              style: TextStyle(color: Colors.black54, fontSize: 20),
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  )),
+              FlatButton(
+                child: Text(
+                  "Ok",
+                  style: TextStyle(
+                    color: Theme.of(context).errorColor,
+                  ),
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  String msg = 'Medicine deleted successfully';
+                  try {
+                    await SQLHelper.getInstant().deleteMedicine(medInfo.id);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  } catch (e) {
+                    msg = 'Medicine hasn\'t deleted';
+                  }
+                  try {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(msg),
+                      duration: Duration(seconds: 3),
+                      backgroundColor: Theme
+                          .of(context)
+                          .accentColor,
+                    ));
+                  } catch (e) {}
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -241,7 +216,7 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                 // if (newValue != null) {
                 setState(() {
                   dropDownValueDoses = newValue;
-                  dropnDosesValue = (24 / newValue).round();
+                  medInfo.nDoses = (24 / newValue).round();
                 });
                 // }
                 medInfo.intervalTime = dropDownValueDoses;
@@ -282,7 +257,7 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                   if (durationValue != 'daily') {
                     isDaily = false;
                     dropDownValueDoses = 6;
-                    dropnDosesValue = 4;
+                    medInfo.nDoses = 4;
                   }
                   else
                     isDaily = true;
@@ -424,45 +399,269 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
     );
   }
 
-  confirmDeleteMed(BuildContext context) async {
-    showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        elevation: 10,
-        title: Text(
-          "Delete medicine!",
-          style: TextStyle(
-            color: Theme.of(context).accentColor,
-            fontSize: 23,
+  Widget startDatePicker() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: PanelTitle(
+            title: "Start date",
+            isRequired: false,
           ),
         ),
-        content: Text(
-          "Would you like to delete medicine?",
-          style: TextStyle(color: Colors.black54, fontSize: 20),
+        Text(
+          DateFormat.yMMMd().format(medInfo.startDate),
+          style: TextStyle(
+            fontSize: 15,
+          ),
         ),
-        actions: [
-          FlatButton(
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(50.0),
+            ),
+            primary: Theme.of(context).accentColor, // background
+            onPrimary: Colors.white, // foreground
+          ),
+          child: Icon(Icons.date_range),
+          onPressed: () =>
+            showRoundedDatePicker(
+              context: context,
+              theme: Theme.of(context),
+              initialDate: medInfo.startDate,
+              firstDate: DateTime.now().subtract(Duration(days: 1)),
+              lastDate: DateTime(DateTime.now().year + 10),
+              borderRadius: 16,
+              onTapDay: (DateTime dateTime, bool available) {
+                if (!available) {
+                  showDialog(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                      title: Text("This date cannot be selected."),
+                      actions: <Widget>[
+                        CupertinoDialogAction(
+                          child: Text("OK"),
+                          onPressed: () {
+                            setState(() {medInfo.startDate = medInfo.startDate;});
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                setState(() {
+                  medInfo.startDate = dateTime;
+                  if (medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
+                      medInfo.startDate.toIso8601String().substring(0 ,10)) >= 0)
+                    medInfo.endDate = medInfo.startDate.add(Duration(days: 1, seconds: -1));
+                });
+                return available;
+              },
+            ),
+        ),
+      ],
+    );
+  }
+
+  Widget endDatePicker() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: PanelTitle(
+            title: "End date",
+            isRequired: false,
+          ),
+        ),
+        Text(
+          DateFormat.yMMMd().format(medInfo.endDate),
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(50.0),
+            ),
+            primary: Theme.of(context).accentColor, // background
+            onPrimary: Colors.white, // foreground
+          ),
+          child: Icon(Icons.date_range),
+          onPressed: () =>
+            showRoundedDatePicker(
+              context: context,
+              theme: Theme.of(context),
+              initialDate: medInfo.endDate,
+              firstDate: medInfo.startDate,
+              lastDate: DateTime(DateTime.now().year + 10),
+              borderRadius: 16,
+              onTapDay: (DateTime dateTime, bool available) {
+                if (!available) {
+                  showDialog(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                      title: Text("This date cannot be selected."),
+                      actions: <Widget>[
+                        CupertinoDialogAction(
+                          child: Text("OK"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                setState(() {
+                  medInfo.endDate = DateTime.parse(dateTime.toIso8601String().substring(0, 10));
+                  medInfo.endDate = medInfo.endDate.add(Duration(days: 1, seconds: -1));
+                  print(medInfo.endDate);
+                });
+                return available;
+              },
+            ),
+        ),
+      ],
+    );
+  }
+
+  Padding startTimePicker(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 3.0, left: 10.0, right: 10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          PanelTitle(
+            title: "Reminder Time",
+            isRequired: false,
+          ),
+          Text(
+            DateFormat.jm().format(medInfo.startTime),
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+          SizedBox(width: 20,),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(50.0),
+              ),
+              primary: Theme.of(context).accentColor,
+              onPrimary: Colors.white,
+            ),
             onPressed: () {
-              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    elevation: 10,
+                    title: Text(
+                      "When to take this medicine?",
+                      style: TextStyle(
+                          color:
+                          Theme.of(context).accentColor),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TimePickerSpinner(
+                          is24HourMode: false,
+                          time: medInfo.startTime,
+                          normalTextStyle: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black26),
+                          highlightedTextStyle:
+                          TextStyle(fontSize: 25),
+                          spacing: 40,
+                          itemHeight: 40,
+                          isForce2Digits: true,
+                          onTimeChange: (time) {
+                            setState(() {
+                              _startTime = time;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      FlatButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text("Cancel")),
+                      FlatButton(
+                          onPressed: () {
+                            setState(() {medInfo.startTime = _startTime;});
+                            Navigator.pop(context);
+                          },
+                          child: Text("Done")),
+                    ],
+                  );
+                });
             },
-            child: Text(
-              "Cancel",
-              style: TextStyle(
-                color: Colors.redAccent,
-              ),
-            )),
-          FlatButton(
-            onPressed: () async {},
-            child: Text(
-              "Ok",
-              style: TextStyle(
-                color: Colors.redAccent,
-              ),
-            )),
+            child: Icon(
+                Icons.timer_outlined
+            ),
+          ),
         ],
-      );
-    });
+      ),
+    );
+  }
+
+  Widget submitButton() {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: RaisedButton(
+        elevation: 10,
+        padding: EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 130,
+        ),
+        textColor: Colors.white,
+        color: Theme.of(context).accentColor,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50.0)),
+        onPressed: () async {
+          await _submit();
+        },
+        child: Text(
+          "Update",
+          style: TextStyle(
+            fontSize: 28,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  _submit() async {
+    final isValid = _formKey.currentState.validate();
+    FocusScope.of(context).unfocus();
+    if (isValid) {
+      try {
+        await _sqlHelper.deleteMedicineUpcomingDoses(medInfo.id);
+        await _sqlHelper.updateMedicine(medInfo);
+        await _sqlHelper.insertDosesAfterDate(medInfo, DateTime.now());
+        if(medInfo.isOn)
+          await Alarm.updateAlarm(medInfo);
+        Navigator.pop(context, medInfo);
+      } catch (e) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(e.toString()),
+          duration: Duration(seconds: 3),
+          backgroundColor: Theme.of(context).errorColor,
+        ));
+      }
+    } else {
+      print('form is invalid');
+    }
   }
 }
 
@@ -492,229 +691,6 @@ class PanelTitle extends StatelessWidget {
             style: TextStyle(fontSize: 16, color: Colors.red),
           ),
         ]),
-      ),
-    );
-  }
-}
-
-class MedReminderDetails extends StatefulWidget {
-  final Medicine medInfo;
-
-  MedReminderDetails(this.medInfo);
-
-  @override
-  _MedReminderDetailsState createState() => _MedReminderDetailsState();
-}
-
-class _MedReminderDetailsState extends State<MedReminderDetails> {
-  SQLHelper _sqlHelper = SQLHelper();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-        ),
-        elevation: 5,
-        centerTitle: true,
-        title: Text("Edit Medicine",),
-      ),
-      body: Center(
-        child: Container(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: PanelTitle(
-                    title: "Pick up Start date",
-                    isRequired: false,
-                  ),
-                ),
-                Text(
-                  DateFormat.yMMMd().format(widget.medInfo.startDate),
-                  style: TextStyle(
-                    fontSize: 15,
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(50.0),
-                    ),
-                    primary:
-                    Theme
-                        .of(context)
-                        .accentColor, // background
-                    onPrimary: Colors.white, // foreground
-                  ),
-                  child: Icon(Icons.date_range),
-                  onPressed: () =>
-                      showRoundedDatePicker(
-                        context: context,
-                        theme: Theme.of(context),
-                        initialDate: widget.medInfo.startDate,
-                        firstDate: DateTime.now().subtract(Duration(days: 1)),
-                        lastDate: DateTime(DateTime.now().year + 10),
-                        borderRadius: 16,
-                        onTapDay: (DateTime dateTime, bool available) {
-                          if (!available) {
-                            showDialog(
-                              context: context,
-                              builder: (c) => AlertDialog(
-                                title: Text("This date cannot be selected."),
-                                actions: <Widget>[
-                                  CupertinoDialogAction(
-                                    child: Text("OK"),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          setState(() {
-                            widget.medInfo.startDate = dateTime;
-                            if (widget.medInfo.startDate.toIso8601String().substring(0 ,10).compareTo(
-                                widget.medInfo.endDate.toIso8601String().substring(0 ,10)) >= 0)
-                              widget.medInfo.endDate = widget.medInfo.startDate.add(Duration(days: 1));
-                          });
-                          return available;
-                        },
-                      ),
-                ),
-                if(widget.medInfo.interval != 'once')
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: PanelTitle(
-                      title: "Pick up end date",
-                      isRequired: false,
-                    ),
-                  ),
-                if(widget.medInfo.interval != 'once')
-                  Text(
-                    DateFormat.yMMMd().format(widget.medInfo.endDate),
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                if(widget.medInfo.interval != 'once')
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(50.0),
-                      ),
-                      primary: Theme.of(context).accentColor,
-                      onPrimary: Colors.white,
-                    ),
-                    child: new Icon(Icons.date_range),
-                    onPressed: () =>
-                        showRoundedDatePicker(
-                          context: context,
-                          theme: Theme.of(context),
-                          initialDate: widget.medInfo.endDate,
-                          firstDate: widget.medInfo.startDate.add(Duration(days: 1)),
-                          lastDate: DateTime(DateTime.now().year + 10),
-                          borderRadius: 16,
-                          onTapDay: (DateTime dateTime, bool available) {
-                            if (!available) {
-                              showDialog(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: Text("This date cannot be selected."),
-                                  actions: <Widget>[
-                                    CupertinoDialogAction(
-                                      child: Text("OK"),
-                                      onPressed: () => Navigator.pop(context),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                            setState(() {
-                              widget.medInfo.endDate = dateTime.add(Duration(seconds: 60*60*24-1));
-                            });
-                            return available;
-                          },
-                        ),
-                  ),
-                Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    child: PanelTitle(
-                      title: "Pick up time for first reminder",
-                      isRequired: false,
-                    )),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TimePickerSpinner(
-                    time: widget.medInfo.startTime,
-                    is24HourMode: false,
-                    normalTextStyle: TextStyle(
-                      fontSize: 22,
-                      color: Colors.grey,
-                    ),
-                    highlightedTextStyle:
-                    TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).accentColor,
-                    ),
-                    spacing: 45,
-                    itemHeight: 40,
-                    isForce2Digits: true,
-                    onTimeChange: (time) {
-                      widget.medInfo.startTime = time;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: RaisedButton(
-                    elevation: 10,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 130,
-                    ),
-                    textColor: Colors.white,
-                    color: Theme.of(context).accentColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0)),
-                    onPressed: () async {
-                      try {
-                        await _sqlHelper.deleteMedicineUpcomingDoses(widget.medInfo.id);
-                        await _sqlHelper.updateMedicine(widget.medInfo);
-                        await _sqlHelper.insertDosesAfterDate(widget.medInfo, DateTime.now());
-                        if(widget.medInfo.isOn)
-                          await Alarm.updateAlarm(widget.medInfo);
-                        Navigator.pop(context);
-                        Navigator.pop(context, widget.medInfo);
-                      } catch (e) {
-                        print(e);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(e.toString()),
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Theme.of(context).errorColor,
-                        ));
-                      }
-                    },
-                    child: Text(
-                      "Done",
-                      style: TextStyle(
-                        fontFamily: "Angel",
-                        fontSize: 28,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

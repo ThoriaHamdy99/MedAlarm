@@ -6,7 +6,6 @@ import 'package:med_alarm/main.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/alarm/alarm_screen.dart';
 import 'package:med_alarm/service/alarm.dart';
-import 'package:med_alarm/utilities/sql_helper.dart';
 
 Notification notification = Notification();
 
@@ -99,24 +98,7 @@ class Notification {
             } break;
           case 'Refill Alarm':
             FlutterRingtonePlayer.stop();
-            switch (event.buttonKeyPressed) {
-              case 'Confirm':
-                print('Confirmed');
-                break;
-
-              case 'Snooze':
-                print('Snoozed');
-                break;
-
-              default:
-                print('Else');
-                // if (navigatorKey == null) main();
-                // navigatorKey.currentState.push(
-                //     MaterialPageRoute(builder: (BuildContext context) {
-                //       return AlarmScreen(map);
-                //     })
-                // );
-            } break;
+            break;
         }
       });
     } catch(e) {
@@ -150,12 +132,6 @@ class Notification {
   }
 
   Future<void> delayNotification(map) async {
-    // print('Map Content Delayed ========================');
-    // for(var key in map.keys) {
-    //   print('key: $key');
-    //   print(map[key]);
-    // }
-    // print('============================================');
     await AwesomeNotifications().createNotification(
         content: NotificationContent(
             id: int.parse(map['id']),
@@ -178,54 +154,12 @@ class Notification {
   }
 
   Future<void> showNotificationAtScheduleTime(Medicine med) async {
-    print('here');
-    DateTime scheduleTime = DateTime(med.startDate.year, med.startDate.month,
-        med.startDate.day, med.startTime.hour, med.startTime.minute);
-    print('here 2');
-    DateTime breakAlarmTime = DateTime(med.endDate.year, med.endDate.month, med.endDate.day + 1);
-    switch (med.interval) {
-      case 'once':
-        if(breakAlarmTime.isBefore(DateTime.now())) {
-          return;
-        }
-        break;
-      case 'daily':
-        scheduleTime = DateTime(DateTime.now().year, DateTime.now().month,
-            DateTime.now().day, med.startTime.hour, med.startTime.minute);
-        while(scheduleTime.isBefore(DateTime.now())) {
-          scheduleTime = scheduleTime.add(Duration(hours: med.intervalTime));
-          // scheduleTime = scheduleTime.add(Duration(hours: med.intervalTime));
-        }
-        if(breakAlarmTime.isBefore(DateTime.now())) {
-          return;
-        }
-        break;
-      case 'weekly':
-        while(scheduleTime.isBefore(DateTime.now())) {
-          scheduleTime = scheduleTime.add(Duration(days: 7));
-        }
-        if(breakAlarmTime.isBefore(DateTime.now())) {
-          return;
-        }
-        break;
-      case 'monthly':
-        while(scheduleTime.isBefore(DateTime.now())) {
-          scheduleTime = scheduleTime.add(Duration(days: 30));
-        }
-        if(breakAlarmTime.isBefore(DateTime.now())) {
-          return;
-        }
-        break;
-    }
+    DateTime scheduleTime = med.getNextDoseAlarm();
+    if(scheduleTime == null) return;
     Map<String, String> payload = med.toMapString();
     payload['doseTime'] = '${scheduleTime.millisecondsSinceEpoch}';
     payload['taken'] = '0';
     payload['snoozed'] = '0';
-    // print('Map Content=================================');
-    // for(var key in payload.keys) {
-    //   print(payload[key]);
-    // }
-    // print('============================================');
     try {
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
@@ -234,9 +168,6 @@ class Notification {
           title: 'Time to take your medicine.',
           body: '${med.medName}: ${med.doseAmount} ${med.medType}',
           payload: payload,
-          // autoCancel: false,
-          // displayedDate: '${scheduleTime.millisecondsSinceEpoch}',
-          // ticker: 'ticker',
         ),
         schedule: NotificationCalendar.fromDate(
             date: scheduleTime, allowWhileIdle: true),
@@ -269,9 +200,6 @@ class Notification {
         title: '${med.medName} needs to be refilled',
         body: 'Only ${med.medAmount} ${med.medType} left',
         notificationLayout: NotificationLayout.Default,
-        // largeIcon: '',
-        // bigPicture: medImageURl,
-        // notificationLayout: NotificationLayout.BigPicture,
         color: Colors.cyan,
         payload: {'uuid': 'uuid-test'},
       ),
@@ -282,6 +210,24 @@ class Notification {
         NotificationActionButton(
             key: 'Snooze', label: 'Snooze to next dose', autoCancel: true,
             buttonType:  ActionButtonType.KeepOnTop)
+      ]
+    );
+  }
+
+  Future<void> showDelayedNotificationRefill(Medicine med, String msg) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        channelKey: "Refill Alarm",
+        id: med.id,
+        title: '${med.medName} needs to be refilled',
+        body: 'Only ${med.medAmount} ${med.medType} left',
+        notificationLayout: NotificationLayout.Default,
+        color: Colors.cyan,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+            key: 'OK', label: 'OK', autoCancel: true,
+            buttonType:  ActionButtonType.KeepOnTop),
       ]
     );
   }

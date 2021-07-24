@@ -170,4 +170,44 @@ class Medicine {
     }
     return filteredDoses;
   }
+
+  DateTime getNextDoseAlarm() {
+    DateTime scheduleTime = DateTime(startDate.year, startDate.month,
+        startDate.day, startTime.hour, startTime.minute);
+    DateTime breakAlarmTime = endDate;
+    switch (interval) {
+      case 'once':
+        if(breakAlarmTime.isBefore(DateTime.now())) {
+          return null;
+        }
+        break;
+      case 'daily':
+        scheduleTime = DateTime(DateTime.now().year, DateTime.now().month,
+            DateTime.now().day, startTime.hour, startTime.minute);
+        while(scheduleTime.isBefore(DateTime.now())) {
+          scheduleTime = scheduleTime.add(Duration(hours: intervalTime));
+        }
+        if(breakAlarmTime.isBefore(DateTime.now())) {
+          return null;
+        }
+        break;
+      case 'weekly':
+        while(scheduleTime.isBefore(DateTime.now())) {
+          scheduleTime = scheduleTime.add(Duration(days: 7));
+        }
+        if(breakAlarmTime.isBefore(DateTime.now())) {
+          return null;
+        }
+        break;
+      case 'monthly':
+        while(scheduleTime.isBefore(DateTime.now())) {
+          scheduleTime = scheduleTime.add(Duration(days: 30));
+        }
+        if(breakAlarmTime.isBefore(DateTime.now())) {
+          return null;
+        }
+        break;
+    }
+    return scheduleTime;
+  }
 }
