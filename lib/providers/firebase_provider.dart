@@ -265,9 +265,10 @@ class FirebaseProvider with ChangeNotifier {
       List<Medicine> medicines = await SQLHelper.getInstant().getAllMedicines();
       if(medicines.isNotEmpty) {
         for(var med in medicines) {
+          print(med.id);
           await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
-              .doc(med.medName)
-              .set(med.toMap(), SetOptions(merge: true));
+              .doc('${med.id}')
+              .set(med.toMap());
           List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.id);
           if(doses.isNotEmpty) {
             for (var dose in doses) {
@@ -278,7 +279,7 @@ class FirebaseProvider with ChangeNotifier {
                       '${med.id}/'
                       'Doses')
                   .doc(dose.doseTime.toIso8601String())
-                  .set(dose.toMap(), SetOptions(merge: true));
+                  .set(dose.toDoc());
             }
           }
         }
@@ -294,11 +295,23 @@ class FirebaseProvider with ChangeNotifier {
     try {
       List<Medicine> medicines = await SQLHelper.getInstant().getAllMedicines();
       if(medicines.isNotEmpty) {
-        await firestore.collection('Medicines')
-          .doc(auth.currentUser.uid).delete();
+        // await firestore.collection('Medicines').doc(auth.currentUser.uid).delete();
+        await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
+          .get().then((snapshot) async {
+          for (DocumentSnapshot med in snapshot.docs){
+            await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines/'
+                '${med.get('id')}/Doses')
+                .get().then((snapshot) {
+              for (DocumentSnapshot dose in snapshot.docs){
+                dose.reference.delete();
+              }
+            });
+            med.reference.delete();
+          }
+        });
         for(var med in medicines) {
           await firestore.collection('Medicines/${auth.currentUser.uid}/Medicines')
-            .doc(med.medName)
+            .doc('${med.id}')
             .set(med.toDoc());
           List<Dose> doses = await SQLHelper.getInstant().getMedicineDoses(med.id);
           if(doses.isNotEmpty) {
@@ -310,10 +323,11 @@ class FirebaseProvider with ChangeNotifier {
                 '${med.id}/'
                 'Doses')
                   .doc(dose.doseTime.toIso8601String())
-                  .set(dose.toMap());
+                  .set(dose.toDoc());
             }
           }
         }
+        print('Done');
       }
     } catch (e) {
       print(e);
@@ -328,6 +342,7 @@ class FirebaseProvider with ChangeNotifier {
       if(medicinesDocs.docs.isNotEmpty) {
         List<Medicine> medicines = [];
         for(var doc in medicinesDocs.docs) {
+          print(doc.get('id'));
           medicines.add(Medicine.fromDoc(doc));
           var dosesDocs = await firestore
               .collection(
@@ -341,13 +356,14 @@ class FirebaseProvider with ChangeNotifier {
             for(var doseDoc in dosesDocs.docs) {
               doses.add(Dose.fromDoc(doseDoc));
             }
-            medicines[medicines.length - 1].addDoses(doses);
+            medicines[medicines.length - 1].doses = doses;
           }
         }
         return medicines;
       }
       return [];
     } catch (e) {
+      print(e);
       return [];
     }
   }

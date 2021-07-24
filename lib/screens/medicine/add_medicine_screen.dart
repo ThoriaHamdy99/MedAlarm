@@ -55,12 +55,12 @@ class _BottomContainer extends StatefulWidget {
 }
 
 class _BottomContainerState extends State<_BottomContainer> {
-  Medicine medInfo = new Medicine();
+  Medicine medInfo = Medicine();
   String dropDownValue = 'Pills';
   String durationValue = 'once';
   int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
-  var items = ['Pills', 'Solutions', 'Injections', 'Drops', 'Powder', 'Other'];
+  var items = ['Pills', 'Syrup', 'Solutions', 'Injections', 'Drops', 'Powder', 'Other'];
   var durationItems = ['once', 'daily', 'weekly', 'monthly'];
   bool isDaily = false;
   var dropnDoses6H = [2, 3, 4];
@@ -118,7 +118,7 @@ class _BottomContainerState extends State<_BottomContainer> {
                 doseAmountTextField(),
                 intervalDDL(),
                 dailyIntervalDDL(),
-                dailyDosesCountDDL(),
+                // dailyDosesCountDDL(),
                 descriptionTextField(),
                 nextButton(context, _submit),
               ],
@@ -163,69 +163,69 @@ class _BottomContainerState extends State<_BottomContainer> {
     );
   }
 
-  Widget dailyDosesCountDDL() {
-    return Visibility(
-      visible: isDaily,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if(medInfo.intervalTime == 6 || medInfo.intervalTime == 8)
-            PanelTitle(
-              title: "Doses per day:",
-              isRequired: false,
-            ),
-            if(medInfo.intervalTime == 6)
-            DropdownButton(
-              value: dropnDosesValue,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: dropnDoses6H.map((int item) {
-                return DropdownMenuItem(
-                    value: item, child: Text(item.toString()));
-              }).toList(),
-              onChanged: (newValue) {
-                // if (newValue != null) {
-                setState(() {
-                  dropnDosesValue = newValue;
-                });
-                // }
-                medInfo.nDoses = dropnDosesValue;
-              },
-              style: TextStyle(
-                fontSize: 18,
-                // fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            if(medInfo.intervalTime == 8)
-            DropdownButton(
-              value: dropnDosesValue,
-              icon: Icon(Icons.keyboard_arrow_down),
-              items: dropnDoses8H.map((int item) {
-                return DropdownMenuItem(
-                    value: item, child: Text(item.toString()));
-              }).toList(),
-              onChanged: (newValue) {
-                // if (newValue != null) {
-                setState(() {
-                  dropnDosesValue = newValue;
-                });
-                // }
-                medInfo.nDoses = dropnDosesValue;
-              },
-              style: TextStyle(
-                fontSize: 18,
-                // fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget dailyDosesCountDDL() {
+  //   return Visibility(
+  //     visible: isDaily,
+  //     child: Padding(
+  //       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         crossAxisAlignment: CrossAxisAlignment.center,
+  //         children: [
+  //           if(medInfo.intervalTime == 6 || medInfo.intervalTime == 8)
+  //           PanelTitle(
+  //             title: "Doses per day:",
+  //             isRequired: false,
+  //           ),
+  //           if(medInfo.intervalTime == 6)
+  //           DropdownButton(
+  //             value: dropnDosesValue,
+  //             icon: Icon(Icons.keyboard_arrow_down),
+  //             items: dropnDoses6H.map((int item) {
+  //               return DropdownMenuItem(
+  //                   value: item, child: Text(item.toString()));
+  //             }).toList(),
+  //             onChanged: (newValue) {
+  //               // if (newValue != null) {
+  //               setState(() {
+  //                 dropnDosesValue = newValue;
+  //               });
+  //               // }
+  //               medInfo.nDoses = dropnDosesValue;
+  //             },
+  //             style: TextStyle(
+  //               fontSize: 18,
+  //               // fontWeight: FontWeight.bold,
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //           if(medInfo.intervalTime == 8)
+  //           DropdownButton(
+  //             value: dropnDosesValue,
+  //             icon: Icon(Icons.keyboard_arrow_down),
+  //             items: dropnDoses8H.map((int item) {
+  //               return DropdownMenuItem(
+  //                   value: item, child: Text(item.toString()));
+  //             }).toList(),
+  //             onChanged: (newValue) {
+  //               // if (newValue != null) {
+  //               setState(() {
+  //                 dropnDosesValue = newValue;
+  //               });
+  //               // }
+  //               medInfo.nDoses = dropnDosesValue;
+  //             },
+  //             style: TextStyle(
+  //               fontSize: 18,
+  //               // fontWeight: FontWeight.bold,
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget dailyIntervalDDL() {
     return Visibility(
@@ -248,11 +248,10 @@ class _BottomContainerState extends State<_BottomContainer> {
                     value: item, child: Text(item.toString()));
               }).toList(),
               onChanged: (var newValue) {
-                // if (newValue != null) {
                 setState(() {
                   dropDownValueDoses = newValue;
+                  dropnDosesValue = (24 / newValue).round();
                 });
-                // }
                 medInfo.intervalTime = dropDownValueDoses;
               },
               style: TextStyle(
@@ -288,8 +287,11 @@ class _BottomContainerState extends State<_BottomContainer> {
               if (newValue != null) {
                 setState(() {
                   durationValue = newValue as String;
-                  if (durationValue != 'daily')
+                  if (durationValue != 'daily') {
                     isDaily = false;
+                    dropDownValueDoses = 6;
+                    dropnDosesValue = 4;
+                  }
                   else isDaily = true;
                 });
               }
@@ -668,6 +670,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
                             throw 'Choose time after now';
                           }
                         }
+                        // await _sqlHelper.insertDummyData();
                         if (!await _sqlHelper.insertMedicine(widget.medInfo)) {
                           print('Med Not Inserted');
                           return;

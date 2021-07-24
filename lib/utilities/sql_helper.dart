@@ -160,11 +160,14 @@ class SQLHelper {
   Future<bool> insertMedicine(Medicine med) async {
     Database db = await this.database;
     var result;
+    String id = med.id == null ? '' : 'id,';
+    String idVal = med.id == null ? '' : '${med.id},';
     try {
-      result = await db.rawInsert('''INSERT INTO Medicine(
-        name, type, startDate, endDate, medAmount, doseAmount,
+      result = await db.rawInsert('''REPLACE INTO Medicine(
+        $id name, type, startDate, endDate, medAmount, doseAmount,
         description, nDoses, startTime, interval, intervalTime, isOn)
         VALUES(
+        $idVal
         '${med.medName}',
         '${med.medType}',
         '${med.startDate.millisecondsSinceEpoch}',
@@ -282,12 +285,40 @@ class SQLHelper {
     }
   }
 
+  Future<List<Medicine>> getAllMedicinesAndDoses() async {
+    Database db = await database;
+    List<Medicine> medicines = [];
+    try {
+      var result = await db.rawQuery('SELECT * FROM Medicine;');
+      for(var med in result) {
+        medicines.add(Medicine.fromMap(med));
+        medicines[medicines.length - 1].doses = await getMedicineDoses(med['id']);
+      }
+      return medicines;
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
   Future<bool> deleteMedicine(int id) async {
     Database db = await database;
     try {
       if(!await deleteMedicineDoses(id)) throw 'Doses aren\'t deleted';
       await db.rawDelete(
           "DELETE FROM Medicine WHERE id = '$id'");
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> deleteAllMedicine() async {
+    Database db = await database;
+    try {
+      await db.rawDelete("DELETE FROM Dose");
+      await db.rawDelete("DELETE FROM Medicine");
       return true;
     } catch (e) {
       print(e);
@@ -303,8 +334,8 @@ class SQLHelper {
         values(
         '$id',
         '${dose.doseTime.millisecondsSinceEpoch}',
-        '${dose.taken ? 1 : 0}',
-        '${dose.snoozed ? 1 : 0}')''');
+        '${(dose.taken??false) ? 1 : 0}',
+        '${(dose.snoozed??false) ? 1 : 0}')''');
       print('+++++++++++++++++++++ From InsertDose +++++++++++++++++++++');
       if(result != null) {
         print('Dose Added');
@@ -362,7 +393,6 @@ class SQLHelper {
     List<Dose> doses = [];
     try {
       var result = await db.rawQuery("SELECT * FROM Dose WHERE id = '$id';");
-      print(result.length);
       result.forEach((dose) => doses.add(Dose.fromMap(dose)));
       return doses;
     } catch (e) {
@@ -449,5 +479,116 @@ class SQLHelper {
               taken INT NOT NULL,
               snoozed INT NOT NULL,
               PRIMARY KEY (id, doseTime));''');
+  }
+
+  insertDummyData() async {
+    var db = await database;
+    await db.rawInsert('''
+    REPLACE INTO Medicine(
+    id, name, type, startDate, endDate, medAmount, doseAmount,
+    description, nDoses, startTime, interval, intervalTime, isOn)
+    VALUES('97', 'Paracetamol 500mg', 'Pills', '${DateTime(2021, 7, 20, 0, 0).millisecondsSinceEpoch}',
+    '${DateTime(2021, 7, 30, 0, 0).millisecondsSinceEpoch}', '20', '2', ' ',
+    '3', '${DateTime(2021, 7, 20, 8, 0).millisecondsSinceEpoch}', 'daily',
+    '8', '1');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Medicine(
+    id, name, type, startDate, endDate, medAmount, doseAmount,
+    description, nDoses, startTime, interval, intervalTime, isOn)
+    VALUES('98', 'Panadol', 'Pills', '${DateTime(2021, 7, 20, 8, 0).millisecondsSinceEpoch}',
+    '${DateTime(2021, 7, 28, 0, 0).millisecondsSinceEpoch}', '15', '1', '',
+    '4', '${DateTime(2021, 7, 20, 14, 0).millisecondsSinceEpoch}', 'weekly',
+    '6', '1');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Medicine(
+    id, name, type, startDate, endDate, medAmount, doseAmount,
+    description, nDoses, startTime, interval, intervalTime, isOn)
+    VALUES('99', 'Oblex', 'Syrup', '${DateTime(2021, 7, 20, 0, 0).millisecondsSinceEpoch}',
+    '${DateTime(2021, 8, 20, 0, 0).millisecondsSinceEpoch}', '80', '15', '',
+    '4', '${DateTime(2021, 7, 20, 20, 0).millisecondsSinceEpoch}', 'monthly',
+    '6', '1');
+    ''');
+
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 20, 8, 0).millisecondsSinceEpoch}', '1', '1');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 20, 16, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 21, 0, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 21, 8, 0).millisecondsSinceEpoch}', '1', '1');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 21, 16, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 22, 0, 0).millisecondsSinceEpoch}', '0', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 22, 8, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 22, 16, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 23, 0, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 23, 8, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 23, 16, 0).millisecondsSinceEpoch}', '0', '1');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 24, 0, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('97', '${DateTime(2021, 7, 24, 8, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('98', '${DateTime(2021, 7, 20, 14, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+    await db.rawInsert('''
+    REPLACE INTO Dose(id, doseTime, taken, snoozed)
+    values('99', '${DateTime(2021, 7, 20, 20, 0).millisecondsSinceEpoch}', '1', '0');
+    ''');
+
+    // await insertDose(4, Dose(doseTime: DateTime(
+    //   2021, 7, 20, 8, 0
+    // ), taken: true, snoozed: false));
+    // await insertDose(4, Dose(doseTime: DateTime(
+    //   2021, 7, 20, 14, 0
+    // ), taken: true, snoozed: true));
+    // await insertDose(4, Dose(doseTime: DateTime(
+    //   2021, 7, 20, 20, 0
+    // ), taken: false, snoozed: false));
+    // await insertDose(4, Dose(doseTime: DateTime(
+    //   2021, 7, 21, 8, 0
+    // ), taken: true, snoozed: true));
+    // await insertDose(4, Dose(doseTime: DateTime(
+    //   2021, 7, 21, 14, 0
+    // ), taken: true, snoozed: false));
+    // await insertDose(4, Dose(doseTime: DateTime(
+    //   2021, 7, 22, 8, 0
+    // ), snoozed: true));
   }
 }

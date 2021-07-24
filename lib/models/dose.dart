@@ -20,7 +20,7 @@ class Dose {
     );
   }
 
-  Map toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'doseTime': doseTime.millisecondsSinceEpoch,
       'taken': taken ? 1 : 0,
@@ -31,12 +31,12 @@ class Dose {
   factory Dose.fromDoc(doc) {
     return Dose(
       doseTime: DateTime.fromMillisecondsSinceEpoch(doc.get('doseTime').millisecondsSinceEpoch),
-      taken: doc.get('taken'),
-      snoozed: doc.get('snoozed'),
+      taken: doc.get('taken') == 1,
+      snoozed: doc.get('snoozed') == 1,
     );
   }
 
-  Map toDoc() {
+  Map<String, dynamic> toDoc() {
     return {
       'doseTime': Timestamp.fromMillisecondsSinceEpoch(
           doseTime.millisecondsSinceEpoch),

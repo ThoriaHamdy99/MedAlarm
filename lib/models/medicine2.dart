@@ -16,9 +16,9 @@ class Medicine {
   String interval;
   int intervalTime;
   bool isOn;
-  List<Dose> dosesTaken;
-  List<Dose> dosesSnoozed;
-  List<Dose> dosesSkipped;
+  List<Dose> doses;
+  // List<Dose> dosesSnoozed;
+  // List<Dose> dosesSkipped;
 
   Medicine({
     this.id,
@@ -34,9 +34,9 @@ class Medicine {
     this.interval,
     this.intervalTime,
     this.isOn,
-    this.dosesTaken,
-    this.dosesSnoozed,
-    this.dosesSkipped
+    this.doses,
+    // this.dosesSnoozed,
+    // this.dosesSkipped
   });
 
   // String get getName => medicineName;
@@ -60,7 +60,7 @@ class Medicine {
       "interval": interval,
       "intervalTime": intervalTime,
       "description": description,
-      "isOn": isOn,
+      "isOn": isOn??true,
       //"doses": this.doses
     };
   }
@@ -99,7 +99,7 @@ class Medicine {
       "interval": interval,
       "intervalTime": '$intervalTime',
       "description": description,
-      "isOn": isOn ? '1' : '0',
+      "isOn": isOn??true ? '1' : '0',
       //"doses": this.doses
     };
   }
@@ -138,7 +138,7 @@ class Medicine {
       "interval": interval,
       "intervalTime": intervalTime,
       "description": description,
-      "isOn": isOn,
+      "isOn": isOn??true,
       //"doses": this.doses
     };
   }
@@ -162,23 +162,12 @@ class Medicine {
     return med;
   }
 
-  addDoses(List<Dose> doses) {
-    for(var dose in doses) {
-      if(dose.snoozed) dosesSnoozed.add(dose);
-      if(dose.taken) dosesTaken.add(dose);
-      else dosesSkipped.add(dose);
+  List<Dose> getDosesBefore(DateTime t) {
+    if(doses == null) return [];
+    List<Dose> filteredDoses = [];
+    for(Dose d in doses) {
+      if(d.doseTime.compareTo(t) <= 0) filteredDoses.add(d);
     }
-  }
-
-  addTakenDose(map) {
-    dosesTaken.add(Dose.fromMap(map));
-  }
-
-  addSnoozedDose(map) {
-    dosesSnoozed.add(Dose.fromMap(map));
-  }
-
-  addSkippedDose(map) {
-    dosesSkipped.add(Dose.fromMap(map));
+    return filteredDoses;
   }
 }

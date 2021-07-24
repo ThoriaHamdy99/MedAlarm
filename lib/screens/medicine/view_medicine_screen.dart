@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:intl/intl.dart';
 
+import 'edit_med.dart';
 import 'edit_medicine_screen.dart';
+
+// import 'edit_medicine_screen.dart';
 
 class ViewMedicineScreen extends StatefulWidget {
   Medicine med;
@@ -34,7 +37,8 @@ class _ViewMedicineScreenState extends State<ViewMedicineScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (BuildContext context) {
-                  return EditMedicine(widget.med);
+                  return EditMedicineScreen(widget.med);
+                  // return EditMedicine(widget.med);
                 })
               ).then((newMed) {
                 if(newMed != null) {
@@ -61,8 +65,10 @@ class _ViewMedicineScreenState extends State<ViewMedicineScreen> {
           otherDetails("Dose amount", '${widget.med.doseAmount}'),
           otherDetails("Alarm starts at", parseTime(widget.med.startTime)),
           otherDetails("Alarm type", widget.med.interval),
+          if(widget.med.interval == 'daily')
           otherDetails("Daily interval (Hours)", '${widget.med.intervalTime}'),
-          otherDetails("Doses per day", '${widget.med.nDoses}'),
+          // if(widget.med.interval == 'daily')
+          // otherDetails("Doses per day", '${widget.med.nDoses}'),
           otherDetails("Start date", parseDate(widget.med.startDate)),
           otherDetails("End date", parseDate(widget.med.endDate)),
           SizedBox(height: 5),
@@ -93,7 +99,7 @@ class _ViewMedicineScreenState extends State<ViewMedicineScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(90),
                   image: DecorationImage(
-                    image: AssetImage('./assets/medicine_icons/${widget.med.medType}.jpg'),
+                    image: AssetImage('./assets/meds_icons/${widget.med.medType}.jpg'),
                     fit: BoxFit.fill,
                   ),
                 ),

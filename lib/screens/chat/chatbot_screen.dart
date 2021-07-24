@@ -172,7 +172,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   answerQuestion() async {
     streamController.add(MessageBubble(messagesController.text));
     answer = await cb.query(answer.list[0], input: int.parse(messagesController.text));
-    if(answer.type == AnswersType.error) answer = await cb.start();
+    if(answer.type == AnswersType.error) answer = cb.start();
     streamController.add(ChatBotMessage(cb, answer, callback));
     messagesController.clear();
   }

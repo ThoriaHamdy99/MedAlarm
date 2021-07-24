@@ -168,10 +168,12 @@ class _MedicineScreenState extends State<MedicineScreen> {
         },
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(vertical: 15),
-          leading: CircleAvatar(
-            child: Image.asset('./assets/medicine_icons/${med.medType}.jpg'),
-            radius: 40,
-            backgroundColor: Colors.black,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+              child: Image.asset('./assets/meds_icons/${med.medType}.jpg'),
+            ),
           ),
           title: Column(
             mainAxisSize: MainAxisSize.min,
@@ -196,6 +198,7 @@ class _MedicineScreenState extends State<MedicineScreen> {
                   fontSize: 20,
                 ),
               ),
+              SizedBox(width: 10),
               Switch(
                 value: med.isOn,
                 activeColor: Theme.of(context).accentColor,

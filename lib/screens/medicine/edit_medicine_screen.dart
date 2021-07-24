@@ -11,37 +11,40 @@ import 'package:validators/validators.dart';
 final _formKey = new GlobalKey<FormState>();
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class EditMedicine extends StatefulWidget {
-  static const id = 'MED_DETAILS_SCREEN';
+class EditMedicineScreen extends StatefulWidget {
   final Medicine med;
 
-  EditMedicine(this.med);
+  EditMedicineScreen(this.med);
 
   @override
-  _EditMedicineState createState() => _EditMedicineState();
+  _EditMedicineScreenState createState() => _EditMedicineScreenState();
 }
 
-class _EditMedicineState extends State<EditMedicine> {
+class _EditMedicineScreenState extends State<EditMedicineScreen> {
   Medicine medInfo;
   String dropDownValue = 'Pills';
   String durationValue = 'once';
   int dropDownValueDoses = 6;
   var doses = [6, 8, 12, 24];
-  var items = ['Pills', 'Solutions', 'Injections', 'Drops', 'Powder', 'Other'];
+  var items = ['Pills', 'Syrup', 'Solutions', 'Injections', 'Drops', 'Powder', 'Other'];
   var durationItems = ['once', 'daily', 'weekly', 'monthly'];
   bool isDaily = false;
   var dropnDoses6H = [2, 3, 4];
   var dropnDoses8H = [2, 3];
   var dropnDosesValue = 2;
 
-  get tfBorder => OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.grey),
-    borderRadius: BorderRadius.circular(10),
-  );
+  get tfBorder =>
+      OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey),
+        borderRadius: BorderRadius.circular(10),
+      );
 
-  get tfFBorder => OutlineInputBorder(
-    borderSide: BorderSide(color: Theme.of(context).accentColor,width: 2),
-  );
+  get tfFBorder =>
+      OutlineInputBorder(
+        borderSide: BorderSide(color: Theme
+            .of(context)
+            .accentColor, width: 2),
+      );
 
   void _submit() {
     final isValid = _formKey.currentState.validate();
@@ -86,6 +89,75 @@ class _EditMedicineState extends State<EditMedicine> {
           "Edit Details",
           style: TextStyle(),
         ),
+        actions: [
+          FlatButton(
+            child: Text(
+              'Delete',
+              style: TextStyle(fontSize: 16, color: Theme
+                  .of(context)
+                  .errorColor),
+            ),
+            onPressed: () async {
+              await showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  elevation: 10,
+                  title: Text(
+                    "Delete ${medInfo.medName}",
+                    style: TextStyle(
+                      // color: Theme.of(context).errorColor,
+                      fontSize: 22,
+                    ),
+                  ),
+                  content: Text(
+                    "Are you sure?",
+                    style: TextStyle(color: Colors.black54, fontSize: 20),
+                  ),
+                  actions: [
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: Theme.of(context).accentColor,
+                          ),
+                        )),
+                    FlatButton(
+                      child: Text(
+                        "Ok",
+                        style: TextStyle(
+                          color: Theme.of(context).errorColor,
+                        ),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        String msg = 'Medicine deleted successfully';
+                        try {
+                          await SQLHelper.getInstant().deleteMedicine(medInfo.id);
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        } catch (e) {
+                          msg = 'Medicine hasn\'t deleted';
+                        }
+                        try {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(msg),
+                            duration: Duration(seconds: 3),
+                            backgroundColor: Theme
+                                .of(context)
+                                .accentColor,
+                          ));
+                        } catch (e) {}
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -101,7 +173,6 @@ class _EditMedicineState extends State<EditMedicine> {
                   doseAmountTextField(),
                   intervalDDL(),
                   dailyIntervalDDL(),
-                  dailyDosesCountDDL(),
                   descriptionTextField(),
                   nextButton(context, _submit),
                 ],
@@ -146,70 +217,6 @@ class _EditMedicineState extends State<EditMedicine> {
     );
   }
 
-  Widget dailyDosesCountDDL() {
-    return Visibility(
-      visible: isDaily,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if(medInfo.intervalTime == 6 || medInfo.intervalTime == 8)
-              PanelTitle(
-                title: "Doses per day:",
-                isRequired: false,
-              ),
-            if(medInfo.intervalTime == 6)
-              DropdownButton(
-                value: dropnDosesValue,
-                icon: Icon(Icons.keyboard_arrow_down),
-                items: dropnDoses6H.map((int item) {
-                  return DropdownMenuItem(
-                      value: item, child: Text(item.toString()));
-                }).toList(),
-                onChanged: (newValue) {
-                  // if (newValue != null) {
-                  setState(() {
-                    dropnDosesValue = newValue;
-                  });
-                  // }
-                  medInfo.nDoses = dropnDosesValue;
-                },
-                style: TextStyle(
-                  fontSize: 18,
-                  // fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            if(medInfo.intervalTime == 8)
-              DropdownButton(
-                value: dropnDosesValue,
-                icon: Icon(Icons.keyboard_arrow_down),
-                items: dropnDoses8H.map((int item) {
-                  return DropdownMenuItem(
-                      value: item, child: Text(item.toString()));
-                }).toList(),
-                onChanged: (newValue) {
-                  // if (newValue != null) {
-                  setState(() {
-                    dropnDosesValue = newValue;
-                  });
-                  // }
-                  medInfo.nDoses = dropnDosesValue;
-                },
-                style: TextStyle(
-                  fontSize: 18,
-                  // fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget dailyIntervalDDL() {
     return Visibility(
       visible: isDaily,
@@ -234,6 +241,7 @@ class _EditMedicineState extends State<EditMedicine> {
                 // if (newValue != null) {
                 setState(() {
                   dropDownValueDoses = newValue;
+                  dropnDosesValue = (24 / newValue).round();
                 });
                 // }
                 medInfo.intervalTime = dropDownValueDoses;
@@ -271,9 +279,13 @@ class _EditMedicineState extends State<EditMedicine> {
               if (newValue != null) {
                 setState(() {
                   durationValue = newValue as String;
-                  if (durationValue != 'daily')
+                  if (durationValue != 'daily') {
                     isDaily = false;
-                  else isDaily = true;
+                    dropDownValueDoses = 6;
+                    dropnDosesValue = 4;
+                  }
+                  else
+                    isDaily = true;
                 });
               }
               medInfo.interval = durationValue;
@@ -411,6 +423,47 @@ class _EditMedicineState extends State<EditMedicine> {
       ),
     );
   }
+
+  confirmDeleteMed(BuildContext context) async {
+    showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        elevation: 10,
+        title: Text(
+          "Delete medicine!",
+          style: TextStyle(
+            color: Theme.of(context).accentColor,
+            fontSize: 23,
+          ),
+        ),
+        content: Text(
+          "Would you like to delete medicine?",
+          style: TextStyle(color: Colors.black54, fontSize: 20),
+        ),
+        actions: [
+          FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(
+                color: Colors.redAccent,
+              ),
+            )),
+          FlatButton(
+            onPressed: () async {},
+            child: Text(
+              "Ok",
+              style: TextStyle(
+                color: Colors.redAccent,
+              ),
+            )),
+        ],
+      );
+    });
+  }
 }
 
 class PanelTitle extends StatelessWidget {
@@ -499,7 +552,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
                         .accentColor, // background
                     onPrimary: Colors.white, // foreground
                   ),
-                  child: new Icon(Icons.date_range),
+                  child: Icon(Icons.date_range),
                   onPressed: () =>
                       showRoundedDatePicker(
                         context: context,

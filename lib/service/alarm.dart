@@ -17,7 +17,12 @@ class Alarm {
   static updateAlarm(Medicine med) async {
     try {
       await notification.cancelNotification(med.id);
-      await notification.showNotificationAtScheduleTime(med);
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+    try {
+      if(med.isOn) await notification.showNotificationAtScheduleTime(med);
     } catch (e) {
       print(e);
       throw e;
@@ -28,8 +33,8 @@ class Alarm {
     await notification.cancelNotification(med.id);
   }
 
-  static deleteAlarm(Medicine med) {
-
+  static deleteAlarm(Medicine med) async {
+    await pauseAlarm(med);
   }
 
   static confirmAlarm(map) async {
