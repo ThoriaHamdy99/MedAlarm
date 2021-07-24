@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/view_medicine_screen.dart';
 import 'package:med_alarm/service/alarm.dart';
@@ -158,14 +160,10 @@ class _MedicineScreenState extends State<MedicineScreen> {
       margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       elevation: 5,
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-                builder: (_) => ViewMedicineScreen(med)
-            ),
-          ).whenComplete((){setState(() {});});
-        },
+      child: FocusedMenuHolder(
+        onPressed: () {},
+        blurSize: 0,
+        blurBackgroundColor: Colors.white,
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(vertical: 15),
           leading: Padding(
@@ -221,7 +219,83 @@ class _MedicineScreenState extends State<MedicineScreen> {
               ),
             ],
           ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (_) => ViewMedicineScreen(med)
+              ),
+            ).whenComplete((){setState(() {});});
+          },
         ),
+        menuItems: [
+          FocusedMenuItem(
+            onPressed: () async {
+              await confirmDeleteMed(context, med);
+              setState(() {});
+            },
+            title: Text('Delete', style: TextStyle(color: Colors.black)),
+            trailingIcon: Icon(Icons.delete, color: Colors.red),
+          ),
+        ],
+      ),
+    );
+  }
+
+  confirmDeleteMed(BuildContext context, Medicine med) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        elevation: 10,
+        title: Text(
+          "Delete ${med.medName}",
+          style: TextStyle(
+            // color: Theme.of(context).errorColor,
+            fontSize: 22,
+          ),
+        ),
+        content: Text(
+          "Are you sure?",
+          style: TextStyle(color: Colors.black54, fontSize: 20),
+        ),
+        actions: [
+          FlatButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Theme.of(context).accentColor,
+                ),
+              )),
+          FlatButton(
+            child: Text(
+              "Ok",
+              style: TextStyle(
+                color: Theme.of(context).errorColor,
+              ),
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              String msg = 'Medicine deleted successfully';
+              try {
+                await SQLHelper.getInstant().deleteMedicine(med.id);
+                setState(() {});
+              } catch (e) {
+                msg = 'Medicine hasn\'t deleted';
+              }
+              try {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(msg),
+                  duration: Duration(seconds: 3),
+                  backgroundColor: Theme
+                      .of(context)
+                      .accentColor,
+                ));
+              } catch (e) {}
+            },
+          ),
+        ],
       ),
     );
   }

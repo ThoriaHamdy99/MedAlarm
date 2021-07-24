@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
 import 'package:med_alarm/screens/home_screen.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 import 'package:med_alarm/config/ColorConstants.dart';

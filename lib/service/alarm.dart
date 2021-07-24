@@ -1,9 +1,22 @@
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/notification/notification.dart';
+import 'package:med_alarm/service/notification.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
 class Alarm {
+  static insureAlarmsAreOn() async {
+    var medicines = await SQLHelper.getInstant().getAllMedicines();
+    if(medicines.isNotEmpty) {
+      for(var med in medicines) {
+        if(med.isOn) {
+          try {
+            await updateAlarm(med);
+          } catch (e) {print(e);}
+        }
+      }
+    }
+  }
+
   static setAlarm(Medicine med) async {
     try {
       print(med.startDate);

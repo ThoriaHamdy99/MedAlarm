@@ -1,6 +1,6 @@
 import 'package:med_alarm/models/doctor.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
-import 'package:med_alarm/screens/chat/chatroom_screen.dart';
+import 'package:med_alarm/screens/home_tabs/chat/chatroom_screen.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
 
 enum AnswersType {
   start,
@@ -12,23 +12,6 @@ enum AnswersType {
 }
 
 class ChatBot {
-  // bool dizzy = false;
-  // bool headache = false;
-  // bool flu = false;
-  // bool diarrhea = false;
-  // bool dentalPain = false;
-  // bool gumPain = false;
-  // bool throatPain = false;
-  // bool earPain = false;
-  /*List<String> answersType = [
-    'start',
-    'options',
-    'question',
-    'contacts',
-    'pages',
-    'error',
-  ];*/
-
   List<Doctor> doctors = [];
   Map<String, List<ValueText>> specialists = {};
   List<String> specialities = [];
@@ -55,26 +38,6 @@ class ChatBot {
           List.from(specialities),
           title: 'Available specialities',
         );
-      // case 'Suggest a medicine?':
-      //   return Answer(
-      //     AnswersType.question,
-      //     ['Question 1?'],
-      //   );
-      // case 'Question 1?':
-      //   return Answer(
-      //     AnswersType.question,
-      //     ['Question 2?'],
-      //   );
-      // case 'Question 2?':
-      //   return Answer(
-      //     AnswersType.question,
-      //     ['Question 3?'],
-      //   );
-      // case 'Question 3?':
-      //   return Answer(
-      //     AnswersType.question,
-      //     ['Question 4?'],
-      //   );
     }
     if(specialities.contains(query)) {
       return Answer(

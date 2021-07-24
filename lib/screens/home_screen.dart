@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/screens/home_tabs/calender_screen.dart';
-import 'package:med_alarm/utilities/push_notifications.dart';
+import 'package:med_alarm/service/push_notifications.dart';
 
-import 'chat/chats_screen.dart';
+import 'home_tabs/chat/chats_screen.dart';
 import 'home_tabs/medicines_screen.dart';
 import 'home_tabs/more_screen.dart';
 

@@ -7,10 +7,10 @@ import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/contact.dart';
 import 'package:med_alarm/models/message.dart';
-import 'package:med_alarm/providers/user_provider.dart';
-import 'package:med_alarm/screens/chat/chatbot_screen.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
+import 'chatbot_screen.dart';
 import 'package:med_alarm/screens/search_contact_screen.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
 
 class ChatsScreen extends StatefulWidget {
   static const String id = 'CHATS_SCREEN';

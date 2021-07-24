@@ -7,8 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
-import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
 import 'package:med_alarm/screens/medicine/add_medicine_screen.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
@@ -143,7 +143,11 @@ class _EditProfileState extends State<EditProfile> {
                         });
 
                         Navigator.of(context).pop();
-                        Navigator.of(context).pushReplacementNamed(UserProfile.id);
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (BuildContext context) {
+                            return UserProfile(UserProvider.instance.currentUser, true);
+                          }),
+                        );
                       }
                     },
                     child: Container(

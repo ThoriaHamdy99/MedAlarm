@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:med_alarm/notification/localNotification.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
 import 'package:med_alarm/screens/login_fresh/login_fresh_screen.dart';
 import 'package:med_alarm/screens/report/report_screen.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 
-import '../../main.dart';
 import '../sync_meds_screen.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -44,8 +43,6 @@ class MoreScreen extends StatelessWidget {
             Divider(height: 0,),
             reportTile(context),
             Divider(height: 0,),
-            notificationTile(context),
-            Divider(height: 0,),
             logoutTile(context),
           ],
         ),
@@ -63,7 +60,11 @@ class MoreScreen extends StatelessWidget {
       title: Text('View Profile'),
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
-        Navigator.of(context).pushNamed(UserProfile.id);
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (BuildContext context) {
+            return UserProfile(UserProvider.instance.currentUser, true);
+          }),
+        );
       },
     );
   }
@@ -109,21 +110,6 @@ class MoreScreen extends StatelessWidget {
       contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       onTap: () {
         Navigator.of(context).pushNamed(ReportScreen.id);
-      },
-    );
-  }
-
-  ListTile notificationTile(BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        Icons.notifications_none_outlined,
-        size: 50,
-        color: Theme.of(context).accentColor,
-      ),
-      title: Text('Notifications'),
-      contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      onTap: () {
-        Navigator.of(context).pushNamed(LocalNotificationScreen.id);
       },
     );
   }

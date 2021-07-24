@@ -4,9 +4,10 @@ import 'package:flutter_rounded_date_picker/rounded_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
-import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/models/user.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
 import 'package:med_alarm/screens/medicine/add_medicine_screen.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
 import 'package:med_alarm/screens/home_screen.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 import 'package:med_alarm/config/ColorConstants.dart';
@@ -67,18 +68,23 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
               email: this.signUpModel.email.trim(),
               password: this.signUpModel.password.trim());
 
-      await fbPro.insertUserFromSUModel(auth.user.uid, this.signUpModel);
+      Map<String, dynamic> userDoc;
+      if (this.signUpModel.type.trim() == 'Patient')
+        userDoc = Patient.fromSignUpModel(auth.user.uid, this.signUpModel).toDoc();
+      else if (this.signUpModel.type.trim() == 'Doctor')
+        userDoc = Doctor.fromSignUpModel(auth.user.uid, this.signUpModel).toDoc();
+      await fbPro.insertUser(userDoc);
       if (this.signUpModel.type.trim() == 'Patient')
         UserProvider.instance.currentUser =
             Patient.fromSignUpModel(auth.user.uid, this.signUpModel);
-      else if (this.signUpModel.type.trim() == 'Doctor')
         UserProvider.instance.currentUser =
             Doctor.fromSignUpModel(auth.user.uid, this.signUpModel);
 
       await FirebaseProvider.instance.registerDeviceToken();
       await SQLHelper.getInstant().insertUser();
 
-      Navigator.of(context).pop();
+      while(Navigator.of(context).canPop())
+        Navigator.of(context).pop();
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomeScreen()));
     } on Auth.FirebaseAuthException catch (e) {
@@ -489,7 +495,7 @@ class _LoginFreshSignUpState extends State<LoginFreshSignUp> {
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             child: PanelTitle(
                               title: "Birth Date",
-                              isRequired: true,
+                              isRequired: false,
                             ),
                           ),
                           Padding(

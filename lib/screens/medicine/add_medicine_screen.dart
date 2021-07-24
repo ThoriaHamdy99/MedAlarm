@@ -612,7 +612,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
                           );
                         }
                         setState(() {
-                          widget.medInfo.endDate = dateTime;
+                          widget.medInfo.endDate = dateTime.add(Duration(seconds: 60*60*24-1));
                         });
                         return available;
                       },
@@ -671,10 +671,8 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
                           }
                         }
                         // await _sqlHelper.insertDummyData();
-                        if (!await _sqlHelper.insertMedicine(widget.medInfo)) {
-                          print('Med Not Inserted');
-                          return;
-                        }
+                        await _sqlHelper.insertMedicine(widget.medInfo);
+                        await _sqlHelper.insertDosesAfterDate(widget.medInfo, widget.medInfo.startDate);
                         await Alarm.setAlarm(await _sqlHelper
                             .getMedicine(widget.medInfo.medName));
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

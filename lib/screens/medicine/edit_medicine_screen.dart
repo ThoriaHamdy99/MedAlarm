@@ -635,7 +635,7 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
                               );
                             }
                             setState(() {
-                              widget.medInfo.endDate = dateTime;
+                              widget.medInfo.endDate = dateTime.add(Duration(seconds: 60*60*24-1));
                             });
                             return available;
                           },
@@ -685,10 +685,9 @@ class _MedReminderDetailsState extends State<MedReminderDetails> {
                         borderRadius: BorderRadius.circular(50.0)),
                     onPressed: () async {
                       try {
-                        if (!await _sqlHelper.updateMedicine(widget.medInfo)) {
-                          print('Med Not Updated');
-                          return;
-                        }
+                        await _sqlHelper.deleteMedicineUpcomingDoses(widget.medInfo.id);
+                        await _sqlHelper.updateMedicine(widget.medInfo);
+                        await _sqlHelper.insertDosesAfterDate(widget.medInfo, DateTime.now());
                         if(widget.medInfo.isOn)
                           await Alarm.updateAlarm(widget.medInfo);
                         Navigator.pop(context);

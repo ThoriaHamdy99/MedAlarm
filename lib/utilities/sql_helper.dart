@@ -4,7 +4,7 @@ import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/user.dart';
-import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
@@ -348,6 +348,91 @@ class SQLHelper {
     return false;
   }
 
+  Future<bool> insertDosesAfterDate(Medicine med, DateTime rangeStart) async {
+    rangeStart.subtract(Duration(seconds: 10));
+    var result;
+    try {
+      switch (med.interval) {
+        case 'once':
+          if(med.startDate.isAfter(rangeStart)) {
+            DateTime time = DateTime.parse(
+                med.startDate.toIso8601String().substring(0, 10));
+            time = time.add(Duration(
+                hours: med.startTime.hour,
+                minutes: med.startTime.minute
+            ));
+            try {await insertDose(med.id, Dose(doseTime: time));} catch (e) {}
+          }
+          break;
+        case 'daily':
+          DateTime time = DateTime.parse(rangeStart.toIso8601String().substring(0, 10));
+          time = time.add(Duration(
+              hours: med.startTime.hour,
+              minutes: med.startTime.minute
+          ));
+          int n = med.nDoses;
+          while(time.isBefore(rangeStart) && n > 1) {
+            time = time.add(Duration(hours: med.intervalTime));
+            n--;
+          }
+          if(time.isBefore(rangeStart)) {
+            time = DateTime.parse(rangeStart.toIso8601String().substring(0, 10));
+            time = time.add(Duration(
+                days: 1,
+                hours: med.startTime.hour,
+                minutes: med.startTime.minute
+            ));
+          }
+          while (time.isBefore(med.endDate)) {
+            try {await insertDose(med.id, Dose(doseTime: time));} catch (e) {}
+            time = time.add(Duration(hours: med.intervalTime));
+          }
+          break;
+        case 'weekly':
+          DateTime time = DateTime.parse(med.startDate.toIso8601String().substring(0, 10));
+          time = time.add(Duration(
+              hours: med.startTime.hour,
+              minutes: med.startTime.minute
+          ));
+          while(time.isBefore(rangeStart)) {
+            time = time.add(Duration(
+                days: 7
+            ));
+          }
+          while (time.isBefore(med.endDate)) {
+            try {await insertDose(med.id, Dose(doseTime: time));} catch (e) {}
+            time = time.add(Duration(days: 7));
+          }
+          break;
+        case 'monthly':
+          DateTime time = DateTime.parse(med.startDate.toIso8601String().substring(0, 10));
+          time = time.add(Duration(
+              hours: med.startTime.hour,
+              minutes: med.startTime.minute
+          ));
+          while(time.isBefore(rangeStart)) {
+            time = time.add(Duration(
+                days: 30
+            ));
+          }
+          while (time.isBefore(med.endDate)) {
+            try {await insertDose(med.id, Dose(doseTime: time));} catch (e) {}
+            time = time.add(Duration(days: 30));
+          }
+          break;
+      }
+      print('+++++++++++++++++++++ From InsertDosesInRange +++++++++++++++++++++');
+      if(result != null) {
+        print('Doses Added');
+        return true;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+    return false;
+  }
+
   Future<bool> replaceDose(map) async {
     Database db = await this.database;
     var result;
@@ -417,6 +502,17 @@ class SQLHelper {
     Database db = await database;
     try {
       await db.rawDelete("DELETE FROM Dose WHERE id = '$id';");
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteMedicineUpcomingDoses(int id) async {
+    Database db = await database;
+    try {
+      await db.rawDelete("DELETE FROM Dose WHERE "
+          "id = '$id' AND doseTime >= '${DateTime.now().millisecondsSinceEpoch - 10000}'");
       return true;
     } catch (e) {
       return false;

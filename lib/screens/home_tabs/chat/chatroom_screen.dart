@@ -2,14 +2,14 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:med_alarm/models/user.dart';
-import 'package:med_alarm/providers/user_provider.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
 import 'package:med_alarm/custom_widgets/custom_widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:med_alarm/screens/user_profile/user_profile.dart';
 
 class ChatRoom extends StatefulWidget {
   static const String id = 'CHAT_ROOM';
@@ -90,68 +90,71 @@ class _ChatRoomState extends State<ChatRoom> {
             bottomRight: Radius.circular(20),
           ),
         ),
-        centerTitle: true,
         elevation: 5,
-        // backgroundColor: Colors.blueAccent,
-        // leading: FlatButton(
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //   },
-        //   child: Icon(Icons.arrow_back),
-        //   shape: RoundedRectangleBorder(
-        //     borderRadius: BorderRadius.all(Radius.circular(90)),
-        //   ),
-        // ),
         titleSpacing: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Hero(
-              tag: widget.otherUser.uid,
-              child: (widget.otherUser.profPicURL == '') ?
-              Container(
-                child: Icon(
-                  Icons.account_circle,
-                  color: Colors.white,
-                  size: AppBar().preferredSize.height-10,
-                ),
-              ) :
-              Container(
-                padding: EdgeInsets.all(3),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    widget.otherUser.profPicURL,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        title: InkWell(
+          borderRadius: BorderRadius.circular(30.0),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (BuildContext context) {
+                return UserProfile(widget.otherUser, false);
+              }),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white
+                Hero(
+                  tag: 'profPic-${widget.otherUser.uid}',
+                  child: (widget.otherUser.profPicURL == '') ?
+                  Container(
+                    child: Icon(
+                      Icons.account_circle,
+                      color: Colors.white,
+                      size: AppBar().preferredSize.height-10,
+                    ),
+                  ) :
+                  Container(
+                    padding: EdgeInsets.all(3),
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(
+                        widget.otherUser.profPicURL,
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(
-                  height: 5,
+                  width: 15,
                 ),
-                Text(
-                  widget.otherUser.phoneNumber,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      widget.otherUser.phoneNumber,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
       body: SafeArea(

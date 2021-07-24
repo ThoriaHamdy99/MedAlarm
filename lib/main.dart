@@ -1,21 +1,20 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:med_alarm/notification/notification.dart';
-import 'package:med_alarm/screens/chat/chatbot_screen.dart';
+import 'package:med_alarm/screens/home_tabs/chat/chatbot_screen.dart';
+import 'package:med_alarm/screens/home_tabs/chat/chatroom_screen.dart';
+import 'package:med_alarm/screens/home_tabs/chat/chats_screen.dart';
+import 'package:med_alarm/service/notification.dart';
 import 'package:med_alarm/screens/sync_meds_screen.dart';
 import 'package:med_alarm/screens/user_profile/edit_profile.dart';
-import 'package:med_alarm/screens/user_profile/user_profile.dart';
-import 'notification/localNotification.dart';
-import 'providers/firebase_provider.dart';
+import 'package:med_alarm/service/alarm.dart';
+import 'utilities/firebase_provider.dart';
 import 'screens/medicine/add_medicine_screen.dart';
 import 'screens/home_tabs/calender_screen.dart';
 import 'screens/login_fresh/login_fresh_screen.dart';
 import 'screens/report/report_screen.dart';
-import 'utilities/scroll_behavior.dart';
-import 'providers/user_provider.dart';
-import 'screens/chat/chatroom_screen.dart';
-import 'screens/chat/chats_screen.dart';
+import 'service/scroll_behavior.dart';
+import 'utilities/user_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_contact_screen.dart';
 import 'utilities/sql_helper.dart';
@@ -28,6 +27,7 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
     await notification.initialize();
+    Alarm.insureAlarmsAreOn();
     WidgetsFlutterBinding.ensureInitialized();
   } catch (e) {
     print(e);
@@ -73,10 +73,8 @@ class _MyAppState extends State<MyApp> {
         ReportScreen.id: (context) => ReportScreen(),
         AddMedicineScreen.id: (context) => AddMedicineScreen(),
         ChatBotScreen.id: (context) => ChatBotScreen(),
-        UserProfile.id: (context) => UserProfile(),
         EditProfile.id: (context) => EditProfile(),
         SyncMedsScreen.id: (context) => SyncMedsScreen(),
-        LocalNotificationScreen.id: (context) => LocalNotificationScreen(),
       },
     );
   }

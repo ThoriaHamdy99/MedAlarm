@@ -4,13 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart' as Auth;
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:med_alarm/screens/home_tabs/chat/chatroom_screen.dart';
+import 'package:med_alarm/screens/user_profile/user_profile.dart';
 
 import '../models/contact.dart';
 import '../models/message.dart';
 import '../models/user.dart';
-import '../providers/user_provider.dart';
-import '../providers/firebase_provider.dart';
-import '../screens/chat/chatroom_screen.dart';
+import '../utilities/user_provider.dart';
+import '../utilities/firebase_provider.dart';
 
 class CustomButton extends StatelessWidget {
   final VoidCallback callback;
@@ -188,7 +189,7 @@ class _ContactTileState extends State<ContactTile> {
                   ),
                 ),
                 leading: Hero(
-                  tag: widget.contact.user.uid,
+                  tag: 'profPic-${widget.contact.user.uid}',
                   child: (widget.contact.user.profPicURL.isEmpty) ?
                     Icon(Icons.account_circle, size: 50.0) :
                     Padding(
@@ -237,11 +238,22 @@ class _ContactTileState extends State<ContactTile> {
             menuItems: <FocusedMenuItem>[
               FocusedMenuItem(
                 onPressed: () async {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return UserProfile(widget.contact.user, false);
+                    }),
+                  );
+                },
+                title: Text('View Profile', style: TextStyle(color: Colors.black)),
+                trailingIcon: Icon(Icons.account_circle, color: Theme.of(context).accentColor),
+              ),
+              FocusedMenuItem(
+                onPressed: () async {
                   setState(() {});
                   await fbPro.deleteContact(widget.currentUser.uid, widget.contact.user.uid);
                 },
-                title: Text('Delete', style: TextStyle(color: Colors.red)),
-                trailingIcon: Icon(Icons.delete, color: Colors.red)
+                title: Text('Remove Contact', style: TextStyle(color: Colors.black)),
+                trailingIcon: Icon(Icons.delete, color: Colors.red),
               ),
             ],
           );

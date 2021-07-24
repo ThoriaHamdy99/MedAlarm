@@ -9,7 +9,7 @@ import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/models/patient.dart';
 import 'package:med_alarm/models/sign_up_model.dart';
 import 'package:med_alarm/models/user.dart';
-import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
 
 class FirebaseProvider with ChangeNotifier {
@@ -119,61 +119,27 @@ class FirebaseProvider with ChangeNotifier {
     });
   }
 
-  insertUserFromSUModel(String uid, SignUpModel model) async {
-    await insertUser(
-      uid,
-      model.email.trim(),
-      model.type.trim(),
-      model.firstname.trim(),
-      model.lastname.trim(),
-      model.phoneNumber.trim(),
-      model.address.trim(),
-      model.dob,
-      speciality: model.speciality,
-    );
-  }
-
-  insertUser(
-      String uid,
-      String email,
-      String type,
-      String firstname,
-      String lastname,
-      String phoneNumber,
-      String address,
-      DateTime date,
-  {String speciality}
-  ) async {
-    if(type == 'Patient')
+  insertUser(Map<String, dynamic> userDoc) async {
+    // if(type == 'Patient')
+    //   await firestore
+    //       .collection('Users')
+    //       .doc(uid)
+    //       .set({
+    //     'email': email,
+    //     'type': type,
+    //     'firstname': firstname,
+    //     'lastname': lastname,
+    //     'profPicURL': '',
+    //     'phoneNumber': phoneNumber,
+    //     'address': address,
+    //     'dob': Timestamp.fromDate(date),
+    //   });
+    // else if(type == 'Doctor')
       await firestore
           .collection('Users')
-          .doc(uid)
-          .set({
-        'email': email,
-        'type': type,
-        'firstname': firstname,
-        'lastname': lastname,
-        'profPicURL': '',
-        'phoneNumber': phoneNumber,
-        'address': address,
-        'dob': Timestamp.fromDate(date),
-      });
-    else if(type == 'Doctor')
-      await firestore
-          .collection('Users')
-          .doc(uid)
-          .set({
-        'email': email,
-        'type': type,
-        'speciality': speciality,
-        'firstname': firstname,
-        'lastname': lastname,
-        'profPicURL': '',
-        'phoneNumber': phoneNumber,
-        'address': address,
-        'dob': Timestamp.fromDate(date),
-      });
-    initNewUserContacts(uid);
+          .doc(userDoc['uid'])
+          .set(userDoc);
+    initNewUserContacts(userDoc['uid']);
   }
 
   Future<bool> updateUser(User user) async {
@@ -259,6 +225,70 @@ class FirebaseProvider with ChangeNotifier {
       return '';
     }
   }
+
+  Future<String> uploadReport(report) async {
+    try {
+      FirebaseStorage storage = FirebaseStorage.instanceFor(
+        bucket: 'gs://medalarm-fcai2021.appspot.com',
+      );
+
+      Reference ref =
+      storage.ref('Reports/${auth.currentUser.uid}/'
+          '${DateTime.now().toIso8601String().substring(0, 10)}');
+      UploadTask storageUploadTask = ref.putFile(report);
+      TaskSnapshot storageTaskSnapshot =
+      await storageUploadTask.whenComplete(() => null);
+      String url = await storageTaskSnapshot.ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      return null;
+    }
+  }
+
+
+  insertReport(
+      String uid,
+      String email,
+      String type,
+      String firstname,
+      String lastname,
+      String phoneNumber,
+      String address,
+      DateTime date,
+      {String speciality}
+      ) async {
+    if(type == 'Patient')
+      await firestore
+          .collection('Users')
+          .doc(uid)
+          .set({
+        'email': email,
+        'type': type,
+        'firstname': firstname,
+        'lastname': lastname,
+        'profPicURL': '',
+        'phoneNumber': phoneNumber,
+        'address': address,
+        'dob': Timestamp.fromDate(date),
+      });
+    else if(type == 'Doctor')
+      await firestore
+          .collection('Users')
+          .doc(uid)
+          .set({
+        'email': email,
+        'type': type,
+        'speciality': speciality,
+        'firstname': firstname,
+        'lastname': lastname,
+        'profPicURL': '',
+        'phoneNumber': phoneNumber,
+        'address': address,
+        'dob': Timestamp.fromDate(date),
+      });
+    initNewUserContacts(uid);
+  }
+
 
   uploadMedicinesMerge() async {
     try {

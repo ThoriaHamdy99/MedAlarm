@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
 import 'package:med_alarm/screens/medicine/add_medicine_screen.dart';
-import 'package:med_alarm/providers/user_provider.dart';
+import 'package:med_alarm/utilities/user_provider.dart';
 import 'package:med_alarm/screens/user_profile/user_profile.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';
@@ -84,15 +84,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
       }
       switch (med.interval) {
         case 'once':
-          DateTime temp = DateTime.parse(med.startDate.toIso8601String().substring(0, 10));
-          temp = temp.add(Duration(
-              hours: med.startTime.hour,
-              minutes: med.startTime.minute
-          ));
-          Medicine m = Medicine.fromMapString(med.toMapString());
-          m.startTime = temp;
-          if(map[temp] == null) map[temp] = [];
-          map[temp].add(m);
+          if(med.startDate.isAfter(DateTime.now())) {
+            DateTime temp = DateTime.parse(
+                med.startDate.toIso8601String().substring(0, 10));
+            temp = temp.add(Duration(
+                hours: med.startTime.hour,
+                minutes: med.startTime.minute
+            ));
+            Medicine m = Medicine.fromMapString(med.toMapString());
+            m.startTime = temp;
+            if (map[temp] == null) map[temp] = [];
+            map[temp].add(m);
+          }
           break;
         case 'daily':
           DateTime temp = DateTime.parse(DateTime.now().toIso8601String().substring(0, 10));
@@ -232,23 +235,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                   ],
                 );
-              //   if (snapShot.data.isEmpty) {
-              //     return buildNoMedsAll(context);
-              //   }
-              //   allMeds = snapShot.data;
-              //   initialized = true;
-              //   _selectedMeds.value = _getEventsForDay(_selectedDay);
-              //   return _selectedMeds.value.isEmpty ?
-              //     buildNoMedsDay() :
-              //     Expanded(
-              //       child: ValueListenableBuilder<List<Medicine>>(
-              //         valueListenable: _selectedMeds,
-              //         builder: (context, value, _) {
-              //           _selectedMeds.value = _getEventsForDay(_selectedDay);
-              //           return medCardsBuilder(value);
-              //         },
-              //       ),
-              //     );
                 }
                 return Center(child: CircularProgressIndicator());
               }),
@@ -292,26 +278,36 @@ class _CalendarScreenState extends State<CalendarScreen> {
       titleSpacing: 5,
       leading:
       InkWell(
-        borderRadius: BorderRadius.circular(30),
-        onTap: () {Navigator.of(context).pushNamed(UserProfile.id);},
-        child: Container(
-          child: (UserProvider.instance.currentUser.profPicURL == '') ?
-            CircleAvatar(
-              child: Icon(
-                Icons.account_circle,
-                color: Colors.white,
-                size: AppBar().preferredSize.height,
-              ),
-              backgroundColor: Colors.transparent,
-            ) :
-            Container(
-              padding: EdgeInsets.all(5),
-              child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                  UserProvider.instance.currentUser.profPicURL,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (BuildContext context) {
+              return UserProfile(UserProvider.instance.currentUser, true);
+            }),
+          );
+        },
+        child: Hero(
+          tag: 'profPic-${UserProvider.instance.currentUser.uid}',
+          child: Container(
+            child: (UserProvider.instance.currentUser.profPicURL == '') ?
+              CircleAvatar(
+                child: Icon(
+                  Icons.account_circle,
+                  color: Colors.white,
+                  size: AppBar().preferredSize.height,
+                ),
+                backgroundColor: Colors.transparent,
+              ) :
+              Container(
+                padding: EdgeInsets.all(5),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    UserProvider.instance.currentUser.profPicURL,
+                  ),
                 ),
               ),
-            ),
+          ),
         ),
       ),
     );
@@ -527,8 +523,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget buildDoseStatus(Medicine med) {
-    print(med.medName);
-    print(med.startTime);
     bool taken = false;
     bool snoozed = false;
 

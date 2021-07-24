@@ -27,6 +27,21 @@ class Doctor extends User {
     dob: dob,
   );
 
+  Map<String, dynamic> toDoc() {
+    return {
+      'uid': uid,
+      'email': email,
+      'type': type,
+      'speciality': speciality,
+      'firstname': firstname,
+      'lastname': lastname,
+      'profPicURL': '',
+      'phoneNumber': phoneNumber,
+      'address': address,
+      'dob': Timestamp.fromMillisecondsSinceEpoch(dob.millisecondsSinceEpoch),
+    };
+  }
+
   Doctor.fromDoc(uid, doc) {
     this.uid = uid;
     email = doc.get('email');

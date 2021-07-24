@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_alarm/models/dose.dart';
 import 'package:med_alarm/models/medicine2.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
 import 'package:med_alarm/screens/medicine/add_medicine_screen.dart';
 import 'package:med_alarm/service/alarm.dart';
 import 'package:med_alarm/utilities/sql_helper.dart';

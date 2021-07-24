@@ -68,10 +68,6 @@ class BuildLoginFresh extends StatelessWidget {
         isRequest(true);
 
         Future.delayed(Duration(seconds: 5), () {
-          // print('-------------- function call----------------');
-          // print(user);
-          // print(password);
-          // print('--------------   end call   ----------------');
           try {
             isRequest(false);
             ScaffoldMessenger.of(_context).showSnackBar(SnackBar(
@@ -100,8 +96,6 @@ class BuildLoginFresh extends StatelessWidget {
         isRequest(true);
 
         Future.delayed(Duration(seconds: 5), () async {
-          // print('-------------- function call----------------');
-          // print(email);
           final _auth = FirebaseAuth.instance;
           _auth.sendPasswordResetEmail(email: email).then((onVal) {
             Navigator.pop(_context, true);

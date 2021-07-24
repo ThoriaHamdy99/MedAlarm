@@ -2,11 +2,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/patient.dart';
-import 'package:med_alarm/providers/firebase_provider.dart';
+import 'package:med_alarm/utilities/firebase_provider.dart';
 
 import '../models/user.dart';
-import '../providers/user_provider.dart';
-import 'chat/chatroom_screen.dart';
+import '../utilities/user_provider.dart';
+import 'home_tabs/chat/chatroom_screen.dart';
 
 class SearchContact extends StatefulWidget {
   static const String id = 'SEARCH_CONTACT_SCREEN';
