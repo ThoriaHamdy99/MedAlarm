@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:ext_storage/ext_storage.dart';
+import 'package:med_alarm/screens/report/med_chart_screen.dart';
+import 'package:med_alarm/screens/report/pressureChart.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart ' as pw;
-import 'package:med_alarm/custom_widgets/charts/med_chart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -19,6 +20,7 @@ class ReportScreen extends StatefulWidget {
 class _ReportScreenState extends State<ReportScreen> {
   ScreenshotController screenshotController = ScreenshotController();
 
+
   Uint8List _imageFile;
 
   @override
@@ -31,56 +33,105 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            ),
-          ),
-          centerTitle: true,
-          elevation: 5,
-          title: Text(
-            "Report",
-            style: TextStyle(
-              // fontFamily: "Angel",
-              // fontSize: 32,
-              color: Colors.white,
-            ),
-          ),
+          title: Text("Report"),
         ),
-        body: Center(
-          child: Column(
-            children: [
-              Screenshot(
-                controller: screenshotController,
-                child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: MedChart.withSampleData()),
+        body: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(15.0),
+                    child: Row(children: [
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                              BorderSide(width: 2, color: Colors.indigo),
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(width: 2, color: Colors.indigo),
+                                borderRadius: BorderRadius.circular(20.0)),
+                            labelText: "Systolic:",
+                            labelStyle:
+                            TextStyle(fontSize: 25, color: Colors.blueAccent),
+                            hintText: "Enter top number",
+                            hintStyle:
+                            TextStyle(fontSize: 15, color: Colors.black54),
+                          ),
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                              BorderSide(width: 2, color: Colors.indigo),
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(width: 2, color: Colors.indigo),
+                                borderRadius: BorderRadius.circular(20.0)),
+                            labelText: "Diastolic:",
+                            labelStyle:
+                            TextStyle(fontSize: 25, color: Colors.blueAccent),
+                            hintText: "Enter bottom number",
+                            hintStyle:
+                            TextStyle(fontSize: 15, color: Colors.black54),
+                          ),
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ]),
+                  ),
+                  Screenshot(
+                    controller: screenshotController,
+                    child: Container(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            MedChart(),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            PointsLineChart.withSampleData(),
+                          ],
+                        )),
+                  ),
+                  const SizedBox(height: 120),
+
+                  // Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 20)),
+                    onPressed: () {
+                      screenshotController
+                          .capture(delay: Duration(milliseconds: 10))
+                          .then((Uint8List image) {
+                        setState(() {
+                          getPdf(image);
+                        });
+                      }).catchError((onError) {
+                        print(onError);
+                      });
+                    },
+                    child: const Text('Send'),
+                  ),
+                ],
               ),
-              Spacer(),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    textStyle: const TextStyle(fontSize: 20)),
-                onPressed: () {
-                  screenshotController
-                      .capture(delay: Duration(milliseconds: 10))
-                      .then((Uint8List image) {
-                    setState(() {
-                      getPdf(image);
-                    });
-                  }).catchError((onError) {
-                    print(onError);
-                  });
-                },
-                child: const Text('Send'),
-              ),
-            ],
-          ),
-        ));
+            )
+        )
+    );
   }
 
   Future getPdf(Uint8List screenShot) async {

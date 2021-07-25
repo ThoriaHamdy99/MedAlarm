@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:med_alarm/models/doctor.dart';
 import 'package:med_alarm/models/dose.dart';
@@ -9,6 +11,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class SQLHelper {
   static SQLHelper dbHelper;
@@ -192,6 +195,41 @@ class SQLHelper {
     }
     return false;
   }
+  Future<bool> replaceMedicine(Medicine med) async {
+    Database db = await this.database;
+    var result;
+    String id = med.id == null ? '' : 'id,';
+    String idVal = med.id == null ? '' : '${med.id},';
+    try {
+      result = await db.rawInsert('''REPLACE INTO Medicine(
+        $id name, type, startDate, endDate, medAmount, doseAmount,
+        description, nDoses, startTime, interval, intervalTime, isOn)
+        VALUES(
+        $idVal
+        '${med.medName}',
+        '${med.medType}',
+        '${med.startDate.millisecondsSinceEpoch}',
+        '${med.endDate.millisecondsSinceEpoch}',
+        '${med.medAmount}',
+        '${med.doseAmount}',
+        '${med.description}',
+        '${med.nDoses}',
+        '${med.startTime.millisecondsSinceEpoch}',
+        '${med.interval}',
+        '${med.intervalTime}',
+        '${med.isOn ? 1 : 0}')''');
+      print('+++++++++++++++++++++ From InsertMedicine +++++++++++++++++++++');
+      if(result != null) {
+        print('Medicine Added');
+        return true;
+      }
+    } catch (e) {
+      print(e);
+      throw 'Medicine name already exists';
+      // return false;
+    }
+    return false;
+  }
 
   Future<bool> updateMedicine(Medicine med) async {
     Database db = await this.database;
@@ -279,6 +317,37 @@ class SQLHelper {
       var result = await db.rawQuery('SELECT * FROM Medicine;');
       result.forEach((medicine) => medicines.add(Medicine.fromMap(medicine)));
       return medicines;
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<LinkedHashMap<DateTime,List<Dose>>> getLastWeekDoses(int id) async {
+    Database db = await database;
+    List<Medicine> medicines = [];
+    List<Dose> doses = [];
+    LinkedHashMap<DateTime,List<Dose>> map ;
+    map = LinkedHashMap<DateTime,List<Dose>>(
+      equals: isSameDay,
+    );
+    DateTime current = DateTime.now();
+    DateTime old = DateTime.parse(current.toIso8601String().substring(0,10)).subtract(Duration(seconds: 1));
+     old = DateTime.parse(old.toIso8601String().substring(0,10)).subtract(Duration(days: 7));
+    try {
+      var result = await db.rawQuery('''SELECT * FROM Dose WHERE id = '$id' AND doseTime >= '${old.millisecondsSinceEpoch}' AND doseTime<='${current.millisecondsSinceEpoch}';''');
+      result.forEach((dose) => doses.add(Dose.fromMap(dose)));
+      for(Dose d in doses){
+        if(isSameDay(d.doseTime,old)){
+          if (map[old]==null)map[old]=[];
+          map[old].add(d);
+        }
+        if(old.isBefore(current)){
+          if (map[old]==null)map[old]=[];
+          old = old.add(Duration(days: 1));
+        }
+      }
+      return map;
     } catch (e) {
       print(e);
       throw e;

@@ -29,6 +29,9 @@ void main() async {
     await notification.initialize();
     Alarm.insureAlarmsAreOn();
     WidgetsFlutterBinding.ensureInitialized();
+
+    await SQLHelper.getInstant().insertDummyData();
+    await SQLHelper.getInstant().getLastWeekDoses(97);
   } catch (e) {
     print(e);
   }

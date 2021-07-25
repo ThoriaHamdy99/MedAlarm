@@ -84,13 +84,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
       }
       switch (med.interval) {
         case 'once':
-          if(med.startDate.isAfter(DateTime.now())) {
-            DateTime temp = DateTime.parse(
-                med.startDate.toIso8601String().substring(0, 10));
-            temp = temp.add(Duration(
-                hours: med.startTime.hour,
-                minutes: med.startTime.minute
-            ));
+          DateTime temp = DateTime.parse(
+              med.startDate.toIso8601String().substring(0, 10));
+          temp = temp.add(Duration(
+              hours: med.startTime.hour,
+              minutes: med.startTime.minute
+          ));
+          if(temp.isAfter(DateTime.now())) {
             Medicine m = Medicine.fromMapString(med.toMapString());
             m.startTime = temp;
             if (map[temp] == null) map[temp] = [];
